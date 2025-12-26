@@ -1,4 +1,4 @@
-﻿<html lang="he">
+<html lang="he">
 <head>
 <meta charset="utf-8"/>
 <title>Спряжение глаголов</title>
@@ -232,31 +232,41 @@ document.getElementById("closeHelp").onclick = function() {
 }
 </style>
 <!-- КНОПКИ/КОНТРОЛЫ В ШАПКЕ -->
-<div align="center" style="margin-top:6px;">
-<label for="langSelect" id="labelLang" style="font-weight:bold; font-size:1.1em;">Язык перевода:</label>
-<select id="langSelect">
-<option value="ru">Русский</option>
-<option value="en">English</option>
-<option value="uk">Українська</option>
-</select>
-<button id="toggleExamples" style="margin-left:10px;">Примеры</button>
-<button id="toggleHelp" style="margin-left:10px;">🔊 </button>
-<!-- === Меню сортировки === -->
-<div class="sort-menu" id="sortMenu">
-<button class="sort-trigger" id="sortMenuBtn">Сортировка</button>
-<div class="sort-dropdown" id="sortDropdown">
-<a href="#" id="sortByHe" onclick="sortVerbs('he'); return false;">Сортировать по ивриту</a>
-<a href="#" id="sortByTr" onclick="sortVerbs('tr'); return false;">Сортировать по переводу</a>
-<a href="#" id="sortByTheme" onclick="sortVerbs('theme'); return false;">Сортировать по темам</a>
-</div>
-</div>
-</div>
-<!-- УДАЛЕНО: старые кнопки сортировки
-  <div style="margin-top:8px;">
-    <button onclick="sortVerbs('he')">Сортировать по ивриту</button>
-    <button onclick="sortVerbs('tr')">Сортировать по переводу</button>
+<div id="headerControls" style="margin-top:6px; display:grid; grid-template-columns: 1fr auto 1fr; align-items:center;">
+  <!-- 🏠 На главную -->
+  <div style="justify-self:start;">
+    <a href="index.html" id="homeLink" title="На главную" aria-label="На главную"
+       style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#ffeb3b;border:2px solid #d11;text-decoration:none;color:#000;font-size:22px;line-height:1;">
+      🏠
+    </a>
   </div>
-  -->
+
+  <!-- Центр: язык перевода + кнопки -->
+  <div id="centerControls" style="justify-self:center; display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
+    <label for="langSelect" id="labelLang" style="font-weight:bold; font-size:1.1em;">Язык перевода:</label>
+    <select id="langSelect">
+      <option value="ru">Русский</option>
+      <option value="en">English</option>
+      <option value="uk">Українська</option>
+    </select>
+
+    <button id="toggleExamples">Примеры</button>
+    <button id="toggleHelp">🔊 </button>
+
+    <!-- === Меню сортировки === -->
+    <div class="sort-menu" id="sortMenu">
+      <button class="sort-trigger" id="sortMenuBtn">Сортировка</button>
+      <div class="sort-dropdown" id="sortDropdown">
+        <a href="#" id="sortByHe" onclick="sortVerbs('he'); return false;">Сортировать по ивриту</a>
+        <a href="#" id="sortByTr" onclick="sortVerbs('tr'); return false;">Сортировать по переводу</a>
+        <a href="#" id="sortByTheme" onclick="sortVerbs('theme'); return false;">Сортировать по темам</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Пустая колонка справа, чтобы центр всегда оставался по центру -->
+  <div></div>
+</div>
 <div id="examplesBox" style="display:none;"></div>
 <div id="helpBox" style="display:none; margin:10px auto; padding:10px; border:1px solid #aaa; background:#f5f5f5; width:90%; text-align:left; line-height:1.6;"></div>
 </div>

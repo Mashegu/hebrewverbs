@@ -1,0 +1,968 @@
+﻿<html lang="he">
+<head>
+<meta charset="utf-8"/>
+<title>Спряжение глаголов</title>
+<style>
+body {font-family: David, Arial, sans-serif; font-size: 20px; margin: 20px;}
+#verbsPanel {margin-top: 15px;}
+.verb {cursor: pointer; display: block; margin: 4px 0;}
+button {margin: 3px; padding: 5px 10px;}
+
+body {font-family: David, Arial, sans-serif; font-size: 18px; margin: 10mm 15mm;}
+#layout {display: flex; width: 100%; height: 90vh;}
+#verbsPanel {
+  width: 240px; min-width: 170px; padding: 10px;
+  overflow-y: auto;
+}
+#verbsPanel h3 {margin: 0; text-align: center;}
+.verb {cursor: pointer; display: block; margin: 4px 0; text-align: left; color: #000;}
+.verb.active {background:#ffe0e0; border-radius:4px; padding:2px;}
+.verb:hover {text-decoration: underline;}
+#tablePanel {flex-grow: 1; padding: 10px; margin-left: 8mm; display: flex; flex-direction: column;}
+#topControls {flex: 0 0 auto;}
+#examplesBox {margin-top:10px; text-align:center; font-size:15px; color:#222; line-height:1.6;}
+#examplesBox span.he {font-size:20px; display:inline-block; margin-bottom:2px;}
+#tableWrapper {flex: 1 1 auto; overflow-y: auto; margin-top: 10px;}
+table {border-collapse: collapse; width: 100%;}
+td, th {border: 1px solid #333; padding: 4px; text-align: center; vertical-align: middle;}
+th {background: #f0f0f0;}
+.tense-header {background:#e0f0ff; font-weight:bold; text-align:center;}
+
+/* Кнопка озвучки – как у "Примеры" */
+#toggleHelp {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 6px 14px;
+  line-height:1;
+  font-size:16px;
+  border:1px solid #888;
+  background:#eee;
+  border-radius:4px;
+  vertical-align:middle;
+}
+#toggleHelp .icon {
+  font-size:18px;
+  line-height:1;
+  display:inline-block;
+}
+
+/* --- Обновлённые шрифты и оформление --- */
+#verbsPanel h3, #infHeader {
+  font-weight: bold;
+}
+#examplesBox span.he {
+  font-family: David;
+  font-weight: bold;
+  font-size: 22px;
+}
+
+/* ✅ Увеличенный шрифт времён в блоке “Примеры” */
+#examplesBox .tense-header {
+  font-family: David;
+  font-weight: bold;
+  font-size: 28px; /* было 22px */
+  color: #000;
+  letter-spacing: 1px;
+}
+
+/* Общие таблицы */
+table td.hebrew, table th#thHebrew {
+  font-family: David;
+  font-weight: bold;
+  font-size: 22px;
+}
+
+/* Заголовки времён в таблице */
+.tense-header {
+  font-family: David;
+  font-weight: bold;
+  font-size: 22px;
+}
+
+/* === Новое: выпадающее меню сортировки рядом с иконкой озвучки === */
+.sort-menu {
+  position: relative;
+  display: inline-block;
+  margin-left: 6px;
+}
+.sort-trigger {
+  border:1px solid #888;
+  background:#eee;
+  border-radius:4px;
+  padding:6px 10px;
+  cursor:pointer;
+  font-size:16px;
+  line-height:1;
+}
+.sort-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  min-width: 220px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+.sort-dropdown a {
+  display: block;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: #000;
+  font-size: 16px;
+}
+.sort-dropdown a:hover {
+  background-color: #f0f0f0;
+}
+/* Показываем меню при наведении либо при добавленном классе .open */
+.sort-menu:hover .sort-dropdown,
+.sort-menu.open .sort-dropdown {
+  display: block;
+}
+/* ✨ Анимация и рамка для блока инструкции по озвучке */
+#helpBox {
+  border: 2px solid #6cf !important;
+  box-shadow: 0 0 10px rgba(0, 128, 255, 0.2);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: scale(0.97);
+}
+#helpBox[style*="display: block"] {
+  opacity: 1;
+  transform: scale(1);
+}
+.theme-header {
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+
+</style>
+<script src="tables.js"></script>
+
+<style id="typography-pass">
+/* === Step 1: Typography pass (Hebrew bold David, translations regular) === */
+@font-face {
+  font-family: 'David';
+  font-style: normal;
+  font-weight: 700;
+  src: local('David'), local('David Bold');
+}
+.verb .hebrew{font-family:'David', serif;font-weight:700;font-size:1.22em;letter-spacing:0.02em;direction:rtl;}
+.verb .translation{font-weight:400;}
+</style><style>
+.scroll-table {
+  max-height: 600px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+}
+</style></head>
+<body>
+<div id="layout">
+<div id="verbsPanel">
+<h3 id="infHeader">Инфинитивы</h3>
+<span class="verb active" data-base="קרא" data-en="to read" data-he="לִקְרוֹא" data-ru="читать" data-theme-key="study" data-uk="читати"><span class="hebrew">לִקְרוֹא</span> — <span class="translation">читать</span></span><span class="verb" data-base="רץ" data-en="to run" data-he="לָרוּץ" data-ru="бегать" data-theme-key="body" data-uk="бігати"><span class="hebrew">לָרוּץ</span> — <span class="translation">бегать</span></span><span class="verb" data-base="הודה" data-en="to thank" data-he="לְהוֹדוֹת" data-ru="благодарить" data-theme-key="communication" data-uk="дякувати"><span class="hebrew">לְהוֹדוֹת</span> — <span class="translation">благодарить</span></span><span class="verb" data-base="פחד" data-en="to be afraid" data-he="לִפְחֹד" data-ru="бояться" data-theme-key="emotions" data-uk="боятися"><span class="hebrew">לִפְחֹד</span> — <span class="translation">бояться</span></span><span class="verb" data-base="לקח" data-en="to take" data-he="לָקַחַת" data-ru="брать" data-theme-key="daily" data-uk="брати"><span class="hebrew">לָקַחַת</span> — <span class="translation">брать</span></span><span class="verb" data-base="התגלח" data-en="to shave oneself" data-he="לְהִתְגַּלֵּחַ" data-ru="бриться" data-theme-key="body" data-uk="голитися"><span class="hebrew">לְהִתְגַּלֵּחַ</span> — <span class="translation">бриться</span></span><span class="verb" data-base="זרק" data-en="to throw" data-he="לִזְרוֹק" data-ru="бросать" data-theme-key="movement" data-uk="кидати"><span class="hebrew">לִזְרוֹק</span> — <span class="translation">бросать</span></span><span class="verb" data-base="היה" data-en="to be" data-he="לִהְיוֹת" data-ru="быть" data-theme-key="daily" data-uk="бути"><span class="hebrew">לִהְיוֹת</span> — <span class="translation">быть</span></span><span class="verb" data-base="האמין" data-en="to believe" data-he="לְהַאֱמִין" data-ru="верить" data-theme-key="thinking" data-uk="вірити"><span class="hebrew">לְהַאֱמִין</span> — <span class="translation">верить</span></span><span class="verb" data-base="התנהג" data-en="to behave" data-he="לְהִתְנַהֵג" data-ru="вести себя" data-theme-key="daily" data-uk="поводитися"><span class="hebrew">לְהִתְנַהֵג</span> — <span class="translation">вести себя</span></span><span class="verb" data-base="תלה" data-en="to hang" data-he="לִתְלוֹת" data-ru="вешать" data-theme-key="home" data-uk="вішати"><span class="hebrew">לִתְלוֹת</span> — <span class="translation">вешать</span></span><span class="verb" data-base="ראה" data-en="to see" data-he="לִרְאוֹת" data-ru="видеть" data-theme-key="perception" data-uk="бачити"><span class="hebrew">לִרְאוֹת</span> — <span class="translation">видеть</span></span><span class="verb" data-base="הדליק" data-en="to turn on" data-he="לְהַדְלִיק" data-ru="включать" data-theme-key="home" data-uk="вмикати"><span class="hebrew">לְהַדְלִיק</span> — <span class="translation">включать</span></span><span class="verb" data-base="התאהב" data-en="to fall in love" data-he="לְהִתְאַהֵב" data-ru="влюбляться" data-theme-key="emotions" data-uk="закохуватися"><span class="hebrew">לְהִתְאַהֵב</span> — <span class="translation">влюбляться</span></span><span class="verb" data-base="נהג" data-en="to drive a car" data-he="לִנְהוֹג" data-ru="водить машину" data-theme-key="movement" data-uk="водити машину"><span class="hebrew">לִנְהוֹג</span> — <span class="translation">водить машину</span></span><span class="verb" data-base="חזר" data-en="to return" data-he="לַחְזוֹר" data-ru="возвращаться" data-theme-key="movement" data-uk="повертатися"><span class="hebrew">לַחְזוֹר</span> — <span class="translation">возвращаться</span></span><span class="verb" data-base="נכנס" data-en="to enter" data-he="לִכָּנֵס" data-ru="входить" data-theme-key="movement" data-uk="входити"><span class="hebrew">לִכָּנֵס</span> — <span class="translation">входить</span></span><span class="verb" data-base="ניצח" data-en="to win" data-he="לְנַצֵּחַ" data-ru="выигрывать" data-theme-key="leisure" data-uk="вигравати"><span class="hebrew">לְנַצֵּחַ</span> — <span class="translation">выигрывать</span></span><span class="verb" data-base="הכיר" data-en="to meet, to get acquainted" data-he="לְהַכִּיר" data-ru="знакомиться" data-theme-key="communication" data-uk="знайомитися"><span class="hebrew">לְהַכִּיר</span> — <span class="translation">знакомиться</span></span><span class="verb" data-base="שיחק" data-en="to play" data-he="לְשַׂחֵק" data-ru="играть" data-theme-key="leisure" data-uk="грати"><span class="hebrew">לְשַׂחֵק</span> — <span class="translation">играть</span></span><span class="verb" data-base="הלך" data-en="to go, to walk" data-he="לָלֶכֶת" data-ru="идти" data-theme-key="movement" data-uk="йти"><span class="hebrew">לָלֶכֶת</span> — <span class="translation">идти</span></span><span class="verb" data-base="התעניין" data-en="to be interested in" data-he="לְהִתְעַנְיֵין" data-ru="интересоваться" data-theme-key="thinking" data-uk="цікавитися"><span class="hebrew">לְהִתְעַנְיֵין</span> — <span class="translation">интересоваться</span></span><span class="verb" data-base="חיפש" data-en="to search, to look for" data-he="לְחַפֵּשׂ" data-ru="искать" data-theme-key="thinking" data-uk="шукати"><span class="hebrew">לְחַפֵּשׂ</span> — <span class="translation">искать</span></span><span class="verb" data-base="השתמש" data-en="to use" data-he="לְהִשְׁתַּמֵּשׁ" data-ru="использовать" data-theme-key="work" data-uk="використовувати"><span class="hebrew">לְהִשְׁתַּמֵּשׁ</span> — <span class="translation">использовать</span></span><span class="verb" data-base="שם" data-en="to put" data-he="לָשִׂים" data-ru="класть" data-theme-key="daily" data-uk="класти"><span class="hebrew">לָשִׂים</span> — <span class="translation">класть</span></span><span class="verb" data-base="צבע" data-en="to paint (walls, furniture)" data-he="לִצְבּוֹעַ" data-ru="красить (стены, мебель)" data-theme-key="home" data-uk="фарбувати (стіни, меблі)"><span class="hebrew">לִצְבּוֹעַ</span> — <span class="translation">красить (стены, мебель)</span></span><span class="verb" data-base="צעק" data-en="to shout, to yell" data-he="לִצְעוֹק" data-ru="кричать" data-theme-key="emotions" data-uk="кричати"><span class="hebrew">לִצְעוֹק</span> — <span class="translation">кричать</span></span><span class="verb" data-base="שכב" data-en="to lie down" data-he="לִשְׁכַּב" data-ru="лежать" data-theme-key="body" data-uk="лежати"><span class="hebrew">לִשְׁכַּב</span> — <span class="translation">лежать</span></span><span class="verb" data-base="תפס" data-en="to catch" data-he="לִתְפּוֹס" data-ru="ловить" data-theme-key="movement" data-uk="ловити"><span class="hebrew">לִתְפּוֹס</span> — <span class="translation">ловить</span></span><span class="verb" data-base="שבר" data-en="to break" data-he="לִשְׁבּוֹר" data-ru="ломать" data-theme-key="body" data-uk="ламати"><span class="hebrew">לִשְׁבּוֹר</span> — <span class="translation">ломать</span></span><span class="verb" data-base="לבש" data-en="to wear, to put on" data-he="לִלְבּוֹשׁ" data-ru="надевать" data-theme-key="body" data-uk="одягати"><span class="hebrew">לִלְבּוֹשׁ</span> — <span class="translation">надевать</span></span><span class="verb" data-base="הזכיר" data-en="to remind" data-he="לְהַזְכִּיר" data-ru="напоминать" data-theme-key="thinking" data-uk="нагадувати"><span class="hebrew">לְהַזְכִּיר</span> — <span class="translation">напоминать</span></span><span class="verb" data-base="התחיל" data-en="to begin, to start" data-he="לְהַתְחִיל" data-ru="начинать" data-theme-key="work" data-uk="починати"><span class="hebrew">לְהַתְחִיל</span> — <span class="translation">начинать</span></span><span class="verb" data-base="הריח" data-en="to smell" data-he="לְהָרִיחַ" data-ru="нюхать" data-theme-key="perception" data-uk="нюхати"><span class="hebrew">לְהָרִיחַ</span> — <span class="translation">нюхать</span></span><span class="verb" data-base="הבטיח" data-en="to promise" data-he="לְהַבְטִיחַ" data-ru="обещать" data-theme-key="communication" data-uk="обіцяти"><span class="hebrew">לְהַבְטִיחַ</span> — <span class="translation">обещать</span></span><span class="verb" data-base="פגע" data-en="to offend, to hurt" data-he="לִפְגוֹעַ" data-ru="обижать, ранить" data-theme-key="emotions" data-uk="ображати, ранити"><span class="hebrew">לִפְגוֹעַ</span> — <span class="translation">обижать, ранить</span></span><span class="verb" data-base="חיבק" data-en="to hug" data-he="לְחַבֵּק" data-ru="обнимать" data-theme-key="emotions" data-uk="обіймати"><span class="hebrew">לְחַבֵּק</span> — <span class="translation">обнимать</span></span><span class="verb" data-base="התלבש" data-en="to get dressed" data-he="לְהִתְלַבֵּשׁ" data-ru="одеваться" data-theme-key="body" data-uk="одягатися"><span class="hebrew">לְהִתְלַבֵּשׁ</span> — <span class="translation">одеваться</span></span><span class="verb" data-base="נשאר" data-en="to stay, to remain" data-he="לְהִשָּׁאֵר" data-ru="оставаться" data-theme-key="daily" data-uk="залишатися"><span class="hebrew">לְהִשָּׁאֵר</span> — <span class="translation">оставаться</span></span><span class="verb" data-base="עצור" data-en="to stop" data-he="לַעֲצוֹר" data-ru="останавливаться, остановить" data-theme-key="movement" data-uk="зупинятися, зупинити"><span class="hebrew">לַעֲצוֹר</span> — <span class="translation">останавливаться, остановить</span></span><span class="verb" data-base="ענה" data-en="to answer, to reply" data-he="לַעֲנוֹת" data-ru="отвечать" data-theme-key="communication" data-uk="відповідати"><span class="hebrew">לַעֲנוֹת</span> — <span class="translation">отвечать</span></span><span class="verb" data-base="נח" data-en="to rest" data-he="לָנוּחַ" data-ru="отдыхать" data-theme-key="leisure" data-uk="відпочивати"><span class="hebrew">לָנוּחַ</span> — <span class="translation">отдыхать</span></span><span class="verb" data-base="פתח" data-en="to open" data-he="לִפְתּוֹחַ" data-ru="открывать" data-theme-key="daily" data-uk="відкривати"><span class="hebrew">לִפְתּוֹחַ</span> — <span class="translation">открывать</span></span><span class="verb" data-base="העריך" data-en="to appreciate, to value" data-he="לְהַעֲרִיךְ" data-ru="оценивать, ценить" data-theme-key="thinking" data-uk="цінувати, оцінювати"><span class="hebrew">לְהַעֲרִיךְ</span> — <span class="translation">оценивать, ценить</span></span><span class="verb" data-base="נפל" data-en="to fall" data-he="לִפּוֹל" data-ru="падать" data-theme-key="movement" data-uk="падати"><span class="hebrew">לִפּוֹל</span> — <span class="translation">падать</span></span><span class="verb" data-base="כתב" data-en="to write" data-he="לִכְתּוֹב" data-ru="писать" data-theme-key="study" data-uk="писати"><span class="hebrew">לִכְתּוֹב</span> — <span class="translation">писать</span></span><span class="verb" data-base="שחה" data-en="to swim" data-he="לִשְׂחוֹת" data-ru="плавать" data-theme-key="leisure" data-uk="плавати"><span class="hebrew">לִשְׂחוֹת</span> — <span class="translation">плавать</span></span><span class="verb" data-base="בכה" data-en="to cry" data-he="לִבְכּוֹת" data-ru="плакать" data-theme-key="emotions" data-uk="плакати"><span class="hebrew">לִבְכּוֹת</span> — <span class="translation">плакать</span></span><span class="verb" data-base="שלם" data-en="to pay" data-he="לְשַׁלֵּם" data-ru="платить" data-theme-key="daily" data-uk="платити"><span class="hebrew">לְשַׁלֵּם</span> — <span class="translation">платить</span></span><span class="verb" data-base="הרים" data-en="to lift, to raise" data-he="לְהָרִים" data-ru="поднимать" data-theme-key="body" data-uk="піднімати"><span class="hebrew">לְהָרִים</span> — <span class="translation">поднимать</span></span><span class="verb" data-base="עלה" data-en="to go up, to ascend" data-he="לַעֲלוֹת" data-ru="подниматься" data-theme-key="movement" data-uk="підніматися"><span class="hebrew">לַעֲלוֹת</span> — <span class="translation">подниматься</span></span><span class="verb" data-base="קנה" data-en="to buy" data-he="לִקְנוֹת" data-ru="покупать" data-theme-key="daily" data-uk="купувати"><span class="hebrew">לִקְנוֹת</span> — <span class="translation">покупать</span></span><span class="verb" data-base="הניח" data-en="to put down, to lay" data-he="לְהָנִיחַ" data-ru="положить" data-theme-key="home" data-uk="покласти"><span class="hebrew">לְהָנִיחַ</span> — <span class="translation">положить</span></span><span class="verb" data-base="עזר" data-en="to help" data-he="לַעֲזוֹר" data-ru="помогать" data-theme-key="communication" data-uk="допомагати"><span class="hebrew">לַעֲזוֹר</span> — <span class="translation">помогать</span></span><span class="verb" data-base="הבין" data-en="to understand" data-he="לְהַבִּין" data-ru="понимать" data-theme-key="study" data-uk="розуміти"><span class="hebrew">לְהַבִּין</span> — <span class="translation">понимать</span></span><span class="verb" data-base="צם" data-en="to fast" data-he="לָצוּם" data-ru="поститься" data-theme-key="body" data-uk="постити"><span class="hebrew">לָצוּם</span> — <span class="translation">поститься</span></span><span class="verb" data-base="שלח" data-en="to send" data-he="לִשְׁלוֹחַ" data-ru="посылать" data-theme-key="communication" data-uk="надсилати"><span class="hebrew">לִשְׁלוֹחַ</span> — <span class="translation">посылать</span></span><span class="verb" data-base="הציע" data-en="to offer, to propose" data-he="לְהַצִּיעַ" data-ru="предлагать" data-theme-key="communication" data-uk="пропонувати"><span class="hebrew">לְהַצִּיעַ</span> — <span class="translation">предлагать</span></span><span class="verb" data-base="הפסיק" data-en="to stop, to cease" data-he="לְהַפְסִיק" data-ru="прекращать, останавливаться" data-theme-key="work" data-uk="припиняти, зупинятися"><span class="hebrew">לְהַפְסִיק</span> — <span class="translation">прекращать, останавливаться</span></span><span class="verb" data-base="הגיע" data-en="to arrive, to come" data-he="לְהַגִּיעַ" data-ru="прибывать, приходить" data-theme-key="movement" data-uk="прибувати, приходити"><span class="hebrew">לְהַגִּיעַ</span> — <span class="translation">прибывать, приходить</span></span><span class="verb" data-base="סידר" data-en="to tidy up, to arrange" data-he="לְסַדֵּר" data-ru="приводить в порядок, убирать" data-theme-key="home" data-uk="прибирати, впорядковувати"><span class="hebrew">לְסַדֵּר</span> — <span class="translation">приводить в порядок, убирать</span></span><span class="verb" data-base="בא" data-en="to come" data-he="לָבוֹא" data-ru="приходить" data-theme-key="movement" data-uk="приходити"><span class="hebrew">לָבוֹא</span> — <span class="translation">приходить</span></span><span class="verb" data-base="טעם" data-en="to taste" data-he="לִטְעוֹם" data-ru="пробовать (на вкус)" data-theme-key="perception" data-uk="пробувати (на смак)"><span class="hebrew">לִטְעוֹם</span> — <span class="translation">пробовать (на вкус)</span></span><span class="verb" data-base="מכר" data-en="to sell" data-he="לִמְכּוֹר" data-ru="продавать" data-theme-key="daily" data-uk="продавати"><span class="hebrew">לִמְכּוֹר</span> — <span class="translation">продавать</span></span><span class="verb" data-base="המשיך" data-en="to continue" data-he="לְהַמְשִׁיךְ" data-ru="продолжать" data-theme-key="work" data-uk="продовжувати"><span class="hebrew">לְהַמְשִׁיךְ</span> — <span class="translation">продолжать</span></span><span class="verb" data-base="הפסיד" data-en="to lose (a game)" data-he="לְהַפְסִיד" data-ru="проигрывать (в игре)" data-theme-key="leisure" data-uk="програвати (в грі)"><span class="hebrew">לְהַפְסִיד</span> — <span class="translation">проигрывать (в игре)</span></span><span class="verb" data-base="ביקש" data-en="to ask, to request" data-he="לְבַקֵּשׁ" data-ru="просить" data-theme-key="communication" data-uk="просити"><span class="hebrew">לְבַקֵּשׁ</span> — <span class="translation">просить</span></span><span class="verb" data-base="הצטנן" data-en="to catch a cold" data-he="לְהִצְטַנֵּן" data-ru="простужаться" data-theme-key="body" data-uk="застуджуватися"><span class="hebrew">לְהִצְטַנֵּן</span> — <span class="translation">простужаться</span></span><span class="verb" data-base="התעורר" data-en="to wake up" data-he="לְהִתְעוֹרֵר" data-ru="просыпаться" data-theme-key="daily" data-uk="прокидатися"><span class="hebrew">לְהִתְעוֹרֵר</span> — <span class="translation">просыпаться</span></span><span class="verb" data-base="נבהל" data-en="to be frightened" data-he="לְהִבָּהֵל" data-ru="пугаться" data-theme-key="emotions" data-uk="лякатися"><span class="hebrew">לְהִבָּהֵל</span> — <span class="translation">пугаться</span></span><span class="verb" data-base="טייל" data-en="to travel, to walk" data-he="לְטַיֵּל" data-ru="путешествовать, гулять" data-theme-key="leisure" data-uk="подорожувати, гуляти"><span class="hebrew">לְטַיֵּל</span> — <span class="translation">путешествовать, гулять</span></span><span class="verb" data-base="ניסה" data-en="to try, to attempt" data-he="לְנַסּוֹת" data-ru="пытаться, пробовать" data-theme-key="thinking" data-uk="намагатися, пробувати"><span class="hebrew">לְנַסּוֹת</span> — <span class="translation">пытаться, пробовать</span></span><span class="verb" data-base="עבד" data-en="to work" data-he="לַעֲבוֹד" data-ru="работать" data-theme-key="work" data-uk="працювати"><span class="hebrew">לַעֲבוֹד</span> — <span class="translation">работать</span></span><span class="verb" data-base="שמח" data-en="to rejoice, to be glad" data-he="לִשְׂמוֹחַ" data-ru="радоваться" data-theme-key="emotions" data-uk="радіти"><span class="hebrew">לִשְׂמוֹחַ</span> — <span class="translation">радоваться</span></span><span class="verb" data-base="התעצבן" data-en="to get angry, to be irritated" data-he="לְהִתְעַצְבֵּן" data-ru="раздражаться, злиться" data-theme-key="emotions" data-uk="дратуватися, сердитися"><span class="hebrew">לְהִתְעַצְבֵּן</span> — <span class="translation">раздражаться, злиться</span></span><span class="verb" data-base="התמתח" data-en="to stretch, to warm up" data-he="לְהִתְמַתֵּחַ" data-ru="разминаться, растягиваться" data-theme-key="sport" data-uk="розтягуватися, розминатися"><span class="hebrew">לְהִתְמַתֵּחַ</span> — <span class="translation">разминаться, растягиваться</span></span><span class="verb" data-base="התאכזב" data-en="to be disappointed" data-he="לְהִתְאַכְזֵב" data-ru="разочаровываться" data-theme-key="emotions" data-uk="розчаровуватися"><span class="hebrew">לְהִתְאַכְזֵב</span> — <span class="translation">разочаровываться</span></span><span class="verb" data-base="סיפר" data-en="to tell, to narrate" data-he="לְסַפֵּר" data-ru="рассказывать" data-theme-key="communication" data-uk="розповідати"><span class="hebrew">לְסַפֵּר</span> — <span class="translation">рассказывать</span></span><span class="verb" data-base="נרגע" data-en="to relax, to calm down" data-he="לְהִרָגַע" data-ru="расслабляться, успокаиваться" data-theme-key="body" data-uk="розслаблятися, заспокоюватися"><span class="hebrew">לְהִרָגַע</span> — <span class="translation">расслабляться, успокаиваться</span></span><span class="verb" data-base="החליט" data-en="to decide, to make a decision" data-he="לְהַחְלִיט" data-ru="решать, принимать решение" data-theme-key="thinking" data-uk="вирішувати, приймати рішення"><span class="hebrew">לְהַחְלִיט</span> — <span class="translation">решать, принимать решение</span></span><span class="verb" data-base="ישב" data-en="to sit" data-he="לָשֶׁבֶת" data-ru="сидеть" data-theme-key="body" data-uk="сидіти"><span class="hebrew">לָשֶׁבֶת</span> — <span class="translation">сидеть</span></span><span class="verb" data-base="אמר" data-en="to say, to tell" data-he="לוֹמַר" data-ru="сказать" data-theme-key="communication" data-uk="сказати"><span class="hebrew">לוֹמַר</span> — <span class="translation">сказать</span></span><span class="verb" data-base="הקשיב" data-en="to listen carefully" data-he="לְהַקְשִׁיב" data-ru="слушать внимательно" data-theme-key="perception" data-uk="уважно слухати"><span class="hebrew">לְהַקְשִׁיב</span> — <span class="translation">слушать внимательно</span></span><span class="verb" data-base="שמע" data-en="to hear" data-he="לִשְׁמוֹעַ" data-ru="слышать" data-theme-key="perception" data-uk="чути"><span class="hebrew">לִשְׁמוֹעַ</span> — <span class="translation">слышать</span></span><span class="verb" data-base="צחק" data-en="to laugh" data-he="לִצְחוֹק" data-ru="смеяться" data-theme-key="emotions" data-uk="сміятися"><span class="hebrew">לִצְחוֹק</span> — <span class="translation">смеяться</span></span><span class="verb" data-base="צפה" data-en="to watch (a movie)" data-he="לִצְפּוֹת" data-ru="смотреть (фильм)" data-theme-key="leisure" data-uk="дивитися (фільм)"><span class="hebrew">לִצְפּוֹת</span> — <span class="translation">смотреть (фильм)</span></span><span class="verb" data-base="שמר" data-en="to keep, to protect" data-he="לִשְׁמוֹר" data-ru="сохранять, беречь" data-theme-key="daily" data-uk="зберігати, берегти"><span class="hebrew">לִשְׁמוֹר</span> — <span class="translation">сохранять, беречь</span></span><span class="verb" data-base="חשב" data-en="to think" data-he="לַחְשׁוֹב" data-ru="думать" data-theme-key="thinking" data-uk="думати"><span class="hebrew">לַחְשׁוֹב</span> — <span class="translation">думать</span></span><span class="verb" data-base="שאל" data-en="to ask (a question)" data-he="לִשְׁאוֹל" data-ru="спрашивать" data-theme-key="communication" data-uk="запитувати"><span class="hebrew">לִשְׁאוֹל</span> — <span class="translation">спрашивать</span></span><span class="verb" data-base="יצא" data-en="to go out, to exit" data-he="לָצֵאת" data-ru="выходить" data-theme-key="movement" data-uk="виходити"><span class="hebrew">לָצֵאת</span> — <span class="translation">выходить</span></span><span class="verb" data-base="רצה" data-en="to want" data-he="לִרְצוֹת" data-ru="хотеть" data-theme-key="feelings" data-uk="хотіти"><span class="hebrew">לִרְצוֹת</span> — <span class="translation">хотеть</span></span><span class="verb" data-base="הרגיש" data-en="to feel, to sense" data-he="לְהַרְגִּישׁ" data-ru="чувствовать, ощущать" data-theme-key="perception" data-uk="відчувати, почувати"><span class="hebrew">לְהַרְגִּישׁ</span> — <span class="translation">чувствовать, ощущать</span></span><span class="verb" data-base="הסתכל" data-en="to look, to observe" data-he="לְהִסְתַּכֵּל" data-ru="смотреть, наблюдать" data-theme-key="perception" data-uk="дивитися, спостерігати"><span class="hebrew">לְהִסְתַּכֵּל</span> — <span class="translation">смотреть, наблюдать</span></span><span class="verb" data-base="נגע" data-en="to touch" data-he="לָגַעַת" data-ru="трогать, касаться" data-theme-key="perception" data-uk="торкатися"><span class="hebrew">לָגַעַת</span> — <span class="translation">трогать, касаться</span></span><span class="verb" data-base="ידע" data-en="to know" data-he="לָדַעַת" data-ru="знать" data-theme-key="study" data-uk="знати"><span class="hebrew">לָדַעַת</span> — <span class="translation">знать</span></span><span class="verb" data-base="זכר" data-en="to remember" data-he="לִזְכּוֹר" data-ru="помнить" data-theme-key="thinking" data-uk="пам’ятати"><span class="hebrew">לִזְכּוֹר</span> — <span class="translation">помнить</span></span><span class="verb" data-base="שכח" data-en="to forget" data-he="לִשְׁכּוֹחַ" data-ru="забывать" data-theme-key="thinking" data-uk="забувати"><span class="hebrew">לִשְׁכּוֹחַ</span> — <span class="translation">забывать</span></span><span class="verb" data-base="הסכים" data-en="to agree" data-he="לְהַסְכִּים" data-ru="соглашаться, быть согласным" data-theme-key="thinking" data-uk="погоджуватися"><span class="hebrew">לְהַסְכִּים</span> — <span class="translation">соглашаться, быть согласным</span></span><span class="verb" data-base="התמקד" data-en="to focus, to concentrate" data-he="לְהִתְמַקֵּד" data-ru="сосредотачиваться, концентрироваться" data-theme-key="thinking" data-uk="зосереджуватися, концентруватися"><span class="hebrew">לְהִתְמַקֵּד</span> — <span class="translation">сосредотачиваться, концентрироваться</span></span><span class="verb" data-base="אהב" data-en="to love" data-he="לֶאֱהוֹב" data-ru="любить" data-theme-key="emotions" data-uk="любити"><span class="hebrew">לֶאֱהוֹב</span> — <span class="translation">любить</span></span><span class="verb" data-base="כעס" data-en="to be angry" data-he="לִכְעוֹס" data-ru="злиться" data-theme-key="emotions" data-uk="сердитися"><span class="hebrew">לִכְעוֹס</span> — <span class="translation">злиться</span></span><span class="verb" data-base="התרגש" data-en="to get excited, to be moved" data-he="לְהִתְרַגֵּשׁ" data-ru="волноваться" data-theme-key="emotions" data-uk="хвилюватися"><span class="hebrew">לְהִתְרַגֵּשׁ</span> — <span class="translation">волноваться</span></span><span class="verb" data-base="התפלא" data-en="to be surprised" data-he="לְהִתְפַּלֵּא" data-ru="удивляться" data-theme-key="emotions" data-uk="дивуватися"><span class="hebrew">לְהִתְפַּלֵּא</span> — <span class="translation">удивляться</span></span><span class="verb" data-base="הצטער" data-en="to regret, to be sorry" data-he="לְהִצְטַעֵר" data-ru="сожалеть, огорчаться" data-theme-key="emotions" data-uk="шкодувати, засмучуватися"><span class="hebrew">לְהִצְטַעֵר</span> — <span class="translation">сожалеть, огорчаться</span></span><span class="verb" data-base="התרגז" data-en="to get angry, to be irritated" data-he="לְהִתְרַגֵּז" data-ru="злиться, раздражаться" data-theme-key="emotions" data-uk="злитися, дратуватися"><span class="hebrew">לְהִתְרַגֵּז</span> — <span class="translation">злиться, раздражаться</span></span><span class="verb" data-base="חייך" data-en="to smile" data-he="לְחַיֵּךְ" data-ru="улыбаться" data-theme-key="emotions" data-uk="усміхатися"><span class="hebrew">לְחַיֵּךְ</span> — <span class="translation">улыбаться</span></span><span class="verb" data-base="התבייש" data-en="to be ashamed, to feel shy" data-he="לְהִתְבַּיֵּשׁ" data-ru="стыдиться, смущаться" data-theme-key="emotions" data-uk="соромитися, ніяковіти"><span class="hebrew">לְהִתְבַּיֵּשׁ</span> — <span class="translation">стыдиться, смущаться</span></span><span class="verb" data-base="כיבד" data-en="to respect" data-he="לְכַבֵּד" data-ru="уважать" data-theme-key="emotions" data-uk="поважати"><span class="hebrew">לְכַבֵּד</span> — <span class="translation">уважать</span></span><span class="verb" data-base="נשק" data-en="to kiss" data-he="לְנַשֵּׁק" data-ru="целовать" data-theme-key="emotions" data-uk="цілувати"><span class="hebrew">לְנַשֵּׁק</span> — <span class="translation">целовать</span></span><span class="verb" data-base="הכניס" data-en="to insert, to put inside" data-he="לְהַכְנִיס" data-ru="вставлять, помещать внутрь" data-theme-key="home" data-uk="вставляти, поміщати всередину"><span class="hebrew">לְהַכְנִיס</span> — <span class="translation">вставлять, помещать внутрь</span></span><span class="verb" data-base="הוציא" data-en="to take out" data-he="לְהוֹצִיא" data-ru="вынимать" data-theme-key="home" data-uk="виймати"><span class="hebrew">לְהוֹצִיא</span> — <span class="translation">вынимать</span></span><span class="verb" data-base="שפך" data-en="to spill, to pour out" data-he="לִשְׁפּוֹךְ" data-ru="проливать, выливать" data-theme-key="home" data-uk="проливати, виливати"><span class="hebrew">לִשְׁפּוֹךְ</span> — <span class="translation">проливать, выливать</span></span><span class="verb" data-base="החזיר" data-en="to return, to put back" data-he="לְהַחְזִיר" data-ru="возвращать на место" data-theme-key="home" data-uk="повертати на місце"><span class="hebrew">לְהַחְזִיר</span> — <span class="translation">возвращать на место</span></span><span class="verb" data-base="קפל" data-en="to fold" data-he="לִקְפּוֹל" data-ru="складывать" data-theme-key="home" data-uk="складати"><span class="hebrew">לִקְפּוֹל</span> — <span class="translation">складывать</span></span><span class="verb" data-base="פרק" data-en="to dismantle, to take apart" data-he="לְפַרֵּק" data-ru="разбирать" data-theme-key="home" data-uk="розбирати"><span class="hebrew">לְפַרֵּק</span> — <span class="translation">разбирать</span></span><span class="verb" data-base="הרכיב" data-en="to assemble" data-he="לְהַרְכִּיב" data-ru="собирать (мебель, конструкцию)" data-theme-key="home" data-uk="збирати (меблі, конструкцію)"><span class="hebrew">לְהַרְכִּיב</span> — <span class="translation">собирать</span></span><span class="verb" data-base="נקה" data-en="to clean" data-he="לְנַקּוֹת" data-ru="чистить, убирать" data-theme-key="home" data-uk="прибирати"><span class="hebrew">לְנַקּוֹת</span> — <span class="translation">чистить, убирать</span></span><span class="verb" data-base="שאף" data-en="to vacuum" data-he="לְשָׁאֵב" data-ru="пылесосить" data-theme-key="home" data-uk="пилососити"><span class="hebrew">לְשָׁאֵב</span> — <span class="translation">пылесосить</span></span><span class="verb" data-base="שטף" data-en="to wash (floor/dishes)" data-he="לִשְׁטוֹף" data-ru="мыть (пол, посуду)" data-theme-key="home" data-uk="мити (підлогу, посуд)"><span class="hebrew">לִשְׁטוֹף</span> — <span class="translation">мыть (пол, посуду)</span></span><span class="verb" data-base="בישל" data-en="to cook" data-he="לְבַשֵּׁל" data-ru="готовить (еду)" data-theme-key="home" data-uk="готувати"><span class="hebrew">לְבַשֵּׁל</span> — <span class="translation">готовить</span></span><span class="verb" data-base="אפה" data-en="to bake" data-he="לֶאֱפוֹת" data-ru="печь (выпечку)" data-theme-key="home" data-uk="пекти"><span class="hebrew">לֶאֱפוֹת</span> — <span class="translation">печь</span></span><span class="verb" data-base="גיהץ" data-en="to iron" data-he="לְגָהֵץ" data-ru="гладить (одежду)" data-theme-key="home" data-uk="прасувати"><span class="hebrew">לְגָהֵץ</span> — <span class="translation">гладить</span></span><span class="verb" data-base="תפר" data-en="to sew" data-he="לִתְפּוֹר" data-ru="шить" data-theme-key="home" data-uk="шити"><span class="hebrew">לִתְפּוֹר</span> — <span class="translation">шить</span></span><span class="verb" data-base="מדד" data-en="to measure" data-he="לְמַדֵּד" data-ru="измерять" data-theme-key="home" data-uk="вимірювати"><span class="hebrew">לְמַדֵּד</span> — <span class="translation">измерять</span></span><span class="verb" data-base="תלה" data-en="to hang clothes" data-he="לִתְלוֹת" data-ru="вешать (одежду)" data-theme-key="home" data-uk="вішати (одяг)"><span class="hebrew">לִתְלוֹת</span> — <span class="translation">вешать (одежду)</span></span><span class="verb" data-base="קילף" data-en="to peel" data-he="לְקַלֵּף" data-ru="чистить (картошку, овощи)" data-theme-key="home" data-uk="чистити (овочі)"><span class="hebrew">לְקַלֵּף</span> — <span class="translation">чистить овощи</span></span><span class="verb" data-base="תאם" data-en="to coordinate" data-he="לְתַאֵם" data-ru="координировать" data-theme-key="work" data-uk="координувати"><span class="hebrew">לְתַאֵם</span> — <span class="translation">координировать</span></span><span class="verb" data-base="נהל" data-en="to manage" data-he="לְנַהֵל" data-ru="управлять, руководить" data-theme-key="work" data-uk="керувати"><span class="hebrew">לְנַהֵל</span> — <span class="translation">управлять</span></span><span class="verb" data-base="ארגן" data-en="to organize" data-he="לְאַרְגֵּן" data-ru="организовывать" data-theme-key="work" data-uk="організовувати"><span class="hebrew">לְאַרְגֵּן</span> — <span class="translation">организовывать</span></span><span class="verb" data-base="סיכם" data-en="to summarize" data-he="לְסַכֵּם" data-ru="подводить итог, суммировать" data-theme-key="work" data-uk="підсумовувати"><span class="hebrew">לְסַכֵּם</span> — <span class="translation">подводить итог</span></span><span class="verb" data-base="תיעד" data-en="to document" data-he="לְתַעֵד" data-ru="документировать" data-theme-key="work" data-uk="документувати"><span class="hebrew">לְתַעֵד</span> — <span class="translation">документировать</span></span><span class="verb" data-base="עדכן" data-en="to update" data-he="לְעַדְכֵּן" data-ru="обновлять (информацию)" data-theme-key="work" data-uk="оновлювати"><span class="hebrew">לְעַדְכֵּן</span> — <span class="translation">обновлять</span></span><span class="verb" data-base="חתם" data-en="to sign" data-he="לַחְתּוֹם" data-ru="подписывать" data-theme-key="work" data-uk="підписувати"><span class="hebrew">לַחְתּוֹם</span> — <span class="translation">подписывать</span></span><span class="verb" data-base="תזמן" data-en="to schedule" data-he="לְתַזְמֵן" data-ru="планировать время, ставить в расписание" data-theme-key="work" data-uk="планувати час"><span class="hebrew">לְתַזְמֵן</span> — <span class="translation">назначать время</span></span><span class="verb" data-base="קידם" data-en="to promote, to advance" data-he="לְקַדֵּם" data-ru="продвигать, развивать" data-theme-key="work" data-uk="просувати"><span class="hebrew">לְקַדֵּם</span> — <span class="translation">продвигать</span></span><span class="verb" data-base="בדק" data-en="to check, to inspect" data-he="לִבְדּוֹק" data-ru="проверять" data-theme-key="work" data-uk="перевіряти"><span class="hebrew">לִבְדּוֹק</span> — <span class="translation">проверять</span></span><span class="verb" data-base="תרגל" data-en="to practice" data-he="לְתַרְגֵּל" data-ru="тренироваться, выполнять упражнения" data-theme-key="study" data-uk="тренуватися, виконувати вправи"><span class="hebrew">לְתַרְגֵּל</span> — <span class="translation">тренироваться</span></span><span class="verb" data-base="שנן" data-en="to memorize" data-he="לְשַׁנֵּן" data-ru="зубрить, заучивать" data-theme-key="study" data-uk="зубрити, завчати"><span class="hebrew">לְשַׁנֵּן</span> — <span class="translation">заучивать</span></span><span class="verb" data-base="פתר" data-en="to solve (exercise)" data-he="לִפְתּוֹר" data-ru="решать (задачу)" data-theme-key="study" data-uk="розв’язувати (завдання)"><span class="hebrew">לִפְתּוֹר</span> — <span class="translation">решать (задачу)</span></span><span class="verb" data-base="תחקר" data-en="to investigate, to research" data-he="לְתַחְקֵר" data-ru="исследовать, изучать" data-theme-key="study" data-uk="досліджувати"><span class="hebrew">לְתַחְקֵר</span> — <span class="translation">исследовать</span></span><span class="verb" data-base="סקר" data-en="to survey, to overview" data-he="לְסַקֵּר" data-ru="делать обзор, изучать" data-theme-key="study" data-uk="оглядати, вивчати"><span class="hebrew">לְסַקֵּר</span> — <span class="translation">делать обзор</span></span><span class="verb" data-base="רשם" data-en="to write down, to note" data-he="לִרְשׁוֹם" data-ru="записывать" data-theme-key="study" data-uk="записувати"><span class="hebrew">לִרְשׁוֹם</span> — <span class="translation">записывать</span></span><span class="verb" data-base="סימן" data-en="to mark, highlight" data-he="לְסַמֵּן" data-ru="отмечать, выделять" data-theme-key="study" data-uk="позначати"><span class="hebrew">לְסַמֵּן</span> — <span class="translation">отмечать</span></span><span class="verb" data-base="ארגן" data-en="to arrange, to organize notes" data-he="לְאַרְגֵּן" data-ru="упорядочивать, организовывать" data-theme-key="study" data-uk="упорядковувати"><span class="hebrew">לְאַרְגֵּן</span> — <span class="translation">упорядочивать</span></span><span class="verb" data-base="סדר" data-en="to organize material" data-he="לְסַדֵּר חוֹמֶר" data-ru="систематизировать материал" data-theme-key="study" data-uk="систематизувати матеріал"><span class="hebrew">לְסַדֵּר חוֹמֶר</span> — <span class="translation">систематизировать материал</span></span><span class="verb" data-base="דפדף" data-en="to flip through" data-he="לְדַפְדֵּף" data-ru="листать (книгу)" data-theme-key="study" data-uk="гортати"><span class="hebrew">לְדַפְדֵּף</span> — <span class="translation">листать</span></span><span class="verb" data-base="הרצה" data-en="to give a lecture" data-he="לְהַרְצוֹת" data-ru="читать лекцию" data-theme-key="study" data-uk="читати лекцію"><span class="hebrew">לְהַרְצוֹת</span> — <span class="translation">читать лекцию</span></span><span class="verb" data-base="סיכם" data-en="to summarize text" data-he="לְסַכֵּם" data-ru="суммировать, составлять конспект" data-theme-key="study" data-uk="підсумовувати"><span class="hebrew">לְסַכֵּם</span> — <span class="translation">суммировать</span></span><span class="verb" data-base="הדגים" data-en="to demonstrate" data-he="לְהַדְגִּים" data-ru="демонстрировать" data-theme-key="study" data-uk="демонструвати"><span class="hebrew">לְהַדְגִּים</span> — <span class="translation">демонстрировать</span></span><span class="verb" data-base="הקשה" data-en="to make something difficult" data-he="לְהַקְשׁוֹת" data-ru="усложнять" data-theme-key="study" data-uk="ускладнювати"><span class="hebrew">לְהַקְשׁוֹת</span> — <span class="translation">усложнять</span></span><span class="verb" data-base="שחזר" data-en="to reconstruct (information)" data-he="לְשַׁחְזֵר" data-ru="воссоздавать, восстанавливать" data-theme-key="study" data-uk="відтворювати"><span class="hebrew">לְשַׁחְזֵר</span> — <span class="translation">воссоздавать</span></span><span class="verb" data-base="שאל" data-en="to borrow (a book)" data-he="לִשְׁאֹל סֵפֶר" data-ru="брать книгу на время" data-theme-key="study" data-uk="позичати книгу"><span class="hebrew">לִשְׁאֹל סֵפֶר</span> — <span class="translation">брать книгу</span></span><span class="verb" data-base="השאיל" data-en="to lend (a book)" data-he="לְהַשְׁאִיל" data-ru="давать книгу взаймы" data-theme-key="study" data-uk="позичати (комусь)"><span class="hebrew">לְהַשְׁאִיל</span> — <span class="translation">давать книгу</span></span><span class="verb" data-base="פחד" data-en="to be afraid" data-he="לְפַחֵד" data-ru="бояться" data-theme-key="feelings" data-uk="боятися"><span class="hebrew">לְפַחֵד</span> — <span class="translation">бояться</span></span><span class="verb" data-base="התרגש" data-en="to be sensitive, easily hurt" data-he="לְהִרָגֵּשׁ" data-ru="быть ранимым" data-theme-key="emotions" data-uk="бути вразливим"><span class="hebrew">לְהִרָגֵּשׁ</span> — <span class="translation">быть ранимым</span></span><span class="verb" data-base="התבלבל" data-en="to get confused" data-he="לְהִתְבַּלְבֵּל" data-ru="путаться, смущаться" data-theme-key="emotions" data-uk="плутатися, соромитися"><span class="hebrew">לְהִתְבַּלְבֵּל</span> — <span class="translation">путаться</span></span><span class="verb" data-base="התאפק" data-en="to restrain oneself" data-he="לְהִתְאַפֵק" data-ru="сдерживаться" data-theme-key="emotions" data-uk="стримуватися"><span class="hebrew">לְהִתְאַפֵק</span> — <span class="translation">сдерживаться</span></span><span class="verb" data-base="התבונן" data-en="to reflect, to observe deeply" data-he="לְהִתְבּוֹנֵן" data-ru="всматриваться, размышлять" data-theme-key="emotions" data-uk="вдумуватися"><span class="hebrew">לְהִתְבּוֹנֵן</span> — <span class="translation">размышлять</span></span><span class="verb" data-base="התבדר" data-en="to have fun lightly" data-he="לְהִתְבַּדֵּר" data-ru="развлечься, развеяться" data-theme-key="emotions" data-uk="розважитися"><span class="hebrew">לְהִתְבַּדֵּר</span> — <span class="translation">развлечься</span></span><span class="verb" data-base="התחבט" data-en="to struggle with a decision" data-he="לְהִתְחַבֵּט" data-ru="мучиться выбором" data-theme-key="emotions" data-uk="мучитися вибором"><span class="hebrew">לְהִתְחַבֵּט</span> — <span class="translation">мучиться выбором</span></span><span class="verb" data-base="התאפס" data-en="to calm down, get grounded" data-he="לְהִתְאֲפֵס" data-ru="успокоиться, прийти в себя" data-theme-key="emotions" data-uk="опанувати себе"><span class="hebrew">לְהִתְאֲפֵס</span> — <span class="translation">успокоиться</span></span><span class="verb" data-base="התעורר רגשית" data-en="to awaken emotionally" data-he="לְהִתְעוֹרֵר רִגְשִׁית" data-ru="эмоционально проснуться" data-theme-key="emotions" data-uk="емоційно прокинутися"><span class="hebrew">לְהִתְעוֹרֵר רִגְשִׁית</span> — <span class="translation">эмоционально проснуться</span></span><span class="verb" data-base="התנגד" data-en="to resist" data-he="לְהִתְנַגֵּד" data-ru="сопротивляться" data-theme-key="emotions" data-uk="противитися"><span class="hebrew">לְהִתְנַגֵּד</span> — <span class="translation">сопротивляться</span></span><span class="verb" data-base="התרפס" data-en="to collapse emotionally" data-he="לְהִתְרַפֵּס" data-ru="расслабиться, упасть духом" data-theme-key="emotions" data-uk="занепасти духом"><span class="hebrew">לְהִתְרַפֵּס</span> — <span class="translation">упасть духом</span></span><span class="verb" data-base="התאבד רגשית" data-en="to give up emotionally" data-he="לְהִתְאַבֵּד רִגְשִׁית" data-ru="опускать руки" data-theme-key="emotions" data-uk="опускати руки"><span class="hebrew">לְהִתְאַבֵּד רִגְשִׁית</span> — <span class="translation">опускать руки</span></span><span class="verb" data-base="התחזק" data-en="to strengthen oneself" data-he="לְהִתְחַזֵּק" data-ru="собраться с силами" data-theme-key="emotions" data-uk="зміцнитися духом"><span class="hebrew">לְהִתְחַזֵּק</span> — <span class="translation">собраться с силами</span></span><span class="verb" data-base="התמכר" data-en="to become addicted" data-he="לְהִתְמַכֵּר" data-ru="быть зависимым" data-theme-key="emotions" data-uk="стати залежним"><span class="hebrew">לְהִתְמַכֵּר</span> — <span class="translation">быть зависимым</span></span><span class="verb" data-base="השתדל" data-en="to try hard" data-he="לְהִשְׁתַּדֵּל" data-ru="стараться" data-theme-key="emotions" data-uk="намагатися"><span class="hebrew">לְהִשְׁתַּדֵּל</span> — <span class="translation">стараться</span></span><span class="verb" data-base="התייאש" data-en="to despair" data-he="לְהִתְיַעֵשׁ" data-ru="отчаяться" data-theme-key="emotions" data-uk="відчаюватися"><span class="hebrew">לְהִתְיַעֵשׁ</span> — <span class="translation">отчаяться</span></span><span class="verb" data-base="התחמם רגשית" data-en="to warm up emotionally" data-he="לְהִתְחַמֵּם רִגְשִׁית" data-ru="воодушевиться" data-theme-key="emotions" data-uk="надихнутися"><span class="hebrew">לְהִתְחַמֵּם רִגְשִׁית</span> — <span class="translation">воодушевиться</span></span><span class="verb" data-base="התגנדר" data-en="to doll up, to pretty oneself" data-he="לְהִתְגַּנְדֵּר" data-ru="прихорашиваться" data-theme-key="emotions" data-uk="прихорошуватися"><span class="hebrew">לְהִתְגַּנְדֵּר</span> — <span class="translation">прихорашиваться</span></span><span class="verb" data-base="התפתה" data-en="to be tempted" data-he="לְהִתְפַּתּוֹת" data-ru="поддаться соблазну" data-theme-key="emotions" data-uk="піддатися спокусі"><span class="hebrew">לְהִתְפַּתּוֹת</span> — <span class="translation">поддаться соблазну</span></span><span class="verb" data-base="התחבק" data-en="to hug mutually" data-he="לְהִתְחַבֵּק" data-ru="обниматься" data-theme-key="emotions" data-uk="обійматися"><span class="hebrew">לְהִתְחַבֵּק</span> — <span class="translation">обниматься</span></span><span class="verb" data-base="ניחם" data-en="to comfort, to console" data-he="לְנַחֵם" data-ru="утешать" data-theme-key="emotions" data-uk="втішати"><span class="hebrew">לְנַחֵם</span> — <span class="translation">утешать</span></span></div>
+<div id="tablePanel">
+<div id="topControls">
+<div id="aiNote" style="text-align:center; font-style:italic; margin-bottom:5px; color:#444;">
+  Формируется при помощи искусственного интеллекта
+  <span id="helpIcon" style="cursor:pointer; margin-left:6px; font-size:18px;" title="Открыть справку">❔</span>
+</div>
+<div id="helpPopup" style="display:none; max-width:700px; margin:10px auto; padding:10px; border:1px solid #888; background:#f9f9f9; font-family:'David',Arial,sans-serif; font-size:13px; line-height:1.15; text-align:left; border-radius:6px;">
+<h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Справка по AI-Hebrew-Verbs</h3>
+<h4 style="margin-bottom:3px;">Что содержит программа</h4>
+<p><strong>AI-Hebrew-Verbs</strong> — интерактивный тренажёр по ивритским глаголам:</p>
+<ul style="margin-top:2px; margin-bottom:5px;">
+<li>150 инфинитивов;</li>
+<li>таблицы спряжения по временам, лицам и числам;</li>
+<li>примеры с переводом и озвучкой.</li>
+</ul>
+<h4 style="margin-bottom:3px;">Работа со списком инфинитивов</h4>
+<ol style="margin-top:2px; margin-bottom:5px;">
+<li>Откройте раздел <strong>«Инфинитивы»</strong>.</li>
+<li>Выберите глагол для изучения.</li>
+<li>При необходимости отсортируйте список:
+      <ul style="margin-top:2px;">
+<li>по ивриту,</li>
+<li>по переводу,</li>
+<li>по темам (движение, чувства, работа и т. д.).</li>
+</ul>
+</li>
+<li>Нажмите на глагол, чтобы открыть таблицу спряжения.</li>
+</ol>
+<h4 style="margin-bottom:3px;">Таблица спряжения</h4>
+<p>В таблице представлены все формы по:</p>
+<ul style="margin-top:2px; margin-bottom:5px;">
+<li>временам — настоящее, прошедшее, будущее;</li>
+<li>лицам — 1-е, 2-е, 3-е;</li>
+<li>числам — ед. и мн. число.</li>
+</ul>
+<p><strong>Задача:</strong> повторяйте и проспрягайте глагол вслух по таблице.</p>
+<h4 style="margin-bottom:3px;">Примеры употребления</h4>
+<p>Под таблицей находятся примеры предложений для каждого времени.  
+  Прослушайте 🎧 → повторите 💬 → переведите 📖 → запомните 💡.</p>
+<h4 style="margin-bottom:3px;">Рекомендации</h4>
+<ul style="margin-top:2px;">
+<li>Начинайте с часто используемых глаголов: <strong>ללכת, לאכול, לדבר</strong>.</li>
+<li>Тренируйте 3–5 глаголов в день.</li>
+<li>Сначала формы, затем примеры.</li>
+<li>Слушайте и повторяйте вслух.</li>
+</ul>
+<div style="text-align:right; margin-top:6px;">
+<button id="closeHelp" style="padding:4px 10px; font-size:13px;">Закрыть</button>
+</div>
+</div>
+<script>
+document.getElementById("helpIcon").onclick = function() {
+  const popup = document.getElementById("helpPopup");
+  popup.style.display = popup.style.display === "block" ? "none" : "block";
+};
+document.getElementById("closeHelp").onclick = function() {
+  document.getElementById("helpPopup").style.display = "none";
+};
+</script>
+<style>
+#helpPopup {
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+</style>
+<!-- КНОПКИ/КОНТРОЛЫ В ШАПКЕ -->
+<div align="center" style="margin-top:6px;">
+<label for="langSelect" id="labelLang" style="font-weight:bold; font-size:1.1em;">Язык перевода:</label>
+<select id="langSelect">
+<option value="ru">Русский</option>
+<option value="en">English</option>
+<option value="uk">Українська</option>
+</select>
+<button id="toggleExamples" style="margin-left:10px;">Примеры</button>
+<button id="toggleHelp" style="margin-left:10px;">🔊 </button>
+<!-- === Меню сортировки === -->
+<div class="sort-menu" id="sortMenu">
+<button class="sort-trigger" id="sortMenuBtn">Сортировка</button>
+<div class="sort-dropdown" id="sortDropdown">
+<a href="#" id="sortByHe" onclick="sortVerbs('he'); return false;">Сортировать по ивриту</a>
+<a href="#" id="sortByTr" onclick="sortVerbs('tr'); return false;">Сортировать по переводу</a>
+<a href="#" id="sortByTheme" onclick="sortVerbs('theme'); return false;">Сортировать по темам</a>
+</div>
+</div>
+</div>
+<!-- УДАЛЕНО: старые кнопки сортировки
+  <div style="margin-top:8px;">
+    <button onclick="sortVerbs('he')">Сортировать по ивриту</button>
+    <button onclick="sortVerbs('tr')">Сортировать по переводу</button>
+  </div>
+  -->
+<div id="examplesBox" style="display:none;"></div>
+<div id="helpBox" style="display:none; margin:10px auto; padding:10px; border:1px solid #aaa; background:#f5f5f5; width:90%; text-align:left; line-height:1.6;"></div>
+</div>
+<div id="tableWrapper">
+<table dir="rtl" id="conjugationTable">
+<thead>
+<tr>
+<th id="thPerson">Лицо</th>
+<th id="thHebrew">Иврит</th>
+<th id="thTranslation">Перевод</th>
+<th id="thTranslit">Транслит</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<script>
+// 📌 UI-тексты
+
+const uiTexts = {
+  ru:{
+    ai:"Формируется при помощи искусственного интеллекта",
+    lang:"Язык перевода:",
+    inf:"Инфинитивы",
+    person:"Лицо",
+    hebrew:"Иврит",
+    translation:"Перевод",
+    translit:"Транслит",
+    present:"הוֹוֶה",
+    past:"עָבָר",
+    future:"עָתִיד",
+    imperative:"צִווּי",
+    examplesBtn:"Примеры",
+
+    // Новый блок локализации для меню сортировки
+    sortMenu:"Сортировка",
+    sortByHe:"Сортировать по ивриту",
+    sortByTr:"Сортировать по переводу",
+    sortByTheme:"Сортировать по темам"
+  },
+  en:{
+    ai:"Generated with AI assistance",
+    lang:"Translation language:",
+    inf:"Infinitives",
+    person:"Person",
+    hebrew:"Hebrew",
+    translation:"Translation",
+    translit:"Translit",
+    present:"הוֹוֶה",
+    past:"עָבָר",
+    future:"עָתִיד",
+    imperative:"צִווּי",
+    examplesBtn:"Examples",
+
+    // Sorting menu
+    sortMenu:"Sort",
+    sortByHe:"Sort by Hebrew",
+    sortByTr:"Sort by translation",
+    sortByTheme:"Sort by themes"
+  },
+  uk:{
+    ai:"Сформовано за допомогою ШІ",
+    lang:"Мова перекладу:",
+    inf:"Інфінітиви",
+    person:"Особа",
+    hebrew:"Іврит",
+    translation:"Переклад",
+    translit:"Трансліт",
+    present:"הוֹוֶה",
+    past:"עָבָר",
+    future:"עָתִיד",
+    imperative:"צִווּי",
+    examplesBtn:"Приклади",
+
+    // Меню сортування
+    sortMenu:"Сортування",
+    sortByHe:"Сортувати за івритом",
+    sortByTr:"Сортувати за перекладом",
+    sortByTheme:"Сортувати за темами"
+  }
+};
+
+
+
+
+
+
+
+let currentVerb = "קרא";
+let currentLang = "ru";
+
+
+// ✅ Примеры
+function showExamples(verb){
+  const box=document.getElementById("examplesBox");
+  box.innerHTML="";
+  if(!examplesDB[verb]||!examplesDB[verb][currentLang]) return;
+  const ex=examplesDB[verb][currentLang];
+  box.innerHTML=`
+    <div><b>${uiTexts[currentLang].present}:</b> ${ex.present}</div>
+    <div><b>${uiTexts[currentLang].past}:</b> ${ex.past}</div>
+    <div><b>${uiTexts[currentLang].future}:</b> ${ex.future}</div>
+    <div><b>${uiTexts[currentLang].imperative}:</b> ${ex.imperative}</div>
+  `;
+}
+
+// ✅ Таблица
+function buildTable(verb){
+  const tbody=document.getElementById("tableBody");
+  tbody.innerHTML="";
+  const order=["present","past","future","imperative"];
+  order.forEach(tense=>{
+    const rows=verbsDB[verb][tense];
+    if(!rows) return;
+    const title=`${uiTexts[currentLang][tense]}`;
+    tbody.insertAdjacentHTML("beforeend", `<tr class="tense-header"><td colspan="4">${title}</td></tr>`);
+    rows.forEach(f=>{
+      tbody.insertAdjacentHTML("beforeend",
+        `<tr>
+          <td>${f.person.he}</td>
+          <td>${f.he}</td>
+          <td>${f[currentLang]}</td>
+          <td>${f.tr}</td>
+        </tr>`);
+    });
+  });
+}
+
+// ✅ Обновление UI (включая перевод кнопок/меню сортировки + озвучка и инструкция)
+function updateUI(){
+  const t = uiTexts[currentLang];
+  document.getElementById("aiNote").textContent = t.ai;
+  document.getElementById("labelLang").textContent = t.lang;
+  document.getElementById("infHeader").textContent = t.inf;
+  document.getElementById("thPerson").textContent = t.person;
+  document.getElementById("thHebrew").textContent = t.hebrew;
+  document.getElementById("thTranslation").textContent = t.translation;
+  document.getElementById("thTranslit").textContent = t.translit;
+  document.getElementById("toggleExamples").textContent = t.examplesBtn;
+
+  // Обновляем список инфинитивов
+  document.querySelectorAll(".verb").forEach(el => {
+    const heb = el.dataset.he;
+    const tr = el.dataset[currentLang]; 
+    el.textContent = `${heb} — ${tr}`;
+  });
+
+  // Переводим элементы выпадающего меню сортировки
+  const sortBtn   = document.getElementById("sortMenuBtn");
+  const sortHe    = document.getElementById("sortByHe");
+  const sortTr    = document.getElementById("sortByTr");
+  const sortTheme = document.getElementById("sortByTheme");
+  if (sortBtn && sortHe && sortTr && sortTheme) {
+    sortBtn.textContent   = t.sortMenu;
+    sortHe.textContent    = t.sortByHe;
+    sortTr.textContent    = t.sortByTr;
+    sortTheme.textContent = t.sortByTheme;
+  }
+}
+
+// ✅ Сортировка
+function sortVerbs(type) {
+  if (type === "theme") {
+    sortByTheme(); // новая функция
+    return;
+  }
+
+  const verbsList = document.getElementById("verbsPanel");
+  const verbs = Array.from(verbsList.querySelectorAll(".verb"));
+  verbs.sort((a, b) => {
+    if (type === "he") {
+      return a.dataset.he.localeCompare(b.dataset.he, 'he');
+    } else if (type === "tr") {
+      return a.dataset[currentLang].localeCompare(b.dataset[currentLang]);
+    }
+  });
+  verbsList.querySelectorAll(".verb").forEach(v => v.remove());
+  verbs.forEach(v => verbsList.appendChild(v));
+}
+
+// ✅ Группировка по темам с алфавитной сортировкой
+function sortByTheme() {
+  const panel = document.getElementById('verbsPanel');
+  const verbs = Array.from(panel.querySelectorAll('.verb'));
+  const table = document.getElementById("conjugationTable");
+  const examples = document.getElementById("examplesBox");
+
+  // скрываем таблицу и примеры
+  table.style.display = "none";
+  examples.style.display = "none";
+
+  // Группируем по теме
+  const groups = {};
+  verbs.forEach(v => {
+    const key = v.dataset.themeKey || 'other';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(v);
+  });
+
+// Названия тем по языкам
+const themeNames = {
+  ru: {
+    work:"Работа",
+    study:"Учёба",
+    food:"Еда",
+    communication:"Общение",
+    movement:"Движение",
+    body:"Тело",
+    daily:"Повседневная жизнь",
+    emotions:"Эмоции",
+    feelings:"Чувства",
+    home:"Дом",
+    leisure:"Отдых",
+    nature:"Природа",
+    family:"Семья",
+    perception:"Восприятие",
+    thinking:"Мышление",
+    time:"Время"
+  },
+  en: {
+    work:"Work",
+    study:"Study",
+    food:"Food",
+    communication:"Communication",
+    movement:"Movement",
+    body:"Body",
+    daily:"Daily Life",
+    emotions:"Emotions",
+    feelings:"Feelings",
+    home:"Home",
+    leisure:"Leisure",
+    nature:"Nature",
+    family:"Family",
+    perception:"Perception",
+    thinking:"Thinking",
+    time:"Time"
+  },
+  uk: {
+    work:"Робота",
+    study:"Навчання",
+    food:"Їжа",
+    communication:"Спілкування",
+    movement:"Рух",
+    body:"Тіло",
+    daily:"Повсякденне життя",
+    emotions:"Емоції",
+    feelings:"Почуття",
+    home:"Дім",
+    leisure:"Відпочинок",
+    nature:"Природа",
+    family:"Сім’я",
+    perception:"Сприйняття",
+    thinking:"Мислення",
+    time:"Час"
+  }
+};
+
+const names = themeNames[currentLang] || themeNames.ru;
+
+  // Очистка панели
+  panel.innerHTML = '';
+
+  // Темы в алфавитном порядке
+  Object.keys(groups)
+    .sort((a,b)=>(names[a]||a).localeCompare(names[b]||b))
+    .forEach(key=>{
+      const header = document.createElement('div');
+      header.className = 'theme-header';
+      header.textContent = names[key] || key;
+      panel.appendChild(header);
+      groups[key].forEach(v=>{
+        v.classList.remove('active');
+        panel.appendChild(v);
+        v.addEventListener('click', ()=>{
+          document.getElementById("conjugationTable").style.display = "table";
+          document.getElementById("examplesBox").style.display = "block";
+          buildTable(v.dataset.base);
+          showExamples(v.dataset.base);
+        });
+      });
+    });
+}
+
+// === Меню сортировки ===
+(function(){
+  const menu = document.getElementById('sortMenu');
+  const btn  = document.getElementById('sortMenuBtn');
+  const dd   = document.getElementById('sortDropdown');
+  if (menu && btn && dd) {
+    btn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', ()=>menu.classList.remove('open'));
+    dd.addEventListener('click', ()=>menu.classList.remove('open'));
+  }
+})();
+
+// ✅ Запуск
+window.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll(".verb").forEach(el=>{
+    el.addEventListener("click",()=>{
+      document.querySelectorAll(".verb").forEach(v=>v.classList.remove("active"));
+      el.classList.add("active");
+      currentVerb=el.dataset.base;
+      buildTable(currentVerb);
+      showExamples(currentVerb);
+    });
+  });
+  document.getElementById("langSelect").addEventListener("change",e=>{
+    currentLang=e.target.value;
+    buildTable(currentVerb);
+    showExamples(currentVerb);
+    updateUI();
+  });
+  document.getElementById("toggleExamples").addEventListener("click",()=>{
+    const box=document.getElementById("examplesBox");
+    box.style.display = box.style.display==="none" ? "block" : "none";
+  });
+  buildTable(currentVerb);
+  showExamples(currentVerb);
+  updateUI();
+});
+</script>
+<script>
+const helpTexts = {
+  ru:`<b>Как включить озвучку:</b><br>
+  🔹 Google Chrome: Озвучка работает автоматически через Web Speech API.<br>
+  🔹 Microsoft Edge: Поддерживает голоса Windows.<br>
+  🔹 Firefox: Требуется включить поддержку Web Speech API (экспериментально).<br>
+  🔹 Safari: Использует встроенный голос Siri.<br><br>
+  Если озвучка не работает, можно использовать внешний сервис: <a href="https://lsdsoftware.com/" target="_blank">SiteNarrator</a>.`,
+  en:`<b>How to enable speech:</b><br>
+  🔹 Google Chrome: Works automatically via Web Speech API.<br>
+  🔹 Microsoft Edge: Supports Windows voices.<br>
+  🔹 Firefox: Enable Web Speech API (experimental).<br>
+  🔹 Safari: Uses Siri.<br><br>
+  If speech does not work, use: <a href="https://lsdsoftware.com/" target="_blank">SiteNarrator</a>.`,
+  uk:`<b>Як увімкнути озвучення:</b><br>
+  🔹 Google Chrome: Працює автоматично через Web Speech API.<br>
+  🔹 Microsoft Edge: Підтримує голоси Windows.<br>
+  🔹 Firefox: Потрібно увімкнути Web Speech API (експериментально).<br>
+  🔹 Safari: Використовує Siri.<br><br>
+  Якщо озвучення не працює, можна скористатись: <a href="https://lsdsoftware.com/" target="_blank">SiteNarrator</a>.`
+};
+
+document.addEventListener("DOMContentLoaded",()=>{
+  const helpBtn=document.getElementById("toggleHelp");
+  const helpBox=document.getElementById("helpBox");
+  if(helpBtn && helpBox){
+    helpBtn.addEventListener("click",()=>{
+      helpBox.innerHTML=helpTexts[currentLang]||helpTexts.ru;
+      helpBox.style.display=helpBox.style.display==="none"?"block":"none";
+    });
+  }
+});
+</script>
+<script>
+window.addEventListener('load', function() {
+  const present = Array.from(document.querySelectorAll('td, th, div, span'))
+    .find(el => el.textContent.trim() === 'הוֹוֶה');
+  if (present) present.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+</script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  const note = document.querySelector('#aiNote');
+  if (note && !document.getElementById('helpIcon')) {
+    const icon = document.createElement('span');
+    icon.id = 'helpIcon';
+    icon.innerHTML = '❔';
+    icon.title = 'Открыть справку';
+    icon.style.cssText = `
+      cursor: pointer;
+      margin-left: 4px;
+      font-size: 16px;
+      vertical-align: middle;
+      color: #b30000;
+    `;
+    note.appendChild(icon);
+
+    icon.onclick = function() {
+      const popup = document.getElementById('helpPopup');
+      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    };
+  }
+
+  const closeBtn = document.getElementById('closeHelp');
+  if (closeBtn) {
+    closeBtn.onclick = function() {
+      document.getElementById('helpPopup').style.display = 'none';
+    };
+  }
+});
+</script>
+<script>
+// Автоматический перевод справки по надписи на кнопке "Язык перевода"
+const helpTexts = {
+  'Русский': `
+  <h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Справка по AI-Hebrew-Verbs</h3>
+  <h4>Что содержит программа</h4>
+  <p><strong>AI-Hebrew-Verbs</strong> — интерактивный тренажёр по ивритским глаголам:</p>
+  <ul><li>150 инфинитивов;</li><li>таблицы спряжения по временам, лицам и числам;</li><li>примеры с переводом и озвучкой.</li></ul>
+  <h4>Работа со списком инфинитивов</h4>
+  <ol><li>Откройте раздел «Инфинитивы».</li><li>Выберите глагол для изучения.</li><li>При необходимости отсортируйте список по ивриту, переводу или теме.</li></ol>
+  <h4>Таблица спряжения</h4>
+  <p>В таблице представлены все формы по временам, лицам и числам.</p>
+  <p><strong>Задача:</strong> повторяйте и проспрягайте глагол вслух.</p>
+  <h4>Примеры употребления</h4>
+  <p>Прослушайте 🎧 → повторите 💬 → переведите 📖 → запомните 💡.</p>
+  <h4>Рекомендации</h4>
+  <ul><li>Начинайте с ללכת, לאכול, לדבר.</li><li>Тренируйте 3–5 глаголов в день.</li></ul>
+  <div style="text-align:right;margin-top:6px;"><button id="closeHelp" style="padding:4px 10px;font-size:13px;">Закрыть</button></div>
+  `,
+  'English': `
+  <h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Help — AI-Hebrew-Verbs</h3>
+  <h4>What the program includes</h4>
+  <p><strong>AI-Hebrew-Verbs</strong> is an interactive Hebrew verb trainer:</p>
+  <ul><li>150 infinitives;</li><li>conjugation tables by tense, person, and number;</li><li>examples with translation and audio.</li></ul>
+  <h4>Working with the infinitive list</h4>
+  <ol><li>Open the “Infinitives” section.</li><li>Select a verb to study.</li><li>Sort by Hebrew, translation, or topic if needed.</li></ol>
+  <h4>Conjugation table</h4>
+  <p>All verb forms by tense, person, and number.</p>
+  <p><strong>Task:</strong> repeat and conjugate the verb aloud.</p>
+  <h4>Usage examples</h4>
+  <p>Listen 🎧 → Repeat 💬 → Translate 📖 → Remember 💡.</p>
+  <h4>Recommendations</h4>
+  <ul><li>Start with ללכת, לאכול, לדבר.</li><li>Practice 3–5 verbs daily.</li></ul>
+  <div style="text-align:right;margin-top:6px;"><button id="closeHelp" style="padding:4px 10px;font-size:13px;">Close</button></div>
+  `,
+  'Українська': `
+  <h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Довідка — AI-Hebrew-Verbs</h3>
+  <h4>Що містить програма</h4>
+  <p><strong>AI-Hebrew-Verbs</strong> — інтерактивний тренажер івритських дієслів:</p>
+  <ul><li>150 інфінітивів;</li><li>таблиці відмінювання за часами, особами та числами;</li><li>приклади з перекладом і озвученням.</li></ul>
+  <h4>Робота зі списком інфінітивів</h4>
+  <ol><li>Відкрийте розділ «Інфінітиви».</li><li>Оберіть дієслово для вивчення.</li><li>За потреби відсортуйте за івритом, перекладом або темою.</li></ol>
+  <h4>Таблиця відмінювання</h4>
+  <p>У таблиці наведено всі форми дієслова за часами, особами та числами.</p>
+  <p><strong>Завдання:</strong> повторюйте та відмінюйте дієслово вголос.</p>
+  <h4>Приклади вживання</h4>
+  <p>Прослухайте 🎧 → повторіть 💬 → перекладіть 📖 → запам’ятайте 💡.</p>
+  <h4>Рекомендації</h4>
+  <ul><li>Почніть із ללכת, לאכול, לדבר.</li><li>Тренуйте 3–5 дієслів щодня.</li></ul>
+  <div style="text-align:right;margin-top:6px;"><button id="closeHelp" style="padding:4px 10px;font-size:13px;">Закрити</button></div>
+  `
+};
+
+function updateHelpByButton() {
+  const help = document.getElementById('helpPopup');
+  if (!help) return;
+
+  const buttons = document.querySelectorAll('button, select');
+  let langButton = null;
+  buttons.forEach(btn => {
+    if (btn.innerText.includes('Язык перевода') || btn.innerText.includes('Language') || btn.innerText.includes('Мова')) {
+      langButton = btn;
+    }
+  });
+
+  if (!langButton) return;
+
+  const currentLang = langButton.innerText.includes('English')
+    ? 'English'
+    : langButton.innerText.includes('Українська') || langButton.innerText.includes('Мова')
+    ? 'Українська'
+    : 'Русский';
+
+  help.innerHTML = helpTexts[currentLang];
+}
+
+// Отслеживаем изменения текста на кнопке перевода
+const observer = new MutationObserver(updateHelpByButton);
+observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+// Первичная инициализация
+window.addEventListener('load', updateHelpByButton);
+</script>
+<script>
+// Гарантируем, что кнопка ❔ всегда остаётся на месте и не исчезает при переводе страницы
+function ensureHelpButton() {
+  const aiNote = document.getElementById('aiNote');
+  if (!aiNote) return;
+
+  let helpIcon = document.getElementById('helpIcon');
+  if (!helpIcon) {
+    const icon = document.createElement('span');
+    icon.id = 'helpIcon';
+    icon.setAttribute('translate', 'no');
+    icon.innerHTML = '❔';
+    icon.title = 'Открыть справку';
+    icon.style.cssText = `
+      cursor: pointer;
+      margin-left: 4px;
+      font-size: 16px;
+      vertical-align: middle;
+      color: #b30000;
+      display: inline-block !important;
+    `;
+    aiNote.appendChild(icon);
+
+    icon.onclick = function() {
+      const popup = document.getElementById('helpPopup');
+      if (popup) popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    };
+  }
+}
+
+// Проверяем наличие кнопки каждые 2 секунды
+setInterval(ensureHelpButton, 2000);
+
+// Первичная установка
+window.addEventListener('load', ensureHelpButton);
+</script>
+<!-- === Многоязычная справка === -->
+<script>
+const helpTexts = {
+  ru: `
+    <h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Справка по AI-Hebrew-Verbs</h3>
+    <p><strong>AI-Hebrew-Verbs</strong> — это интерактивный тренажёр для изучения спряжений ивритских глаголов по биньянам и временам. 
+    Вы можете искать глаголы, просматривать таблицы форм и слушать произношение.</p>
+    <h4>⚙️ Основные функции</h4>
+    <ul>
+      <li>Выбор языка интерфейса (русский, английский, украинский)</li>
+      <li>Поиск по инфинитиву или корню</li>
+      <li>Автоматическая генерация таблиц спряжения</li>
+      <li>Озвучка форм глаголов</li>
+      <li>Работа с личным списком слов</li>
+    </ul>
+    <h4>🧠 Искусственный интеллект</h4>
+    <p>Таблицы формируются с помощью искусственного интеллекта. 
+    При необходимости вы можете запросить обновлённые варианты или исправления.</p>
+    <p>© AI-Hebrew-Verbs. Все права защищены.</p>
+  `,
+  en: `
+    <h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Help — AI-Hebrew-Verbs</h3>
+    <p><strong>AI-Hebrew-Verbs</strong> is an interactive trainer for studying Hebrew verb conjugations by binyan and tense. 
+    You can search for verbs, view conjugation tables, and listen to pronunciations.</p>
+    <h4>⚙️ Main features</h4>
+    <ul>
+      <li>Interface language selection (Russian, English, Ukrainian)</li>
+      <li>Search by infinitive or root</li>
+      <li>Automatic conjugation table generation</li>
+      <li>Audio pronunciation for verb forms</li>
+      <li>Personal word list management</li>
+    </ul>
+    <h4>🧠 Artificial Intelligence</h4>
+    <p>The conjugation tables are generated using artificial intelligence.
+    You can request updated versions or corrections if needed.</p>
+    <p>© AI-Hebrew-Verbs. All rights reserved.</p>
+  `,
+  uk: `
+    <h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Довідка — AI-Hebrew-Verbs</h3>
+    <p><strong>AI-Hebrew-Verbs</strong> — інтерактивний тренажер для вивчення відмінювання єврейських дієслів за біньянами та часами.
+    Ви можете шукати дієслова, переглядати таблиці форм і слухати вимову.</p>
+    <h4>⚙️ Основні функції</h4>
+    <ul>
+      <li>Вибір мови інтерфейсу (російська, англійська, українська)</li>
+      <li>Пошук за інфінітивом або коренем</li>
+      <li>Автоматичне створення таблиць відмінювання</li>
+      <li>Озвучення форм дієслів</li>
+      <li>Робота з особистим списком слів</li>
+    </ul>
+    <h4>🧠 Штучний інтелект</h4>
+    <p>Таблиці створюються за допомогою штучного інтелекту.
+    За потреби ви можете запросити оновлені варіанти або виправлення.</p>
+    <p>© AI-Hebrew-Verbs. Усі права захищено.</p>
+  `
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("langSelect");
+  const help = document.getElementById("helpPopup");
+  if (!select || !help) return;
+
+  const updateHelp = () => {
+    const lang = select.value;
+    help.innerHTML = helpTexts[lang] || helpTexts.ru;
+  };
+
+  updateHelp();
+  select.addEventListener("change", updateHelp);
+});
+</script>
+<!-- === Многоязычная справка (полная версия) === -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const helpTexts = {
+    ru: `
+      <h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Справка по AI-Hebrew-Verbs</h3>
+      <h4>Что содержит программа</h4>
+      <p><strong>AI-Hebrew-Verbs</strong> — интерактивный тренажёр по ивритским глаголам.</p>
+      <ul>
+        <li>150 инфинитивов с переводами;</li>
+        <li>Таблицы спряжения по временам, лицам и числам;</li>
+        <li>Примеры с переводом и озвучкой.</li>
+      </ul>
+      <h4>Работа со списком инфинитивов</h4>
+      <ol>
+        <li>Откройте раздел <strong>«Инфинитивы»</strong>.</li>
+        <li>Выберите глагол для изучения.</li>
+        <li>Используйте сортировку: по ивриту, переводу или темам.</li>
+        <li>Нажмите на глагол, чтобы открыть таблицу спряжения.</li>
+      </ol>
+      <h4>Таблица спряжения</h4>
+      <ul>
+        <li>Времена: настоящее, прошедшее, будущее;</li>
+        <li>Лица: 1-е, 2-е, 3-е;</li>
+        <li>Числа: ед., мн.</li>
+      </ul>
+      <h4>Примеры употребления</h4>
+      <p>Под таблицей — примеры предложений. Прослушайте 🎧 → повторите 💬 → переведите 📖 → запомните 💡.</p>
+      <h4>Рекомендации</h4>
+      <ul>
+        <li>Начинайте с часто употребляемых глаголов: <strong>ללכת, לדבר, לאכול</strong>.</li>
+        <li>Учите 3–5 глаголов в день.</li>
+        <li>Повторяйте формы вслух.</li>
+        <li>Используйте озвучку для тренировки произношения.</li>
+      </ul>
+    `,
+    en: `
+      <h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Help — AI-Hebrew-Verbs</h3>
+      <h4>Program contents</h4>
+      <p><strong>AI-Hebrew-Verbs</strong> is an interactive trainer for Hebrew verb conjugations.</p>
+      <ul>
+        <li>150 infinitives with translations;</li>
+        <li>Conjugation tables by tense, person, and number;</li>
+        <li>Examples with translation and audio.</li>
+      </ul>
+      <h4>Working with the infinitive list</h4>
+      <ol>
+        <li>Open the <strong>“Infinitives”</strong> section.</li>
+        <li>Select a verb for study.</li>
+        <li>Use sorting: by Hebrew, translation, or theme.</li>
+        <li>Click a verb to open its conjugation table.</li>
+      </ol>
+      <h4>Conjugation table</h4>
+      <ul>
+        <li>Tenses: Present, Past, Future;</li>
+        <li>Persons: 1st, 2nd, 3rd;</li>
+        <li>Numbers: Singular and Plural.</li>
+      </ul>
+      <h4>Usage examples</h4>
+      <p>Below the table are example sentences. Listen 🎧 → repeat 💬 → translate 📖 → remember 💡.</p>
+      <h4>Recommendations</h4>
+      <ul>
+        <li>Start with frequent verbs: <strong>ללכת, לדבר, לאכול</strong>.</li>
+        <li>Study 3–5 verbs per day.</li>
+        <li>Repeat forms aloud.</li>
+        <li>Use audio to improve pronunciation.</li>
+      </ul>
+    `,
+    uk: `
+      <h3 style="margin-top:0; font-size:15px; color:#005cb2;">📘 Довідка — AI-Hebrew-Verbs</h3>
+      <h4>Що містить програма</h4>
+      <p><strong>AI-Hebrew-Verbs</strong> — інтерактивний тренажер для вивчення відмінювання єврейських дієслів.</p>
+      <ul>
+        <li>150 інфінітивів із перекладами;</li>
+        <li>Таблиці відмінювання за часами, особами та числами;</li>
+        <li>Приклади з перекладом і озвученням.</li>
+      </ul>
+      <h4>Робота зі списком інфінітивів</h4>
+      <ol>
+        <li>Відкрийте розділ <strong>«Інфінітиви»</strong>.</li>
+        <li>Оберіть дієслово для вивчення.</li>
+        <li>Використовуйте сортування: за івритом, перекладом або темою.</li>
+        <li>Натисніть на дієслово, щоб переглянути таблицю відмінювання.</li>
+      </ol>
+      <h4>Таблиця відмінювання</h4>
+      <ul>
+        <li>Часи: теперішній, минулий, майбутній;</li>
+        <li>Особи: 1-ша, 2-га, 3-тя;</li>
+        <li>Числа: однина та множина.</li>
+      </ul>
+      <h4>Приклади вживання</h4>
+      <p>Під таблицею наведені приклади речень. Прослухайте 🎧 → повторіть 💬 → перекладіть 📖 → запам’ятайте 💡.</p>
+      <h4>Рекомендації</h4>
+      <ul>
+        <li>Починайте з найуживаніших дієслів: <strong>ללכת, לדבר, לאכול</strong>.</li>
+        <li>Вивчайте 3–5 дієслів на день.</li>
+        <li>Повторюйте форми вголос.</li>
+        <li>Використовуйте озвучення для тренування вимови.</li>
+      </ul>
+    `
+  };
+
+  const select = document.getElementById("langSelect");
+  const help = document.getElementById("helpPopup");
+  const icon = document.getElementById("helpIcon");
+
+  if (!select || !help || !icon) return;
+
+  const updateHelp = () => {
+    help.innerHTML = helpTexts[select.value] || helpTexts.ru;
+  };
+
+  select.addEventListener("change", updateHelp);
+  icon.addEventListener("click", () => {
+    help.style.display = help.style.display === "block" ? "none" : "block";
+  });
+
+  updateHelp();
+});
+</script>
+
+</body>
+</html>

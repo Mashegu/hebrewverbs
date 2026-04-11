@@ -1,29 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<!-- === SEO META TAGS === -->
-<meta name="description" content="hebrewverbs — интерактивный тренажёр по ивритским глаголам. Таблицы спряжения, примеры на иврите, перевод на русский, английский и украинский. 150 глаголов со всеми временами: настоящее, прошедшее, будущее и повелительное.">
-<meta name="keywords" content="иврит, глаголы, спряжение глаголов, таблица спряжения, ивритские глаголы, примеры на иврите, изучение иврита, тренажёр по ивриту, грамматика иврита, биньяны, Hebrew verbs, Hebrew conjugation, Hebrew verb tables, Hebrew examples, לימוד עברית, פעלי עברית">
-<meta name="author" content="hebrewverbs">
-
-<!-- === OPEN GRAPH / SOCIAL MEDIA === -->
-<meta property="og:title" content="hebrewverbs — Спряжение ивритских глаголов">
-<meta property="og:description" content="Таблицы спряжения, переводы и примеры на иврите. Полный тренажёр по ивритским глаголам.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://your-site.github.io/"> 
-<meta property="og:image" content="https://your-site.github.io/og-image.png"> 
-
-<!-- === TWITTER CARD === -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="hebrewverbs — Спряжение ивритских глаголов">
-<meta name="twitter:description" content="Интерактивный тренажёр с таблицами спряжения и примерами.">
-<meta name="twitter:image" content="https://your-site.github.io/og-image.png">
-
-<!-- === FAVICON === -->
-<link rel="icon" type="image/png" href="favicon.png">
-
-<title>hebrewverbs — тренажёр по ивритским глаголам</title>
+<title>Hebrew-Deklension — склонение в иврите</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -49,44 +28,23 @@
     }
     h2 {
         font-size: 24px;
-        margin-top: 10px;
-        margin-bottom: 5px;
+        margin-top: 30px;
         color: #1e40af;
         font-weight: 700;
     }
     p, li {
         font-size: 17px;
-        margin: 6px 0;
     }
 
     .card {
         background: #ffffff;
-        padding: 20px 25px;
+        padding: 16px 25px;
         border-radius: 14px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        margin-bottom: 10px; /* уменьшено */
+        margin-bottom: 2px;
     }
-    .btn {
-        display: inline-block;
-        padding: 12px 20px;
-        border-radius: 10px;
-        background: #2563eb;
-        color: white;
-        text-decoration: none;
-        font-size: 18px;
-        font-weight: 600;
-        margin: 6px 0;
-        transition: 0.2s;
-    }
-    .btn:hover {
-        background: #1d4ed8;
-    }
-    .btn-secondary {
-        background: #e2e8f0;
-        color: #1e3a8a;
-    }
-    .btn-secondary:hover {
-        background: #cbd5e1;
+    .feature-list li {
+        margin-bottom: 6px;
     }
 
     .download-box {
@@ -94,205 +52,107 @@
         border-left: 4px solid #f59e0b;
         padding: 15px 20px;
         border-radius: 10px;
-        margin-top: 10px;
+        margin-top: 15px;
     }
+    .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 10px;
+        background: #e2e8f0;
+        color: #1e3a8a;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 600;
+        margin-top: 10px;
+        transition: 0.2s;
+    }
+    .btn:hover {
+        background: #cbd5e1;
+    }
+
     footer {
-        margin-top: 20px;
+        margin-top: 40px;
         text-align: center;
         color: #64748b;
         font-size: 14px;
         padding-bottom: 20px;
     }
 
+    .steps-list li {
+        margin-bottom: 10px;
+    }
+    .note-box {
+        background: #eff6ff;
+        border-left: 4px solid #2563eb;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
     .btn-row {
         display: flex;
-        align-items: center;
-        gap: 10px;
         flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 12px;
     }
-    .counter-badge { display: none;  align-items: center;
-        gap: 6px;
-        padding: 8px 12px;
-        border-radius: 10px;
-        background: #f1f5f9;
-        color: #0f172a;
-        font-size: 14px;
-        font-weight: 600;
-        border: 1px solid #e2e8f0;
+    .btn-primary {
+        background: #dbeafe;
     }
-.counter-badge { display: none; }
+    .btn-primary:hover {
+        background: #bfdbfe;
+    }
+
 </style>
 </head>
+
+
 <body>
 
 <div class="container">
 
-    <h1>hebrewverbs<br>интерактивный тренажёр по ивритским глаголам</h1>
+<h1>hebrew-declension<br>склонение предлогов и слов в иврите</h1>
 
-    <!-- --------------------------------------------------------- -->
-    <!-- 1. Что содержит программа -->
-    <!-- --------------------------------------------------------- -->
-    <div class="card">
-        <h2>Что содержит программа</h2>
-        <p><strong>hebrewverbs</strong> — это офлайн-тренажёр для изучения ивритских глаголов. Программа включает:</p>
+<div class="card">
+<h2>О проекте</h2>
+<p>
+<strong>hebrew-declension</strong> — учебный сайт для склонения предлогов и слов в иврите.
+Здесь можно вводить предлоги и слова и сразу видеть их формы, примеры и перевод.
+</p>
 
-        <ul>
-            <li>150 инфинитивов с переводами на русский, английский и украинский;</li>
-            <li>Таблицы спряжения по временам, родам и числам;</li>
-            <li>Примеры предложений с переводами и озвучкой;</li>
-            <li>Быстрый переключатель языков перевода;</li>
-            <li>Фильтры и сортировку по темам и алфавиту.</li>
-        </ul>
-    </div>
+<p>
+Сайт работает на <strong>трёх языках перевода</strong>:
+русском, украинском и английском.
+Также есть <strong>озвучка</strong>, чтобы можно было прослушивать формы и примеры.
+</p>
 
-    <!-- --------------------------------------------------------- -->
-    <!-- 2. Как работать с инфинитивами -->
-    <!-- --------------------------------------------------------- -->
-    <div class="card">
-        <h2>Как работать со списком инфинитивов</h2>
-        <p>Раздел «Инфинитивы» содержит список всех глаголов программы. Список открывается сразу в алфавитном порядке по переводу.</p>
+<p>
+Если предлог или слово <strong>склоняется</strong> в иврите, сайт показывает формы склонения.
+Если слово <strong>не склоняется</strong>, появляется сообщение об этом.
+Если слова или предлога <strong>нет в базе</strong>, его можно <strong>сгенерировать вручную</strong>.
+</p>
 
-        <ul>
-            <li>Выберите глагол в списке слева;</li>
-            <li>Щёлкните по глаголу, чтобы открыть таблицу и примеры;</li>
-            <li>Используйте вертикальную прокрутку для просмотра всех слов;</li>
-            <li>При необходимости включите сортировку по ивриту или по темам.</li>
-        </ul>
+<p>
+В сайте есть <strong>Список</strong>:
+можно сохранять слова и предлоги в <strong>личный список</strong>,
+а также работать с разделом <strong>«на слуху»</strong> — это предлоги и слова, которые часто употребляются в быту.
+При необходимости слова и предлоги можно удалять из личного списка.
+</p>
+</div>
 
-        <div class="btn-row">
-        <a href="Guide.html" class="btn btn-secondary" id="openInterfaceBtn">📘 Открыть интерфейс</a>
-        <span class="counter-badge">Открывали: <span id="openCount">0</span></span>
-    </div>
-    </div>
+<div class="card" style="margin-top: -6px;">
+<p style="margin:0 0 8px 0;">
+<a class="btn btn-primary" href="Guide.html">Открыть сайт</a>
+</p>
+<p style="margin:0;">
+Ссылка открывается независимо от сервера: в GitHub Pages, локально и офлайн.
+</p>
+</div>
 
-    <!-- --------------------------------------------------------- -->
-    <!-- 3. Таблицы спряжения -->
-    <!-- --------------------------------------------------------- -->
-    <div class="card">
-        <h2>Таблицы спряжения</h2>
-        <p>Для каждого глагола представлены формы:</p>
-
-        <ul>
-            <li>Настоящее время (м/ж, ед./мн.);</li>
-            <li>Прошедшее время для всех лиц;</li>
-            <li>Будущее время по всем формам;</li>
-            <li>Императив (повелительное наклонение), если доступно.</li>
-        </ul>
-
-        <p>Таблица открывается автоматически после выбора глагола.</p>
-    </div>
-
-    <!-- --------------------------------------------------------- -->
-    <!-- 4. Примеры употребления -->
-    <!-- --------------------------------------------------------- -->
-    <div class="card">
-        <h2>Примеры употребления</h2>
-        <p>Над таблицей отображаются примеры предложений:</p>
-
-        <ul>
-            <li>Иврит + перевод на выбранный язык;</li>
-            <li>Кнопка озвучки каждого примера;</li>
-            <li>Кнопка «Примеры/Таблица» для переключения режима;</li>
-            <li>Перевод можно менять в один клик (RU / EN / UA).</li>
-        </ul>
-    </div>
-
-    <!-- --------------------------------------------------------- -->
-    <!-- 5. Рекомендации -->
-    <!-- --------------------------------------------------------- -->
-    <div class="card">
-        <h2>Рекомендации</h2>
-        <ul>
-            <li>Учите 3–5 глаголов в день;</li>
-            <li>Повторяйте вслух и используйте озвучку;</li>
-            <li>Сравнивайте примеры между временами;</li>
-            <li>Запоминайте корни и биньяны — это ускоряет обучение.</li>
-        </ul>
-    </div>
-
-    <!-- --------------------------------------------------------- -->
-    <!-- 6. Скачать офлайн-версию -->
-    <!-- --------------------------------------------------------- -->
-    <div class="card">
-        <h2>Скачать офлайн-версию</h2>
-        <div class="download-box">
-            <p><strong>Файл:</strong> Guide.html</p>
-            <p>Работает полностью без интернета.</p>
-						 <div class="btn-row">
-                         <a href="Guide.html" class="btn btn-secondary" id="downloadBtn" download>📘 Скачать</a>
-                         <span class="counter-badge">Скачивали: <span id="downloadCount">0</span></span>
-                    </div>
-          </div>
-    </div>
-
-    <footer>
-        © hebrewverbs — тренажёр по ивритским глаголам
-    </footer>
+<footer>
+© hebrew-deklension — склонение в иврите
+</footer>
 
 </div>
 
-
-<script>
-(() => {
-  // Счётчики кликов (публичные, без секретов).
-  // На странице НЕ отображаем (CSS display:none), но в DOM/коде (DevTools → Elements) значения видны.
-  const API_BASE = 'https://api.counterapi.dev/v1';
-  const NAMESPACE = 'mashegu-hebrewverbs';
-  const KEY_OPEN = 'guide_open_click';
-  const KEY_DOWNLOAD = 'guide_download_click';
-
-  const urlGet = (key) => `${API_BASE}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(key)}/`;
-  const urlUp  = (key) => `${API_BASE}/${encodeURIComponent(NAMESPACE)}/${encodeURIComponent(key)}/up?t=${Date.now()}_${Math.random()}`;
-
-  // Beacon: запрос обычно успевает уйти даже при переходе по ссылке
-  const beaconUp = (key) => { const img = new Image(); img.src = urlUp(key); };
-
-  const pickNumber = (obj) => {
-    for (const k of ['count','value','result']) if (typeof obj?.[k] === 'number') return obj[k];
-    if (typeof obj?.data === 'object') {
-      for (const k of ['count','value','result']) if (typeof obj.data?.[k] === 'number') return obj.data[k];
-    }
-    return 0;
-  };
-
-  const setText = (id, v) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = String(v);
-  };
-
-  const getValue = async (key) => {
-    try {
-      const r = await fetch(urlGet(key), { cache: 'no-store' });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return pickNumber(await r.json());
-    } catch {
-      return 0;
-    }
-  };
-
-  let openVal = 0, downVal = 0;
-
-  document.addEventListener('DOMContentLoaded', async () => {
-    // Подтягиваем текущие значения и записываем в DOM (в коде будет видно число)
-    [openVal, downVal] = await Promise.all([getValue(KEY_OPEN), getValue(KEY_DOWNLOAD)]);
-    setText('openCount', openVal);
-    setText('downloadCount', downVal);
-
-    // Считаем клики и обновляем DOM-число (при этом на странице ничего не видно из-за display:none)
-    document.getElementById('openInterfaceBtn')?.addEventListener('click', () => {
-      beaconUp(KEY_OPEN);
-      openVal += 1;
-      setText('openCount', openVal);
-    });
-
-    document.getElementById('downloadBtn')?.addEventListener('click', () => {
-      beaconUp(KEY_DOWNLOAD);
-      downVal += 1;
-      setText('downloadCount', downVal);
-    });
-  });
-})();
-</script>
-
 </body>
+
 </html>

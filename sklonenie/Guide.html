@@ -1,1 +1,3797 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guide</title>
+
+<style>
+
+body{
+  font-family: David, Arial, sans-serif;
+  font-size:18px;
+  margin:10mm 15mm;
+  background:#fff;
+}
+
+#layout{
+  display:flex;
+  width:100%;
+  height:auto;
+}
+
+/* ===== RIGHT PANEL ===== */
+#mainPanel{
+  flex:1;
+  padding:10px;
+    display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* ===== HEADER ===== */
+#aiNote{
+  text-align:center;
+  font-style:italic;
+  margin-bottom:6px;
+  width:100%;
+  max-width:1400px;
+}
+
+/* controls centered */
+#topControls{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+  width:100%;
+  max-width:1400px;
+  justify-content:flex-start;
+  flex-wrap:nowrap;
+}
+
+
+
+/* ==== FIX: keep "Список" in same row with language controls ==== */
+#topControls{ flex-wrap:nowrap !important; }
+#topControls > *{ min-width:0; }
+#queryBox{ min-width:0 !important; flex:1 1 320px; }
+#queryHebrew{ min-width:140px; width:100%; }
+#favoritesPanel{ flex:0 0 auto; position:relative; }
+.favHeaderRow{ padding:6px 10px; }
+#favTitle{ font-size:20px; font-weight:700; }
+#topControls strong{
+  font-weight:bold;
+}
+
+#topControls select,
+#topControls button{
+  font-size:16px;
+  padding:4px 8px;
+}
+
+/* hide checkbox visually, keep logic */
+#showExamples{
+  display:none !important;
+}
+
+/* hide badge (visual only) */
+#baseBadge{
+  display:none !important;
+}
+
+/* ===== CONTENT ===== */
+
+/* ordering for top controls */
+#homeLink{ order:0; }
+#favoritesPanel{
+  display:inline-flex;
+  align-items:center;
+  flex:0 0 auto;
+  margin-right:12px;
+  z-index:50;
+}
+
+
+#topControls > strong{ order:2; }
+#langSelectect{ order:3; }
+#speakBase{ order:4; }
+#queryBox{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:1 1 auto;
+  min-width:220px;
+}
+
+#baseBadge{ order:6; margin-left:auto; margin-right:auto; } /* бейдж остаётся по центру */
+
+#tableWrapper{
+  font-family: David, Arial, sans-serif; /* примеры */
+  flex:1;
+  overflow-y:auto;
+  width:100%;
+  max-width:1400px;
+  margin:10px auto 0;
+  text-align:center; /* примеры по центру */
+}
+/* Center translations text blocks */
+#tableWrapper .example-ru,
+#tableWrapper .example-uk,
+#tableWrapper .example-en{
+  text-align:center;
+}
+
+
+/* tighter examples spacing */
+#tableWrapper p,
+#tableWrapper div,
+#tableWrapper td{
+  line-height:1.15;
+  margin:1px 0;
+}
+
+/* плотнее примеры */
+#tableWrapper .ex-he,
+#tableWrapper .example-ru,
+#tableWrapper .example-uk,
+#tableWrapper .example-en{
+  margin-top:2px;
+  margin-bottom:2px;
+}
+
+.small{
+  text-align:center;
+  color:#222;
+  font-size:15px;
+}
+
+/* Иврит (общий класс) */
+.hebrew{ font-family: David, "David CLM", serif; direction: rtl; unicode-bidi: plaintext; }
+
+/* ИВРИТ ТОЛЬКО В ПРИМЕРАХ (правая панель) */
+#tableWrapper .he,
+#tableWrapper [lang="he"],
+#tableWrapper [dir="rtl"]{
+  font-family: David, "David CLM", serif;
+  font-size: 40px;     /* x2 */
+  font-weight: 400;    /* не жирный */
+  direction: rtl;
+  unicode-bidi: plaintext;
+  line-height: 1.2;
+}
+/* Авто-стиль: иврит в примерах (правая панель) */
+#tableWrapper .ex-he{
+  font-family: David, "David CLM", serif;
+  font-size: 40px;     /* x2 */
+  font-weight: inherit; /* сохраняем жирность от <b>/<strong> */
+  direction: rtl;
+  unicode-bidi: plaintext;
+  line-height: 1.2;
+}
+/* В примерах (tables.js) нужные формы отмечены <b>...</b> — оставляем их жирными */
+#tableWrapper b,
+#tableWrapper strong{
+  font-weight: 700 !important;
+}
+/* Переводы в примерах (RU/UK/EN) — шрифт David (если доступен), иначе fallback */
+#tableWrapper .example-ru,
+#tableWrapper .example-uk,
+#tableWrapper .example-en{
+  font-family: David, Arial, sans-serif;
+}
+
+#homeLink{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  text-decoration:none;
+  font-size:18px;
+  line-height:1;
+  border:1px solid #ddd;
+  background:#fff;
+  cursor:pointer;
+}
+#homeLink:hover{ background:#f5f5f5; }
+
+
+/* ===== QUERY (hebrew input) ===== */
+#queryBox{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+#queryHebrew{
+  width:120px;
+  font-size:18px;
+  padding:6px 10px;
+  border:1px solid #bbb;
+  border-radius:6px;
+  direction:rtl;
+  text-align:center;
+  font-family: David, "David CLM", serif;
+}
+#genPlus,#genMinus{
+  width:36px;
+  height:34px;
+  font-size:20px;
+  border:1px solid #bbb;
+  border-radius:6px;
+  background:#fff;
+  cursor:pointer;
+}
+#genPlus:hover,#genMinus:hover{ background:#f5f5f5; }
+
+/* ===== AI menu under «+» ===== */
+#genMenu{
+  position:absolute;
+  top:calc(100% + 6px);
+  right:0;
+  min-width:170px;
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);
+  padding:6px;
+  display:none;
+  z-index:200;
+}
+#queryBox{ position:relative; }
+#genMenu a{
+  display:block;
+  padding:6px 10px;
+  border-radius:10px;
+  text-decoration:none;
+  color:#111;
+  font-size:16px;
+}
+#genMenu a:hover{ background:#f5f5f5; }
+#genMenu .danger{ color:#b91c1c; }
+
+/* показываем кнопку «+» рядом с вводом; «−» больше не нужен */
+#topControls #genMinus{ display:inline-flex; align-items:center; justify-content:center; }
+#aiBadge{
+  display:none;
+  margin-left:8px;
+  padding:2px 10px;
+  border:2px solid #e11d48;
+  color:#e11d48;
+  border-radius:999px;
+  font-weight:700;
+}
+
+
+/* ===== Personal list ===== */
+#favoritesPanel{
+  position:relative;
+  left:auto;
+  top:auto;
+  z-index:200;
+  display:flex;
+  flex-direction:column;
+  width:300px;
+  max-width:300px;
+}
+
+/* “шапка” списка — всегда одна строка, как 'Язык перевода' */
+.favHeaderRow{
+  display:inline-flex;
+  white-space:nowrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:6px 10px;
+  background:#fff;
+  cursor:pointer;
+}
+
+.favHeader{
+  font-weight:bold;
+  font-size:inherit;
+  line-height:1.1;
+}
+
+/* кнопка + такая же как + возле ввода */
+.favAddBtn{
+  width:40px;
+  height:36px;
+  font-size:20px;
+  border:1px solid #bbb;
+  border-radius:6px;
+  background:#fff;
+  cursor:pointer;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* dropdown — ВНЕ потока, не двигает склонение/примеры */
+#favDropdown{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);
+  padding:6px 8px;
+  max-height:60vh;
+  overflow:auto;
+
+  /* open by content, not full width */
+  width:max-content;
+  min-width:260px;
+  max-width:360px;
+  z-index:250;
+}
+#favoritesPanel.favCollapsed #favDropdown{
+  display:none !important;   /* реально скрываем список */
+  z-index:250;
+}
+
+.favList{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  margin:0;
+  padding:0;
+}
+
+/* строка без зазоров */
+.favItem{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px solid #eee;
+  padding:8px 4px;
+}
+.favItem:last-child{ border-bottom:none; }
+
+.favItemBtn{
+  flex:1;
+  background:transparent;
+  border:none;
+  text-align:center;
+  padding:0;
+  cursor:pointer;
+  font-size:18px;
+}
+
+/* знак удаления — маленький, размер буквы */
+.favDel{
+  width:22px;
+  height:22px;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-size:18px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0.8;
+}
+.favDel:hover{ opacity:1; }
+
+.genBtn.flash{ transform: scale(0.96); background:#eee; }
+
+/* === PATCH: center personal list header text === */
+#favoritesPanel{
+  position:fixed;
+  left:16px;
+  top:92px;
+  z-index:200;
+  display:flex;
+  flex-direction:column;
+  width:300px;
+  max-width:300px;
+}
+
+.favHeader{ flex:1; text-align:center; }
+.favHeaderRow{ justify-content:center; }
+.favAddBtn{ margin-left:auto; }
+/* dropdown centered under header */
+#favDropdown{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);
+  padding:6px 8px;
+  max-height:60vh;
+  overflow:auto;
+
+  /* open by content, not full width */
+  width:max-content;
+  min-width:260px;
+  max-width:360px;
+  z-index:250;
+}
+.favHeaderRow{
+  white-space:nowrap;
+}
+
+
+/* === PERSONAL LIST DROPDOWN: fit content & center === */
+#favoritesPanel{
+  position:fixed;
+  left:16px;
+  top:92px;
+  z-index:200;
+  display:flex;
+  flex-direction:column;
+  width:300px;
+  max-width:300px;
+}
+
+#favDropdown{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);
+  padding:6px 8px;
+  max-height:60vh;
+  overflow:auto;
+
+  /* open by content, not full width */
+  width:max-content;
+  min-width:260px;
+  max-width:360px;
+  z-index:250;
+}
+
+
+/* ===== FINAL PATCH (2026-02-24): Personal list dropdown should fit content ===== */
+#favoritesPanel{
+  position:fixed;
+  left:16px;
+  top:92px;
+  z-index:200;
+  display:flex;
+  flex-direction:column;
+  width:300px;
+  max-width:300px;
+}
+
+
+#favDropdown{
+  left:0 !important;
+  right:auto !important;            /* anchor from left edge of header */
+  width:fit-content !important;     /* shrink to content */
+  min-width:0 !important;           /* IMPORTANT: remove forced minimum width */
+  max-width:fit-content !important;
+  z-index:250;
+}
+
+/* keep items from stretching the dropdown */
+#favDropdown .favItemBtn{
+  white-space:nowrap;
+}
+
+
+/* show dropdown when panel is open */
+#favoritesPanel:not(.favCollapsed) #favDropdown{
+  display:block;
+  z-index:250;
+}
+
+
+/* ===== LIST MENU (2026-02-25): "Список" ===== */
+#listMenu{
+  z-index:220;
+
+  position:fixed;
+  top:0;
+  left:0;
+  transform:translateX(-50%);
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);
+  padding:6px;
+  display:none;
+  z-index:120;
+  width:max-content;
+}
+#listMenu .listMenuItem{
+  display:block;
+  width:100%;
+  text-align:center;
+  padding:8px 10px;
+  border:none;
+  background:transparent;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:16px;
+}
+#listMenu .listMenuItem:hover{ background:#f5f5f5; }
+
+/* Panel states */
+#favoritesPanel.menuOpen #listMenu{ display:block; }
+#favoritesPanel.personalOpen #favDropdown{ display:block !important; }
+#favoritesPanel:not(.personalOpen) #favDropdown{ display:none !important; }
+
+/* "Список" header look */
+#favoritesPanel .favHeaderRow{ user-select:none; }
+
+
+
+
+/* ===== Personal list: compact rows, X next to word, same fill as "Весь список" ===== */
+#favDropdown{
+  left:0 !important;
+  right:auto !important;
+  width:max-content !important;
+  min-width:0 !important;
+  max-width:340px !important;
+  box-sizing:border-box !important;
+  padding:4px 6px 6px !important;
+  max-height:calc(100vh - 180px) !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  border:1px solid #eee !important;
+  border-radius:14px !important;
+  background:#fff !important;
+  box-shadow:0 10px 30px rgba(0,0,0,0.10) !important;
+  z-index:250 !important;
+}
+
+#favDropdown .favList{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+#favDropdown .favItem{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:4px 2px !important;
+  margin:0 !important;
+  border-bottom:none !important;
+  box-sizing:border-box !important;
+}
+#favDropdown .favItem:last-child{
+  border-bottom:none !important;
+}
+
+#favDropdown .favItemCell{
+  flex:0 1 auto !important;
+  min-width:0 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+  background:#f3f3f3 !important;
+  border:1px solid #8f8f8f !important;
+  border-radius:2px !important;
+  padding:4px 8px !important;
+  white-space:normal !important;
+  text-align:center !important;
+  box-shadow:none !important;
+}
+
+#favDropdown .favItemBtn{
+  flex:0 1 auto !important;
+  min-width:0 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+  background:transparent !important;
+  border:none !important;
+  border-radius:0 !important;
+  padding:0 !important;
+  margin:0 !important;
+  cursor:pointer !important;
+  white-space:normal !important;
+  text-align:center !important;
+  box-shadow:none !important;
+}
+
+#favDropdown .listHe{
+  font-family: David, "David CLM", serif !important;
+  direction:rtl !important;
+  unicode-bidi:plaintext !important;
+  font-size:16px !important;
+  font-weight:400 !important;
+  line-height:1.15 !important;
+}
+
+#favDropdown .listTr{
+  font-size:16px !important;
+  font-weight:400 !important;
+  line-height:1.15 !important;
+  white-space:normal !important;
+}
+
+#favDropdown .favDel{
+  width:auto !important;
+  height:auto !important;
+  flex:0 0 auto !important;
+  border:none !important;
+  background:transparent !important;
+  cursor:pointer !important;
+  font-size:16px !important;
+  line-height:1 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  opacity:0.9 !important;
+  margin-left:0 !important;
+  padding:0 !important;
+}
+#favDropdown .favDel:hover{ opacity:1 !important; }
+
+
+
+/* ===== LIST RESULTS (left panel) ===== */
+#listResults{
+  display:none;
+  position:fixed;
+  left:16px;
+  top:160px;
+  width:300px;
+  max-width:300px;
+  padding:6px 6px 10px;
+  max-height:calc(100vh - 180px);
+  overflow:auto;
+  border:1px solid #eee;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 10px 30px rgba(0,0,0,0.10);
+  z-index:190;
+}
+
+#listResults .listRow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:6px 4px;
+  border-bottom:1px solid #f0f0f0;
+}
+#listResults .listRow:last-child{ border-bottom:none; }
+#listResults .listHe{
+  font-family: David, "David CLM", serif;
+  direction:rtl;
+  unicode-bidi:plaintext;
+  font-size:16px;      /* как в личном списке */
+  font-weight:400;
+}
+#listResults .listTr{
+  font-size:16px;
+  font-weight:400;
+}
+
+
+/* ===== v13 layout: stable single-row header with auto width left block ===== */
+#aiNote{ max-width:none !important; }
+#topControls{
+  max-width:none !important;
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns: auto 1fr !important;
+  column-gap: 14px !important;
+  align-items:center !important;
+  justify-content:stretch !important;
+}
+#leftControls, #rightControls{ min-width:0; }
+#leftControls{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:max-content;
+  white-space:nowrap;
+}
+#rightControls{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+  flex-wrap:nowrap;
+}
+#rightControls > *{ min-width:0; }
+#queryBox{ flex:1 1 420px !important; min-width:0 !important; }
+#favoritesPanel{ width:max-content !important; }
+
+
+/* ===== v14: fix overall header layout (no shifting, everything in one row) ===== */
+#topControls{
+  max-width:none !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+}
+#headerRow{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:nowrap;
+  width:100%;
+}
+#headerRow > *{ min-width:0; }
+#favoritesPanel{
+  position:static !important;
+  left:auto !important;
+  top:auto !important;
+  width:auto !important;
+  max-width:none !important;
+  margin:0 !important;
+}
+#langLabel{ white-space:nowrap; }
+#langSelectect{ flex:0 0 auto; }
+#queryBox{
+  flex:1 1 auto;
+  min-width:220px;
+}
+#queryHebrew{
+  min-width:0;
+  width:100%;
+}
+
+
+/* ===== v17 OVERRIDES: Personal list must open in header row ===== */
+#headerRow #favoritesPanel{
+  position:relative !important;
+  left:auto !important;
+  top:auto !important;
+  width:max-content !important;
+  max-width:none !important;
+  display:inline-flex !important;
+}
+#headerRow #favoritesPanel.favCollapsed #favDropdown{ display:none !important; }
+#headerRow #favoritesPanel.personalOpen #favDropdown{ display:block !important; }
+#headerRow #favoritesPanel #favDropdown{
+  position:absolute !important;
+  top:calc(100% + 8px) !important;
+  left:0 !important;
+  right:auto !important;
+  transform:none !important;
+}
+
+
+/* v17b: hard hide support */
+#listMenu[hidden]{ display:none !important; }
+
+/* v17d: hard hide support for listResults */
+#listResults[hidden]{ display:none !important; }
+
+/* ===== v17k: restore ONLY the right-side "Язык перевода" row (from Guide.html) ===== */
+
+/* keep controls centered and aligned like Guide */
+#topControls{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:12px !important;
+}
+
+/* typography like Guide */
+#topControls strong{ font-weight:bold !important; }
+#topControls select,
+#topControls button{
+  font-size:16px !important;
+  padding:4px 8px !important;
+}
+
+/* ordering for RIGHT block only (left block untouched) */
+#topControls > strong{ order:2 !important; }
+#langSelectect{ order:3 !important; }
+#speakBase{ order:4 !important; }
+#queryBox{ order:5 !important; }
+
+/* input row like Guide */
+#queryBox{
+  display:flex !important;
+  align-items:center !important;
+  gap:6px !important;
+}
+#queryHebrew{
+  width:auto !important;
+  min-width:120px !important;
+  max-width:360px !important;
+  font-size:18px !important;
+  padding:6px 10px !important;
+  border:1px solid #bbb !important;
+  border-radius:6px !important;
+  direction:rtl !important;
+  text-align:center !important;
+  font-family: David, "David CLM", serif !important;
+  box-sizing:border-box !important;
+  flex:0 0 auto !important;
+}
+
+
+/* ===== v17l: center the whole page ===== */
+body{ margin:0 !important; }
+#layout{ display:flex !important; justify-content:center !important; }
+#mainPanel{ width:100% !important; max-width:950px !important; margin:10mm auto !important; }
+
+
+/* ===== v17m: CENTER PAGE (strong overrides) ===== */
+html, body{ width:100% !important; }
+body{ margin:0 !important; }
+#layout{ width:100% !important; display:flex !important; justify-content:center !important; }
+#mainPanel{ width:100% !important; max-width:950px !important; margin:0 auto !important; }
+
+
+/* ===== v17o: Centering exactly like Guide.html (copied layout principles) ===== */
+body{
+  margin:10mm 15mm !important;
+  background:#fff !important;
+}
+#layout{
+  display:flex !important;
+  width:100% !important;
+  height:auto !important;
+}
+#mainPanel{
+  flex:1 !important;
+  padding:10px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important; /* ключевое: центрируем содержимое */
+}
+
+/* controls centered (as in Guide) */
+#topControls{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:12px !important;
+  margin-bottom:10px !important;
+  width:100% !important;
+  max-width:950px !important;
+}
+
+/* content centered width */
+#tableWrapper{
+  width:100% !important;
+  max-width:950px !important;
+  margin:10px auto 0 !important;
+  text-align:center !important;
+}
+
+
+
+/* ===== Speech help popup ===== */
+#topControls{ position:relative; }
+.speechHelpPopup{
+  position:absolute;
+  top:58px;
+  right:240px;
+  width:290px;
+  max-width:calc(100vw - 24px);
+  z-index:30;
+}
+.speechHelpInner{
+  position:relative;
+  background:#f5f5f5;
+  border:2px solid #6ab8ff;
+  border-radius:18px;
+  box-shadow:0 8px 22px rgba(0,0,0,.10);
+  padding:14px 16px 12px;
+  max-height:210px;
+  overflow:auto;
+  text-align:left;
+}
+.speechHelpClose{
+  position:absolute;
+  top:10px;
+  right:12px;
+  border:1px solid #bdbdbd;
+  border-radius:12px;
+  background:#fff;
+  cursor:pointer;
+  padding:4px 12px;
+  font-size:15px;
+}
+.speechHelpTitle{
+  font-weight:800;
+  font-size:18px;
+  margin:2px 72px 10px 0;
+}
+.speechHelpList{
+  margin:0 0 12px 0;
+  padding-left:22px;
+  font-size:13px;
+  line-height:1.35;
+}
+.speechHelpList li{ margin:0 0 8px; }
+.speechHelpExternalLine{ font-size:13px; line-height:1.35; }
+@media (max-width: 900px){
+  .speechHelpPopup{ top:64px; right:6px; width:270px; }
+}
+
+
+#queryBox{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:0 0 auto !important;
+  min-width:0 !important;
+  width:auto !important;
+}
+#manualHebrewWrap,
+#manualGenderWrap{
+  display:none;
+  align-items:center;
+  gap:8px;
+  flex:0 0 auto;
+}
+#manualHebrewWrap.show,
+#manualGenderWrap.show{
+  display:flex;
+}
+#manualHebrewInput,
+#manualGenderSelect{
+  font-size:16px;
+  padding:6px 10px;
+  border:1px solid #999;
+  border-radius:8px;
+  background:#fff;
+}
+#manualHebrewInput{
+  width:auto !important;
+  min-width:120px;
+  max-width:360px;
+  direction:rtl;
+  text-align:center;
+  box-sizing:border-box;
+  flex:0 0 auto;
+}
+#manualGenderSelect{
+  min-width:86px;
+  flex:0 0 auto;
+}
+
+
+#manualHelpPopup{
+  display:none;
+  position:absolute;
+  top:calc(100% + 64px);
+  left:50%;
+  right:auto;
+  transform:translateX(-50%);
+  width:fit-content;
+  max-width:min(860px, calc(100vw - 40px));
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);
+  padding:10px 12px;
+  z-index:230;
+  box-sizing:border-box;
+}
+#manualHelpPopup.show{ display:none; }
+#manualHelpPopupText{
+  font-size:14px;
+  line-height:1.35;
+  text-align:left;
+}
+#manualHebrewInput.manualTarget{
+  border:2px solid #111;
+}
+
+
+/* center whole page */
+html, body{
+  width:100%;
+}
+body{
+  margin:10mm 15mm;
+  display:flex;
+  justify-content:center;
+}
+#layout{
+  width:100%;
+  max-width:1400px;
+  display:flex;
+  justify-content:center;
+}
+#mainPanel{
+  width:100%;
+  max-width:1400px;
+  margin:0 auto;
+  align-items:center;
+}
+#topControls{
+  width:100%;
+  max-width:1400px;
+  justify-content:center !important;
+}
+#tableWrapper{
+  width:100%;
+  max-width:1400px;
+  margin:10px auto 0;
+}
+
+
+/* === final center + content-width patch === */
+html, body{
+  width:100% !important;
+}
+body{
+  margin:10mm 15mm !important;
+}
+#layout{
+  width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+}
+#mainPanel{
+  width:100% !important;
+  max-width:1400px !important;
+  margin:0 auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+}
+#topControls{
+  width:100% !important;
+  max-width:1400px !important;
+  margin:0 auto 10px !important;
+}
+#tableWrapper{
+  width:100% !important;
+  max-width:1400px !important;
+  margin:10px auto 0 !important;
+}
+
+
+
+/* ===== FINAL FIX: inputs must be content-width, not stretched ===== */
+#queryBox{
+  flex:0 0 auto !important;
+  width:auto !important;
+  max-width:none !important;
+  min-width:0 !important;
+}
+#queryHebrew,
+#manualHebrewInput{
+  display:inline-block !important;
+  flex:0 0 auto !important;
+  min-width:80px !important;
+  max-width:260px !important;
+  width:80px !important; /* real width will be set by JS autosize */
+}
+#manualHebrewWrap,
+#manualGenderWrap{
+  flex:0 0 auto !important;
+}
+#tableWrapper .statusMessageBlock{
+  text-align:center;
+  margin-top:20px;
+}
+#tableWrapper .statusMessageText{
+  font-size:20px;
+  text-align:center;
+}
+#tableWrapper .statusHelpPopup{
+  display:block;
+  margin:16px auto 0;
+  width:fit-content;
+  max-width:min(680px, calc(100vw - 60px));
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);
+  padding:10px 12px;
+  box-sizing:border-box;
+  text-align:left;
+}
+#tableWrapper .statusHelpPopupText{
+  font-size:14px;
+  line-height:1.35;
+}
+
+</style>
+
+<style id="three-fields-scheme-style">
+#genMenu{display:none !important;}
+#manualHebrewWrap.show, #manualGenderWrap.show{display:flex !important;}
+#manualHelpPopup.show{display:block !important;}
+</style>
+
+<style id="hide-duplicate-manual-popup">#manualHelpPopup, #manualHelpPopup.show{display:none !important;}</style>
+
+<style id="final-center-restore-20260331">
+/* Final restore: keep the whole top line in one centered row */
+#layout{
+  width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+}
+#mainPanel{
+  width:100% !important;
+  max-width:1400px !important;
+  margin:0 auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+}
+#topControls{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:12px !important;
+  width:fit-content !important;
+  max-width:none !important;
+  margin:0 auto 10px !important;
+}
+#topControls > *{
+  flex:0 0 auto !important;
+}
+#homeLink{ order:0 !important; }
+#favoritesPanel{
+  order:1 !important;
+  position:relative !important;
+  left:auto !important;
+  top:auto !important;
+  margin:0 !important;
+  width:auto !important;
+  max-width:none !important;
+  display:inline-flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+}
+#langLabel{ order:2 !important; white-space:nowrap !important; }
+#langSelect{ order:3 !important; }
+#speakBase{ order:4 !important; }
+#queryBox{
+  order:5 !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:6px !important;
+  flex:0 0 auto !important;
+  width:auto !important;
+  min-width:0 !important;
+}
+#queryHebrew,
+#manualHebrewInput{
+  width:auto !important;
+  max-width:260px !important;
+}
+#tableWrapper{
+  width:100% !important;
+  max-width:1400px !important;
+  margin:10px auto 0 !important;
+  text-align:center !important;
+}
+</style>
+<style>
+body{
+  font-family: David, Arial, sans-serif;
+  font-size:18px;
+  margin:10mm 15mm;
+  background:#fff;
+}
+
+/* ... весь твой существующий CSS ... */
+
+.hl{
+  color: red;
+  font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+<div id="layout">
+<main id="mainPanel">
+
+    <div id="aiNote"></div>
+
+    <!-- TOP CONTROLS (visual = Guide-face, ids = Guide) -->
+    <div id="topControls">
+      <span id="baseBadge" class="small">—</span>
+
+      
+      <a id="homeLink" href="index.html" title="На главную">🏠</a>
+<div id="favoritesPanel" class="favCollapsed" title="Список (клик — меню)">
+        <div class="favHeaderRow" id="favHeaderRow">
+          <div class="favHeader" id="favTitle">Список</div>
+  <button id="favAddBtn" class="favAddBtn" type="button" title="Добавить то, что введено сверху">+</button>
+</div>
+        <div id="listMenu" class="listMenu" role="menu" aria-label="Список меню">
+          <button type="button" class="listMenuItem" data-mode="personal">Личный список</button>
+          <button type="button" class="listMenuItem" data-mode="all">На слуху</button>
+          <button type="button" class="listMenuItem" data-mode="sorted">Сортировать по переводу</button>
+        </div>
+        <div id="favDropdown" class="favDropdown">
+        <div id="favoritesEmpty" class="favEmpty">Пока пусто</div>
+        <div id="favoritesList" class="favList"></div>
+            </div>
+</div>
+
+<strong id="langLabel">Язык перевода:</strong>
+      <select id="langSelect">
+        <option value="ru">Русский</option>
+        <option value="en">English</option>
+        <option value="uk">Українська</option>
+      </select>
+<button id="speakBase" title="Озвучка" aria-haspopup="dialog" aria-expanded="false">🔊</button>
+<div id="speechHelpPopup" class="speechHelpPopup" hidden>
+  <div class="speechHelpInner">
+
+    <button id="speechHelpClose" class="speechHelpClose">×</button>
+
+    <div id="speechHelpTitle" class="speechHelpTitle">Как включить озвучку:</div>
+
+    <ul class="speechHelpList">
+      <li><b>Google Chrome:</b> <span id="speechHelpChrome">Озвучка работает автоматически через Web Speech API.</span></li>
+      <li><b>Microsoft Edge:</b> <span id="speechHelpEdge">Поддерживает голоса Windows.</span></li>
+      <li><b>Firefox:</b> <span id="speechHelpFirefox">Требуется включить поддержку Web Speech API (экспериментально).</span></li>
+      <li><b>Safari:</b> <span id="speechHelpSafari">Использует встроенный голос Siri.</span></li>
+    </ul>
+
+    <div class="speechHelpExternalLine">
+      <span id="speechHelpExternal">Если озвучка не работает, можно использовать внешний сервис:</span>
+      <a href="https://sitenarrator.com" target="_blank">SiteNarrator</a>.
+    </div>
+
+  </div>
+</div>
+
+      <div id="queryBox">
+        <div id="manualHelpPopup" aria-hidden="true">
+          <div id="manualHelpPopupText">Вставьте иврит с огласовками и перевод, затем выберите род или местоимение. Иврит с огласовками можно взять в Google Translate, Morfix, Pealim или Dicta Nakdan.</div>
+        </div>
+        <input id="queryHebrew" type="text" value="שלום" inputmode="text" autocomplete="off"
+               placeholder="вставьте предлог / слово"
+               aria-label="Предлог или слово">
+        <div id="manualGenderWrap" aria-hidden="true">
+          <select id="manualGenderSelect" aria-label="Род слова (авто)">
+            <option value="" selected>род / местоим.</option>
+            <option value="m">мой</option>
+            <option value="f">моя</option>
+            <option value="n">моё</option>
+            <option value="pl">мои</option>
+            <option value="acc">меня</option>
+            <option value="dat">мне</option>
+            <option value="ins">мной</option>
+          </select>
+        </div>
+        <div id="manualHebrewWrap" aria-hidden="true">
+          <input id="manualHebrewInput" type="text" value="" inputmode="text" autocomplete="off"
+                 placeholder="иврит"
+                 aria-label="Перевод на иврите">
+        </div>
+        <button id="genPlus" title="Добавить">+</button>
+        <button id="genMinus" title="Удалить сгенерированное слово">×</button>
+        <div id="genMenu" role="menu" aria-label="AI меню">
+          <a href="#" id="genInsert">вставить</a>
+          <a href="#" id="genDelete" class="danger">удалить</a>
+          <a href="#" id="genAlt">другой вариант</a>
+        </div>
+      </div>
+
+      
+
+        <div id="listResults" class="listResults" aria-live="polite"></div>
+</div>
+<div id="tableWrapper">
+      <div class="small" id="emptyHint">Введите предлог или слово сверху.</div>
+    </div>
+
+  </main>
+</div>
+
+<script src="tables.js">function autoSizeInputByContent(el){
+  if(!el) return;
+  const probe = document.createElement("span");
+  const cs = window.getComputedStyle(el);
+  probe.style.position = "absolute";
+  probe.style.visibility = "hidden";
+  probe.style.whiteSpace = "pre";
+  probe.style.font = cs.font;
+  probe.style.letterSpacing = cs.letterSpacing;
+  probe.textContent = (el.value && el.value.length ? el.value : (el.placeholder || "")).replace(/ /g, "\u00A0");
+  document.body.appendChild(probe);
+
+  const minW = parseFloat(cs.minWidth) || 120;
+  const maxW = parseFloat(cs.maxWidth) || 360;
+  const extra = 28;
+  const width = Math.max(minW, Math.min(maxW, Math.ceil(probe.getBoundingClientRect().width + extra)));
+  el.style.setProperty("width", width + "px", "important");
+  probe.remove();
+}
+
+function bindAutoSizeInput(el){
+  if(!el) return;
+  const run = () => autoSizeInputByContent(el);
+  el.addEventListener("input", run);
+  el.addEventListener("change", run);
+  el.addEventListener("focus", run);
+  window.addEventListener("resize", run);
+  run();
+}
+
+bindAutoSizeInput(document.getElementById("queryHebrew"));
+bindAutoSizeInput(document.getElementById("manualHebrewInput"));
+</script>
+<script src="tables2.js"></script>
+<script src="generator.js"></script>
+
+<script>
+if (window.Generator) {
+  window.AIGEN = {
+    init(TABLES) {
+      if (typeof window.Generator.init === "function") {
+        window.Generator.init(TABLES);
+      }
+      return true;
+    },
+    upsert({ term, uiLang, mode, manualHebrew, gender }) {
+      try {
+        const result = manualHebrew
+          ? window.Generator.createFromManualBase(term, manualHebrew, uiLang || "ru", gender || "")
+          : window.Generator.findOrGenerate(term, uiLang || "ru");
+        if (result.status === "found" || result.status === "generated") {
+          return { ok: true, key: result.key, entry: result.entry, result };
+        }
+        if (result.status === "needs_review") {
+          return { ok: false, error: result.reason || "Нужна ручная проверка." };
+        }
+        return { ok: false, error: result.error || "Не удалось сгенерировать." };
+      } catch (e) {
+        return { ok: false, error: e && e.message ? e.message : "Ошибка генератора" };
+      }
+    },
+    remove({ term }) {
+      try {
+        if (!window.Generator.listGeneratedEntries || !window.Generator.deleteGeneratedEntry) {
+          return { ok: false, error: "Удаление не поддерживается." };
+        }
+        const all = window.Generator.listGeneratedEntries();
+        const normalized = window.Generator.normalizeForCompare
+          ? window.Generator.normalizeForCompare(term)
+          : String(term || "").trim().toLowerCase();
+        let foundKey = null;
+        for (const [key, entry] of Object.entries(all || {})) {
+          const vars = [
+            entry?.base?.he || "",
+            entry?.base?.ru || "",
+            entry?.base?.uk || "",
+            entry?.base?.en || ""
+          ];
+          const hit = vars.some(v => {
+            const vv = window.Generator.normalizeForCompare
+              ? window.Generator.normalizeForCompare(v)
+              : String(v || "").trim().toLowerCase();
+            return vv === normalized;
+          });
+          if (hit) {
+            foundKey = key;
+            break;
+          }
+        }
+        if (!foundKey) {
+          return { ok: false, error: "Слово не найдено в tables2.js." };
+        }
+        const ok = window.Generator.deleteGeneratedEntry(foundKey);
+        return ok ? { ok: true } : { ok: false, error: "Не удалось удалить." };
+      } catch (e) {
+        return { ok: false, error: e && e.message ? e.message : "Ошибка удаления" };
+      }
+    }
+  };
+}
+</script>
+
+
+<script>
+(function(){
+  if(typeof TABLES === "undefined") return;
+  const DAILY_KEYS = [
+    "bein","im","etzel","el","al","lifnei","bishvil","min","be","le","leyad",
+    "yad","regel","ayin","lev","ab","em","ach","achot","ben","bat","yeled",
+    "shalom","shem","ozen","beten","rosh","pe","shen","zman"
+  ];
+  function uniqEntries(arr){
+    const seen = new Set();
+    return arr.filter(x => {
+      const k = (x.he || "") + "|" + (x.ru || "");
+      if(seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+  function pickByKeys(keys){
+    const out = [];
+    keys.forEach(k => {
+      const e = TABLES[k];
+      if(!e || !e.base) return;
+      out.push({
+        he: e.base.he || "",
+        ru: e.base.ru || "",
+        uk: e.base.uk || "",
+        en: e.base.en || ""
+      });
+    });
+    return uniqEntries(out).filter(x => x.he);
+  }
+  window.DAILY_FROM_TABLES = pickByKeys(DAILY_KEYS);
+})();
+</script>
+
+<script>
+/* === PATCH: ensure single-letter Hebrew prepositions work (ב, ל, כ, מ) === */
+(function(){
+  if(typeof TABLES === "undefined") return;
+
+  function alias(heKey, latinKey){
+    if(TABLES[latinKey]){
+      TABLES[heKey] = TABLES[latinKey];
+    }
+  }
+
+  // בְּ
+  alias("בְּ", "be");
+  alias("ב", "be");
+  alias("ב-", "be");
+
+  // לְ
+  alias("לְ", "le");
+  alias("ל", "le");
+  alias("ל-", "le");
+
+  // כְ (если есть в базе как "ke")
+  alias("כְ", "ke");
+  alias("כ", "ke");
+  alias("כ-", "ke");
+
+  // מִן/מְ (если есть как "min"/"me")
+  alias("מ", "min");
+  alias("מ-", "min");
+})();
+</script>
+<script>
+
+/* ===== v14: stable header row + keep lists inside "Список" panel ===== */
+(function(){
+  function ensureHeaderLayout(){
+    const top = document.getElementById('topControls');
+    if(!top) return;
+
+    const fav = document.getElementById('favoritesPanel');
+    const listResults = document.getElementById('listResults');
+
+    // 1) Build a single flex row for the header controls (everything except listResults)
+    let row = document.getElementById('headerRow');
+    if(!row){
+      row = document.createElement('div');
+      row.id = 'headerRow';
+
+      const nodes = Array.from(top.childNodes);
+      top.innerHTML = '';
+
+      for(const n of nodes){
+        if(n.nodeType === Node.TEXT_NODE && !n.textContent.trim()) continue;
+        if(n.nodeType === Node.ELEMENT_NODE && n.id === 'listResults') continue;
+        row.appendChild(n);
+      }
+
+      top.appendChild(row);
+    }
+
+    // 2) Put listResults INSIDE the "Список" panel so it doesn't shift the header
+    if(fav && listResults){
+      // place after dropdown container
+      const drop = document.getElementById('favDropdown');
+      if(drop && listResults.parentElement !== fav){
+        // if listResults is still in topControls, move it
+        drop.insertAdjacentElement('afterend', listResults);
+      } else if(listResults.parentElement !== fav && !drop){
+        fav.appendChild(listResults);
+      }
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ensureHeaderLayout);
+  } else {
+    ensureHeaderLayout();
+  }
+  window.addEventListener('resize', ensureHeaderLayout);
+})();
+
+
+
+
+/* app.js — FINAL FIX (Type B + Type C) */
+
+const wrap = document.getElementById("tableWrapper");
+const input = document.getElementById("queryHebrew");
+
+
+
+function meaningfulLen(s){
+  const t = String(s||"")
+    .trim()
+    .replace(/[\u0591-\u05C7]/g,"")
+    .replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g,"")
+    .replace(/\s+/g,"");
+  return t.length;
+}
+
+// Debounce: не показываем сообщение во время набора по буквам
+let __queryTimer = null;
+input.addEventListener("input", () => {
+  if(__queryTimer) clearTimeout(__queryTimer);
+
+  const v = String(input.value || "").trim();
+  if(!v){
+    // пусто — очищаем вывод
+    wrap.innerHTML = "";
+    return;
+  }
+
+  
+  if(meaningfulLen(v) < 2){
+    const raw = String(v || "").trim();
+    const t1 = raw
+      .replace(/[\u0591-\u05C7]/g,"")
+      .replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g,"")
+      .replace(/[\s\-־]/g,"");
+
+    const lang = getLang();
+    const lower = raw.toLowerCase();
+
+    const allowedHeb = ["ב","ל","כ","מ"];
+    const allowedRu  = ["у","к","с"];
+    const allowedUk  = ["у","в","з"];
+    const allowedEn  = [];
+
+    let ok1 = false;
+    if(allowedHeb.includes(t1)) ok1 = true;
+    else if(lang === "ru" && allowedRu.includes(lower)) ok1 = true;
+    else if(lang === "uk" && allowedUk.includes(lower)) ok1 = true;
+    else if(lang === "en" && allowedEn.includes(lower)) ok1 = true;
+
+    if(!ok1){
+      wrap.innerHTML = "";
+      return;
+    }
+  }
+__queryTimer = setTimeout(() => {
+    onQuery();
+  }, 700); // 700мс после последнего ввода
+});
+const langSel = document.getElementById("langSelect");
+
+
+/* =========================
+   Input direction (RTL for Hebrew, LTR for RU/UK/EN)
+   ========================= */
+
+function detectInputDir(s){
+  const str = String(s || "");
+  // Find first strong character
+  for (let i = 0; i < str.length; i++){
+    const ch = str[i];
+    const code = ch.codePointAt(0);
+    // Hebrew
+    if (code >= 0x0590 && code <= 0x05FF) return "rtl";
+    // Cyrillic (RU/UK) or Latin
+    if ((code >= 0x0400 && code <= 0x04FF) || (code >= 0x0041 && code <= 0x007A)) return "ltr";
+  }
+  // default: keep RTL (your UI is Hebrew-first)
+  return "rtl";
+}
+
+function applyInputDir(){
+  if (!input) return;
+  const dir = detectInputDir(input.value);
+  input.setAttribute("dir", dir);
+  input.style.textAlign = (dir === "rtl") ? "right" : "left";
+}
+
+/* =========================
+   Helpers
+   ========================= */
+
+// remove niqqud + cantillation
+function stripNiqqud(s){
+  return String(s||"")
+    .normalize("NFD")
+    .replace(/[\u0591-\u05C7]/g,"")
+    .normalize("NFC");
+}
+
+// Cyrillic lookalikes -> Latin (so RU keyboard "еЛ" works as "el")
+const CYR_TO_LAT = {
+  "е":"e","Е":"e",
+  "о":"o","О":"o",
+  "а":"a","А":"a",
+  "с":"c","С":"c",
+  "х":"x","Х":"x",
+  "у":"y","У":"y",
+  "к":"k","К":"k",
+  "м":"m","М":"m",
+  "т":"t","Т":"t",
+  "р":"p","Р":"p",
+  "в":"b","В":"b",
+  "н":"h","Н":"h",
+  "л":"l","Л":"l",
+  "і":"i","І":"i"
+};
+
+function cyrToLatLookalikes(s){
+  return String(s||"").replace(/[еЕоОаАсСхХуУкКмМтТрРвВнНлЛіІ]/g, ch => CYR_TO_LAT[ch] || ch);
+}
+
+function normalizeDelimiters(s){
+  return String(s||"")
+    .replace(/[־–—]/g,"-")   // maqaf/long dash -> "-"
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+/**
+ * normalizeQuery:
+ * - accepts Hebrew (with/without niqqud), Latin keys (el, et, tahat...), and Cyrillic lookalikes (еЛ)
+ * - returns { raw, noNiq, noNiqLower }
+ */
+function normalizeQuery(raw){
+  let s = normalizeDelimiters(raw);
+
+  // if it contains any Hebrew letter => keep Hebrew + space + hyphen only
+  const hasHeb = /[\u0590-\u05FF]/.test(s);
+
+  if(hasHeb){
+    s = s.replace(/[^\u0590-\u05FF\s\-]+/g,"");
+    // remove trailing "-X" where X is Hebrew letters (e.g. מעל-ג)
+    s = s.replace(/[-]+[\u0590-\u05FF]+$/g,"");
+    s = s.replace(/[-]+$/g,"").trim();
+    const noNiq = stripNiqqud(s);
+    return { raw: s, noNiq, noNiqLower: noNiq };
+  }
+
+  // otherwise treat as Latin key (optionally typed with RU lookalikes)
+  s = cyrToLatLookalikes(s);
+  s = s.replace(/[^a-zA-Z0-9_\-\s]+/g,""); // allow your keys: me_al, tahat, etc.
+  s = s.replace(/\s+/g,"").trim();          // keys typically without spaces
+  const low = s.toLowerCase();
+  return { raw: low, noNiq: low, noNiqLower: low };
+}
+
+function getLang(){
+  return (langSel && langSel.value) || "ru";
+}
+
+function t(){
+  const lang = getLang();
+  const dict = {
+    ru: {
+      list: "Список",
+      langLabel: "Язык перевода:",
+      personal: "Личный список",
+      preps: "Предлоги",
+      words: "Слова",
+      daily: "На слуху",
+      all: "На слуху",
+      sorted: "Сортировать по переводу",
+      addTitle: "Добавить то, что введено сверху",
+      speakTitle: "Озвучка",
+      menuAria: "Список меню",
+      decl: "Склонение",
+      ex: "Примеры",
+      favEmpty: "Пока пусто",
+      helpTitle: "Как включить озвучку:",
+      helpChrome: "Озвучка работает автоматически через Web Speech API.",
+      helpEdge: "Поддерживает голоса Windows.",
+      helpFirefox: "Требуется включить поддержку Web Speech API (экспериментально).",
+      helpSafari: "Использует встроенный голос Siri.",
+      helpExternal: "Если озвучка не работает, можно использовать внешний сервис:",
+      close: "Закрыть",
+      viaShel: "Оформление через",
+      notDeclinable: "Не склоняется",
+      notFound: "Предлог или слово не находится в базе данных",
+      noExamples: "Нет примеров.",
+      enterWord: "Введите предлог или слово сверху."
+    },
+    uk: {
+      list: "Список",
+      langLabel: "Мова перекладу:",
+      personal: "Особистий список",
+      preps: "Прийменники",
+      words: "Слова",
+      daily: "На слуху",
+      all: "На слуху",
+      sorted: "Сортувати за перекладом",
+      addTitle: "Додати те, що введено зверху",
+      speakTitle: "Озвучення",
+      menuAria: "Меню списку",
+      decl: "Відмінювання",
+      ex: "Приклади",
+      favEmpty: "Поки порожньо",
+      helpTitle: "Як увімкнути озвучування:",
+      helpChrome: "Озвучування працює автоматично через Web Speech API.",
+      helpEdge: "Підтримує голоси Windows.",
+      helpFirefox: "Потрібно увімкнути підтримку Web Speech API (експериментально).",
+      helpSafari: "Використовує вбудований голос Siri.",
+      helpExternal: "Якщо озвучування не працює, можна використати зовнішній сервіс:",
+      close: "Закрити",
+      viaShel: "Оформлення через",
+      notDeclinable: "Не відмінюється",
+      notFound: "Прийменник або слово не знайдено в базі даних",
+      noExamples: "Немає прикладів.",
+      enterWord: "Введіть прийменник або слово зверху."
+    },
+    en: {
+      list: "List",
+      langLabel: "Translation language:",
+      personal: "Personal list",
+      preps: "Prepositions",
+      words: "Words",
+      daily: "Common",
+      all: "Common",
+      sorted: "Sort by translation",
+      addTitle: "Add what is typed above",
+      speakTitle: "Speak",
+      menuAria: "List menu",
+      decl: "Declension",
+      ex: "Examples",
+      favEmpty: "Empty for now",
+      helpTitle: "How to enable speech:",
+      helpChrome: "Speech works automatically via Web Speech API.",
+      helpEdge: "Supports Windows voices.",
+      helpFirefox: "Web Speech API must be enabled (experimental).",
+      helpSafari: "Uses built-in Siri voice.",
+      helpExternal: "If speech does not work, you can use external service:",
+      close: "Close",
+      viaShel: "Constructed with",
+      notDeclinable: "Does not decline",
+      notFound: "The preposition or word was not found in the database",
+      noExamples: "No examples.",
+      enterWord: "Enter a preposition or word above."
+    }
+  };
+  return dict[lang] || dict.ru;
+}
+
+function applyUiLang(){
+  const s = t();
+
+  // Top label
+  const langLabel = document.getElementById("langLabel");
+  if(langLabel) langLabel.textContent = s.langLabel;
+
+  // "Список" header
+  const favTitle = document.getElementById("favTitle");
+  if(favTitle) favTitle.textContent = s.list;
+
+  // Panel title tooltip
+  if(favPanel) favPanel.title = s.list + " (клик — меню)";
+
+  // "+" title
+  const favAddBtn = document.getElementById("favAddBtn");
+  if(favAddBtn) favAddBtn.title = s.addTitle;
+
+  // Speak button title
+  const speakBase = document.getElementById("speakBase");
+  if(speakBase) speakBase.title = s.speakTitle;
+
+  // Menu aria
+  const listMenuEl = document.getElementById("listMenu");
+  if(listMenuEl) listMenuEl.setAttribute("aria-label", s.menuAria);
+
+  // Menu items
+  document.querySelectorAll("#listMenu .listMenuItem").forEach(btn=>{
+    const mode = btn.getAttribute("data-mode");
+    if(mode === "personal") btn.textContent = s.personal;
+    else if(mode === "all") btn.textContent = s.all;
+    else if(mode === "sorted") btn.textContent = s.sorted;
+  });
+  // Personal list empty label
+  const favEmptyEl2 = document.getElementById("favoritesEmpty");
+  if(favEmptyEl2) favEmptyEl2.textContent = s.favEmpty;
+
+  // Speech help popup
+  const speechHelpTitle = document.getElementById("speechHelpTitle");
+  const speechHelpChrome = document.getElementById("speechHelpChrome");
+  const speechHelpEdge = document.getElementById("speechHelpEdge");
+  const speechHelpFirefox = document.getElementById("speechHelpFirefox");
+  const speechHelpSafari = document.getElementById("speechHelpSafari");
+  const speechHelpExternal = document.getElementById("speechHelpExternal");
+  const speechHelpClose = document.getElementById("speechHelpClose");
+  if(speechHelpTitle) speechHelpTitle.textContent = s.helpTitle;
+  if(speechHelpChrome) speechHelpChrome.textContent = s.helpChrome;
+  if(speechHelpEdge) speechHelpEdge.textContent = s.helpEdge;
+  if(speechHelpFirefox) speechHelpFirefox.textContent = s.helpFirefox;
+  if(speechHelpSafari) speechHelpSafari.textContent = s.helpSafari;
+  if(speechHelpExternal) speechHelpExternal.textContent = s.helpExternal;
+  if(speechHelpClose) speechHelpClose.textContent = s.close;
+
+  const emptyHint = document.getElementById("emptyHint");
+  if(emptyHint) emptyHint.textContent = s.enterWord;
+
+  // If a list is already open, re-render it in the new language
+  if(listMode === "personal"){
+    openPersonal();
+  }else if(listMode === "all" || listMode === "sorted"){
+    showMode(listMode);
+  }
+}
+
+function esc(s){
+  return String(s||"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
+
+/* =========================
+   Find entry
+   ========================= */
+
+/* =========================
+   Forms index: allow search by ANY declension form
+   ========================= */
+
+const FORM_INDEX = Object.create(null);
+
+function buildFormsIndex(){
+  for(const k in FORM_INDEX){ delete FORM_INDEX[k]; }
+  // prevent duplicates caused by aliases: TABLES["..."] = TABLES["key"]
+  const seen = new Set();
+
+  for(const k in TABLES){
+    const entry = TABLES[k];
+    if(!entry || seen.has(entry)) continue;
+    seen.add(entry);
+
+    const forms = entry.forms || [];
+    for(const f of forms){
+      if(!f || !f.form) continue;
+      const norm = normalizeQuery(f.form).noNiqLower;
+      if(norm && !FORM_INDEX[norm]){
+        FORM_INDEX[norm] = { key: k, entry };
+      }
+    }
+  }
+}
+
+if(typeof TABLES !== "undefined"){
+  buildFormsIndex();
+}
+
+/* =========================
+   Translation index: allow search by RU/UK/EN phrases (e.g., "у меня")
+   ========================= */
+
+const TR_INDEX = {
+  ru: Object.create(null),
+  uk: Object.create(null),
+  en: Object.create(null)
+};
+
+function normalizeTranslation(raw){
+  if(raw == null) return "";
+  let s = String(raw).toLowerCase().trim();
+  // keep letters (any language), digits, spaces and hyphen
+  s = s.replace(/[^\p{L}\p{N}\s\-]+/gu, " ");
+  s = s.replace(/\s+/g, " ").trim();
+  return s;
+}
+
+function splitVariants(str){
+  if(!str) return [];
+  let s = String(str);
+  // remove gender / notes in parentheses: (м), (ж), (pl. m), etc.
+  s = s.replace(/\([^)]*\)/g, "");
+  return s
+    .split(/\/|;|,|\|/g)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
+function addTr(lang, phrase, key, entry){
+  const norm = normalizeTranslation(phrase);
+  if(!norm) return;
+  if(!TR_INDEX[lang][norm]){
+    TR_INDEX[lang][norm] = { key, entry };
+  }
+}
+
+function buildTranslationIndex(){
+  for(const lang of ['ru','uk','en']){ for(const k in TR_INDEX[lang]){ delete TR_INDEX[lang][k]; } }
+  const seen = new Set(); // avoid alias duplicates
+  for(const k in TABLES){
+    const entry = TABLES[k];
+    if(!entry || seen.has(entry)) continue;
+    seen.add(entry);
+
+    const base = entry.base || {};
+    ["ru","uk","en"].forEach(lang => {
+      if(base[lang]){
+        splitVariants(base[lang]).forEach(v => addTr(lang, v, k, entry));
+      }
+    });
+
+    const forms = entry.forms || [];
+    for(const f of forms){
+      const tr = (f && f.tr) ? f.tr : null;
+      if(!tr) continue;
+      ["ru","uk","en"].forEach(lang => {
+        if(tr[lang]){
+          splitVariants(tr[lang]).forEach(v => addTr(lang, v, k, entry));
+        }
+      });
+    }
+  }
+}
+
+if(typeof TABLES !== "undefined"){
+  buildTranslationIndex();
+}
+
+
+function findEntry(term){
+  const lang = getLang();
+  const trq = normalizeTranslation(term);
+  if(trq && TR_INDEX[lang] && TR_INDEX[lang][trq]){
+    return TR_INDEX[lang][trq];
+  }
+
+  const q = normalizeQuery(term);
+  if(!q.raw) return null;
+
+  // 1) direct by key
+  if(TABLES[q.raw]) return { key: q.raw, entry: TABLES[q.raw] };
+
+  // 2) Hebrew without niqqud
+  if(TABLES[q.noNiq]) return { key: q.noNiq, entry: TABLES[q.noNiq] };
+
+  // 3) by ANY declension form (fast index)
+  const byForm = FORM_INDEX[q.noNiqLower];
+  if(byForm) return byForm;
+
+  // 4) fallback: try all keys with same normalized form
+  const target = q.noNiqLower;
+  for(const k in TABLES){
+    const kk = normalizeQuery(k).noNiqLower;
+    if(kk === target){
+      return { key: k, entry: TABLES[k] };
+    }
+  }
+  return null;
+}
+
+
+function findEntryInTables2(term){
+  if(!window.TABLES2 || typeof window.TABLES2 !== "object") return null;
+
+  const lang = getLang();
+  const trq = normalizeTranslation(term);
+  if(trq){
+    for(const [k, entry] of Object.entries(window.TABLES2)){
+      const base = entry?.base || {};
+      const trVars = [base[lang], base.ru, base.uk, base.en].filter(Boolean);
+      for(const v of trVars){
+        for(const vv of splitVariants(v)) {
+          if(normalizeTranslation(vv) === trq) return { key:k, entry };
+        }
+      }
+      const forms = entry?.forms || [];
+      for(const f of forms){
+        const tr = f?.tr || {};
+        const trForms = [tr[lang], tr.ru, tr.uk, tr.en].filter(Boolean);
+        for(const v of trForms){
+          for(const vv of splitVariants(v)) {
+            if(normalizeTranslation(vv) === trq) return { key:k, entry };
+          }
+        }
+      }
+    }
+  }
+
+  const q = normalizeQuery(term);
+  if(!q.raw) return null;
+
+  if(window.TABLES2[q.raw]) return { key: q.raw, entry: window.TABLES2[q.raw] };
+  if(window.TABLES2[q.noNiq]) return { key: q.noNiq, entry: window.TABLES2[q.noNiq] };
+
+  for(const [k, entry] of Object.entries(window.TABLES2)){
+    const base = entry?.base || {};
+    const vars = [k, base.he || "", base.ru || "", base.uk || "", base.en || ""];
+    for(const v of vars){
+      const nv = normalizeQuery(v).noNiqLower;
+      if(nv && nv === q.noNiqLower){
+        return { key: k, entry };
+      }
+    }
+
+    const forms = entry?.forms || [];
+    for(const f of forms){
+      const form = f?.form || "";
+      const nf = normalizeQuery(form).noNiqLower;
+      if(nf && nf === q.noNiqLower){
+        return { key: k, entry };
+      }
+    }
+  }
+  return null;
+}
+
+
+
+/* =========================
+   AI generator (aiGenerator.js + tables2.js templates)
+   - stores generated entries in localStorage
+   - inserts them into runtime TABLES
+   ========================= */
+
+const AIGEN = (window.AIGEN || null);
+if(AIGEN && typeof AIGEN.init === 'function'){
+  try{ AIGEN.init(TABLES); }catch(e){}
+  // после подмешивания из localStorage нужно пересобрать индексы
+  try{ buildFormsIndex(); buildTranslationIndex(); }catch(e){}
+}
+
+function rebuildIndexes(){
+  if(typeof TABLES === 'undefined') return;
+  buildFormsIndex();
+  buildTranslationIndex();
+}
+
+function aiInsertOrAlt(mode){
+  if(!AIGEN || typeof AIGEN.upsert !== 'function'){
+    alert('generator.js не подключён или выключен.');
+    return;
+  }
+  const term = String(input.value || '').trim();
+  if(!term){ return; }
+  const res = AIGEN.upsert({ term, uiLang: getLang(), mode });
+  if(res && res.ok){
+    rebuildIndexes();
+    if(res.entry){
+      renderEntry({ key: res.key || term, entry: res.entry });
+      return;
+    }
+    const found = findEntry(term);
+    if(found) renderEntry(found);
+  }else{
+    alert((res && res.error) ? res.error : 'Не удалось сгенерировать.');
+  }
+}
+
+function aiDelete(){
+  if(!window.Generator || typeof window.Generator.deleteGeneratedEntry !== 'function' || typeof window.Generator.listGeneratedEntries !== 'function'){
+    alert('generator.js не подключён или выключен.');
+    return;
+  }
+
+  const term = String(input.value || '').trim();
+  if(!term){
+    return;
+  }
+
+  const all = window.Generator.listGeneratedEntries() || {};
+  const norm = window.Generator.normalizeForCompare
+    ? window.Generator.normalizeForCompare(term)
+    : String(term || '').trim().toLowerCase();
+
+  let foundKey = null;
+
+  for (const [key, entry] of Object.entries(all)) {
+    const vars = [
+      entry?.base?.he || '',
+      entry?.base?.ru || '',
+      entry?.base?.uk || '',
+      entry?.base?.en || ''
+    ];
+
+    const hit = vars.some(v => {
+      const vv = window.Generator.normalizeForCompare
+        ? window.Generator.normalizeForCompare(v)
+        : String(v || '').trim().toLowerCase();
+      return vv === norm;
+    });
+
+    if (hit) {
+      foundKey = key;
+      break;
+    }
+  }
+
+  if(!foundKey){
+    if(wrap) wrap.innerHTML = '<div class="small" id="emptyHint">Введите предлог или слово сверху.</div>';
+    if(input) input.value = "";
+    hideManualMode();
+    closeGenMenu();
+    return;
+  }
+
+  const ok = window.Generator.deleteGeneratedEntry(foundKey);
+  if(ok){
+    rebuildIndexes();
+    onQuery();
+  }else{
+    alert('Не удалось удалить.');
+  }
+}
+
+/* =========================
+   Render
+
+   ========================= */
+
+function renderEntry(found){
+  if(!wrap) return;
+
+  const { entry, key } = found;
+  const lang = getLang();
+  const x = t();
+
+  const base = entry.base || {};
+  const baseHe = base.he || key;
+  const baseTr = base[lang] || base.ru || "";
+  const aiNote = entry._ai ? "⚡ AI-fallback по аналогу" : "";
+
+  const isTypeC =
+    entry.type === "C" ||
+    (Array.isArray(entry.examples) && !Array.isArray(entry.forms));
+
+  const __e = found.entry;
+
+  const isShel = (function(e){
+    if(!e || !Array.isArray(e.forms)) return false;
+    for(const row of e.forms){
+      const f = (row && row.form) ? String(row.form) : "";
+      if(f.includes("שֶׁל")) return true;
+    }
+    return false;
+  })(__e);
+
+  const isNonPoss = (function(e){
+    if(!e) return false;
+    // Для тренажёра местоименных суффиксов формы через שֶׁל
+    // считаем несклоняемыми: это не прямое присоединение суффиксов.
+    if(isShel) return true;
+    if(e.type === "C") return true;
+    if(!Array.isArray(e.forms)) return true;
+    return e.forms.length !== 10;
+  })(__e);
+
+  const shelTag = isShel ? `
+    <div style="text-align:center; margin:6px 0 3px;">
+      <span style="display:inline-block; padding:4px 5mm; border:1px solid #666; border-radius:10px; font-size:14px; white-space:nowrap;">
+        ${x.viaShel} <b>שֶׁל</b>
+      </span>
+    </div>
+  ` : ``;
+
+  const nonPossBanner = isNonPoss ? `
+    <div style="text-align:center; margin:6px 0 3px;">
+      <span style="display:inline-block; padding:4px 5mm; border:1px solid #c33; border-radius:10px; font-size:15px; white-space:nowrap;">
+        ${x.notDeclinable}
+      </span>
+    </div>
+  ` : ``;
+
+  let html = `
+    <div style="text-align:center; margin-top:10px;">
+      <div style="font-size:34px; font-weight:700;" dir="rtl">${baseHe}</div>
+      <div style="font-size:18px; margin-top:6px;">${esc(baseTr)}</div>
+    </div>
+    ${aiNote ? `<div class="small" style="margin-top:6px;">${aiNote}</div>` : ``}
+    ${shelTag}${nonPossBanner}
+    <div style="margin:18px auto 0; max-width:1400px;">
+  `;
+
+  if(isNonPoss){
+    html += `</div>`;
+    wrap.innerHTML = html;
+    return;
+  }
+
+  /* ===== TYPE C ===== */
+  if(isTypeC){
+    html += `<h3 style="text-align:center; margin:18px 0;">${x.ex}</h3>`;
+
+    const ex = entry.examples || [];
+    if(!ex.length){
+      html += `<div class="small">${x.noExamples}</div>`;
+    } else {
+      for(const e of ex){
+        const he = e.he || "";
+        const tr = e[lang] || e.ru || "";
+        html += `
+          <div style="display:flex; justify-content:center; gap:18px; margin:6px 0;">
+            <div style="font-size:34px;" dir="rtl">${he}</div>
+            <div style="font-size:20px;">${tr}</div>
+          </div>
+        `;
+      }
+    }
+    html += `</div>`;
+    wrap.innerHTML = html;
+    return;
+  }
+
+  /* ===== TYPE B ===== */
+  html += `<h3 style="text-align:center; margin:12px 0;">${x.decl}</h3>`;
+
+  const forms = entry.forms || [];
+  for(const f of forms){
+    const he = f.form || "";
+    const tr = (f.tr && (f.tr[lang] || f.tr.ru)) || "";
+    html += `
+      <div style="text-align:center; margin:8px 0;">
+        <div style="font-size:42px; font-weight:700;" dir="rtl">${he}</div>
+        <div style="font-size:20px; margin-top:2px;">${esc(tr)}</div>
+      </div>
+    `;
+  }
+
+  html += `<h3 style="text-align:center; margin:18px 0;">${x.ex}</h3>`;
+
+  let any = false;
+  for(const f of forms){
+    const ex = f.examples;
+    if(!ex) continue;
+    const he = ex.he || "";
+    const tr = ex[lang] || ex.ru || "";
+    if(!he && !tr) continue;
+    any = true;
+    html += `
+      <div style="text-align:center; margin:10px 0;">
+        <div style="font-size:34px;" dir="rtl">${he}</div>
+        <div style="font-size:20px; margin-top:2px;">${tr}</div>
+      </div>
+    `;
+  }
+  if(!any){
+    html += `<div class="small">${x.noExamples}</div>`;
+  }
+
+  html += `</div>`;
+  wrap.innerHTML = html;
+}
+
+/* =========================
+   Events
+   ========================= */
+
+function renderStatusMessage(text){
+  if(!wrap) return;
+  const showHelp = !!(manualHelpPopup && manualHelpPopup.classList.contains("show"));
+  const helpText = manualHelpPopupText ? esc(manualHelpPopupText.textContent || "") : "";
+  wrap.innerHTML = `
+    <div class="statusMessageBlock">
+      <div class="statusMessageText">${esc(text)}</div>
+      ${showHelp ? `<div class="statusHelpPopup" aria-hidden="false"><div class="statusHelpPopupText">${helpText}</div></div>` : ``}
+    </div>
+  `;
+}
+
+function onQuery(){
+  if(!wrap || !input) return;
+
+  applyInputDir();
+  const termRaw = String(input.value || "").trim();
+
+  if(meaningfulLen(termRaw) < 2){
+    const raw = String(termRaw || "").trim();
+    const t1 = raw
+      .replace(/[\u0591-\u05C7]/g,"")
+      .replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g,"")
+      .replace(/[\s\-־]/g,"");
+
+    const lang = getLang();
+    const lower = raw.toLowerCase();
+
+    const allowedHeb = ["ב","ל","כ","מ"];
+    const allowedRu  = ["у","к","с"];
+    const allowedUk  = ["у","в","з"];
+    const allowedEn  = [];
+
+    let ok1 = false;
+    if(allowedHeb.includes(t1)) ok1 = true;
+    else if(lang === "ru" && allowedRu.includes(lower)) ok1 = true;
+    else if(lang === "uk" && allowedUk.includes(lower)) ok1 = true;
+    else if(lang === "en" && allowedEn.includes(lower)) ok1 = true;
+
+    if(!ok1){
+      wrap.innerHTML = "";
+      return;
+    }
+  }
+
+  let found = null;
+
+  if(window.Generator && typeof window.Generator.findEntryEverywhere === 'function'){
+    found = window.Generator.findEntryEverywhere(termRaw);
+  }
+  if(!found){
+    found = findEntry(termRaw);
+  }
+  if(!found){
+    found = findEntryInTables2(termRaw);
+  }
+
+  if(found && found.entry){
+    renderEntry(found);
+    return;
+  }
+
+  const indeclinable = (
+    window.Generator && typeof window.Generator.isLikelyIndeclinable === 'function'
+      ? window.Generator.isLikelyIndeclinable(termRaw)
+      : false
+  );
+
+  if(indeclinable){
+    renderStatusMessage(t().notDeclinable);
+    return;
+  }
+
+  renderStatusMessage(t().notFound);
+}
+
+input.addEventListener("input", () => {
+  if(manualGenderSelect) manualGenderSelect.value = "";
+  applyInputDir();
+  onQuery();
+  syncManualGenderSelect();
+});
+langSel.addEventListener("change", () => { applyUiLang(); applyInputDir(); onQuery(); updateListTranslations(); syncManualGenderSelect(); });
+
+/* =========================
+   AI/manual + helper
+   ========================= */
+const genPlusBtn = document.getElementById("genPlus");
+const genMenu    = document.getElementById("genMenu");
+const genInsert  = document.getElementById("genInsert");
+const genDelete  = document.getElementById("genDelete");
+const genAlt     = document.getElementById("genAlt");
+const manualHebrewWrap = document.getElementById("manualHebrewWrap");
+const manualHebrewInput = document.getElementById("manualHebrewInput");
+const manualGenderWrap = document.getElementById("manualGenderWrap");
+const manualGenderSelect = document.getElementById("manualGenderSelect");
+const manualHelpPopup = document.getElementById("manualHelpPopup");
+
+function closeGenMenu(){ if(genMenu) genMenu.style.display = "none"; }
+function toggleGenMenu(){
+  if(!genMenu) return;
+  genMenu.style.display = (genMenu.style.display === "block") ? "none" : "block";
+}
+function isManualModeOpen(){
+  return !!(manualHebrewWrap && manualHebrewWrap.classList.contains("show"));
+}
+function hideManualMode(){
+  if(manualHebrewWrap) manualHebrewWrap.classList.remove("show");
+  if(manualGenderWrap) manualGenderWrap.classList.remove("show");
+  if(manualHebrewWrap) manualHebrewWrap.setAttribute("aria-hidden", "true");
+  if(manualGenderWrap) manualGenderWrap.setAttribute("aria-hidden", "true");
+  if(manualHelpPopup) manualHelpPopup.classList.remove("show");
+  if(manualHelpPopup) manualHelpPopup.setAttribute("aria-hidden", "true");
+  if(wrap && wrap.textContent && /не находится|не склоня/i.test(wrap.textContent)){ onQuery(); }
+  if(manualHebrewInput) manualHebrewInput.value = "";
+  if(manualHebrewInput) manualHebrewInput.classList.remove("manualTarget");
+  if(manualGenderSelect) manualGenderSelect.value = "";
+  if(typeof autoSizeInputByContent === "function" && manualHebrewInput) autoSizeInputByContent(manualHebrewInput);
+  if(typeof autoSizeInputByContent === "function" && input) autoSizeInputByContent(input);
+}
+function detectAutoGenderForTerm(){
+  const term = (input && input.value ? input.value : "").trim();
+  const uiLang = langSel ? langSel.value : "ru";
+  if(window.Generator && typeof window.Generator.inferManualGender === "function"){
+    const lang = currentTermLang();
+    return window.Generator.inferManualGender(term, (lang === "ru" || lang === "uk" || lang === "en") ? lang : uiLang);
+  }
+  if(/[а-яёА-ЯЁ]/.test(term)){
+    const t = term.toLowerCase();
+    if(/[ыи]$/.test(t)) return "pl";
+    if(/[оеё]$/.test(t)) return "n";
+    if(/[ая]$/.test(t)) return "f";
+    return "m";
+  }
+  if(/[іїєґІЇЄҐa-zA-Z]/.test(term)) return "m";
+  return "m";
+}
+function syncManualGenderSelect(){
+  if(!manualGenderSelect) return;
+  const current = manualGenderSelect.value || "";
+  if(["acc","dat","ins"].includes(current)) return;
+  if(current) return;
+  const detected = detectAutoGenderForTerm();
+  if(["m","f","n","pl"].includes(detected)){
+    manualGenderSelect.value = detected;
+  }
+}
+function showManualMode(){
+  if(manualGenderSelect) manualGenderSelect.value = "";
+  syncManualGenderSelect();
+  if(manualHebrewWrap) manualHebrewWrap.classList.add("show");
+  if(manualGenderWrap) manualGenderWrap.classList.add("show");
+  if(manualHebrewWrap) manualHebrewWrap.setAttribute("aria-hidden", "false");
+  if(manualGenderWrap) manualGenderWrap.setAttribute("aria-hidden", "false");
+  if(manualHelpPopup) manualHelpPopup.classList.add("show");
+  if(manualHelpPopup) manualHelpPopup.setAttribute("aria-hidden", "false");
+  if(wrap && wrap.textContent && /не находится|не склоня/i.test(wrap.textContent)){ onQuery(); }
+  if(manualHebrewInput) manualHebrewInput.classList.add("manualTarget");
+  if(manualHebrewInput) setTimeout(()=>manualHebrewInput.focus(), 0);
+}
+function currentTermLang(){
+  const term = (input && input.value ? input.value : "").trim();
+  if(window.Generator && typeof window.Generator.detectLanguage === "function"){
+    return window.Generator.detectLanguage(term);
+  }
+  if(/[֐-׿]/.test(term)) return "he";
+  if(/[іїєґІЇЄҐ]/.test(term)) return "uk";
+  if(/[а-яёА-ЯЁ]/.test(term)) return "ru";
+  if(/[a-zA-Z]/.test(term)) return "en";
+  return "unknown";
+}
+function submitManualCreate(){
+  const term = (input && input.value ? input.value : "").trim();
+  const he = (manualHebrewInput && manualHebrewInput.value ? manualHebrewInput.value : "").trim();
+  const gender = (manualGenderSelect && manualGenderSelect.value) ? manualGenderSelect.value : detectAutoGenderForTerm();
+  if(!term){ renderStatusMessage("Введите слово."); return; }
+  if(!he){ renderStatusMessage("Введите перевод на иврите."); if(manualHebrewInput) manualHebrewInput.focus(); return; }
+  const uiLang = langSel ? langSel.value : "ru";
+  const res = window.AIGEN && typeof window.AIGEN.upsert === "function"
+    ? window.AIGEN.upsert({ term, uiLang, manualHebrew: he, gender, mode: "manual" })
+    : { ok:false, error:"Генератор недоступен" };
+  if(res && res.ok){
+    hideManualMode();
+    const found = findEntry(term) || findEntryInTables2(term) || (res.result && res.result.entry ? {key: res.key, entry: res.result.entry} : null);
+    if(found && found.entry){
+      renderEntry(found);
+      return;
+    }
+    onQuery();
+    return;
+  }
+  renderStatusMessage((res && res.error) ? res.error : "Не удалось добавить слово");
+}
+
+if(genPlusBtn){
+  genPlusBtn.addEventListener("click", (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+
+    const term = (input && input.value ? input.value : "").trim();
+    if(!term){ return; }
+
+    if(!/[\u0590-\u05FF]/.test(term)){
+      const he = (manualHebrewInput && manualHebrewInput.value ? manualHebrewInput.value : "").trim();
+      if(!isManualModeOpen()){
+        showManualMode();
+        return;
+      }
+      if(!he){
+        renderStatusMessage("Вставьте перевод на иврите с огласовками");
+        if(manualHebrewInput) manualHebrewInput.focus();
+        return;
+      }
+      submitManualCreate();
+      return;
+    }
+
+    toggleGenMenu();
+  });
+}
+
+if(manualHebrewInput){
+  manualHebrewInput.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter"){
+      e.preventDefault();
+      submitManualCreate();
+    }
+  });
+}
+if(input){
+  input.addEventListener("input", ()=>{
+    if(manualGenderSelect) manualGenderSelect.value = "";
+    syncManualGenderSelect();
+    if(isManualModeOpen()) hideManualMode();
+  });
+}
+if(langSel){
+  langSel.addEventListener("change", ()=>{
+    syncManualGenderSelect();
+    if(isManualModeOpen()) hideManualMode();
+  });
+}
+
+syncManualGenderSelect();
+hideManualMode();
+
+if(genInsert){
+  genInsert.addEventListener("click", (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    closeGenMenu();
+    aiInsertOrAlt("insert");
+  });
+}
+
+if(genDelete){
+  genDelete.addEventListener("click", (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    closeGenMenu();
+    aiDelete();
+  });
+}
+
+const genMinusBtn = document.getElementById("genMinus");
+if(genMinusBtn){
+  genMinusBtn.addEventListener("click", (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    hideManualMode();
+    closeGenMenu();
+    aiDelete();
+  });
+}
+
+if(genAlt){
+  genAlt.addEventListener("click", (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    closeGenMenu();
+    aiInsertOrAlt("alt");
+  });
+}
+
+// close menu on outside click / Esc
+document.addEventListener("click", (e)=>{
+  if(!e.target.closest || !e.target.closest("#queryBox")){
+    closeGenMenu();
+  }
+});
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape"){
+    closeGenMenu();
+    hideManualMode();
+  }
+});
+
+/* =========================
+   Favorites (Personal list)
+   ========================= */
+
+const favPanel = document.getElementById("favoritesPanel");
+const listResults = document.getElementById("listResults");
+
+
+if(listResults) listResults.setAttribute("hidden","");
+// v17c: prevent immediate re-open caused by overlapping click handlers
+let __suppressMenuToggleUntil = 0;
+// v17d: close the big results panel (Предлоги/Слова/На слуху)
+function closeResults(){
+  if(listResults){ listResults.style.display = "none";
+    listResults.setAttribute("hidden",""); listResults.setAttribute("hidden",""); }
+}
+// Start collapsed (safety)
+if(favPanel) favPanel.classList.add("favCollapsed");
+const favHeader  = document.getElementById("favHeaderRow");
+const favTitle   = document.getElementById("favTitle");
+
+if(favTitle){
+  favTitle.style.cursor = "pointer";
+  favTitle.title = "Клик — открыть/закрыть";
+  // Toggle by clicking the title text as well
+  if(favPanel){
+    favTitle.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      if(favHeader){ favHeader.dispatchEvent(new MouseEvent("click",{bubbles:true})); }
+    });
+  }
+}
+
+const favListEl  = document.getElementById("favoritesList");
+const favEmptyEl = document.getElementById("favoritesEmpty");
+
+
+const favAddBtn = document.getElementById("favAddBtn");
+
+// "+" must add current query to Personal list (and must NOT toggle the menu)
+if(favAddBtn){
+  favAddBtn.addEventListener("click", (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    addCurrentToFavs();
+  });
+}
+// ===== "Список" menu (2026-02-25) =====
+const listMenu = document.getElementById("listMenu");
+if(listMenu) listMenu.setAttribute("hidden","");
+let listMode = "none"; // none | personal | preps | words | daily | all
+
+function closeAllLists(resetRightPanel=false){
+  if(favPanel){
+    favPanel.classList.remove("menuOpen");
+    favPanel.classList.remove("personalOpen");
+  }
+  listMode = "none";
+  if(resetRightPanel && wrap){
+    wrap.innerHTML = `<div class="small" id="emptyHint">${t().enterWord}</div>`;
+  }
+}
+
+function openMenu(){
+  if(!favPanel) return;
+  // menu only (no personal dropdown)
+  favPanel.classList.add("menuOpen");
+  favPanel.classList.remove("personalOpen");
+}
+
+function openPersonal(){
+  if(!favPanel) return;
+  // IMPORTANT: personal list must be visible even if panel starts collapsed
+  favPanel.classList.remove("favCollapsed");
+  favPanel.classList.remove("menuOpen");
+  favPanel.classList.add("personalOpen");
+  listMode = "personal";
+  renderFavs();
+const dd = document.getElementById('favDropdown');
+  if(dd) dd.style.display = 'block';
+}
+
+function getLang(){
+  return (langSel && langSel.value) ? langSel.value : "ru";
+}
+
+function uniqByHebrewBase(items){
+  const seen = new Set();
+  const out = [];
+  for(const it of items){
+    const h = (it && it.he) ? String(it.he) : "";
+    const k = stripNiqqud(h);
+    if(!k) continue;
+    if(seen.has(k)) continue;
+    seen.add(k);
+    out.push(it);
+  }
+  return out;
+}
+
+const RU_PREP = new Set([
+  "в","на","к","с","со","у","из","от","до","без","для","про","по","о","об","обо","при",
+  "после","перед","за","через","между","над","под","внутри","внутрь","вне","снаружи",
+  "напротив","рядом","рядом с","около","возле","вокруг","среди","вдоль","вместо",
+  "кроме","благодаря","несмотря","несмотря на","в течение","в связи","в связи с"
+]);
+
+const EN_PREP = new Set([
+  "in","on","at","to","from","with","without","for","about","after","before","between","under","above",
+  "inside","into","outside","opposite","near","around","among","instead of","except","because of"
+]);
+
+const HE_PREP = new Set([
+  "עבור","נגד","מפני","לפני","לפי","לעצם","למען","בפני","ליד","לבד","ל","בעצם","בעיני","בניגוד ל-","ביד",
+  "בזכות","בגף","בגין","ב","אצל","אין",
+  "במו ידים","בקשר ל-","דרך","הנה","הרי","כלפי","מחמת","יש","כל","מעצמי"
+]);
+
+function isPrepositionEntry(base){
+  const ru = String(base?.ru || "").trim().toLowerCase();
+  const en = String(base?.en || "").trim().toLowerCase();
+  const he = stripNiqqud(String(base?.he || "")).trim().toLowerCase().replace(/[־–—]/g, "-");
+  if(RU_PREP.has(ru) || EN_PREP.has(en) || HE_PREP.has(he)) return true;
+  // phrase preps
+  for(const p of RU_PREP){ if(p.includes(" ") && ru === p) return true; }
+  for(const p of EN_PREP){ if(p.includes(" ") && en === p) return true; }
+  for(const p of HE_PREP){ if(p.includes(" ") && he === p) return true; }
+  return false;
+}
+
+function collectAllEntries(){
+  const arr = [];
+  if(typeof TABLES !== "object") return arr;
+
+  // TABLES has aliases (Hebrew keys). We dedupe by base.he without niqqud.
+  for(const k of Object.keys(TABLES)){
+    const obj = TABLES[k];
+    if(!obj || !obj.base || !obj.base.he) continue;
+    arr.push({ key:k, base: obj.base, he: obj.base.he });
+  }
+  const uniq = uniqByHebrewBase(arr.map(x=>({he:x.base.he, base:x.base})));
+  uniq.sort((a,b)=> stripNiqqud(a.he).localeCompare(stripNiqqud(b.he), "he"));
+  return uniq;
+}
+
+function sortEntriesByHebrew(entries){
+  return [...entries].sort((a,b)=> stripNiqqud(a.base.he).localeCompare(stripNiqqud(b.base.he), "he"));
+}
+
+function sortEntriesByTranslation(entries){
+  const lang = getLang();
+  return [...entries].sort((a,b)=>{
+    const aa = String(a.base[lang] || a.base.ru || a.base.en || "").toLowerCase();
+    const bb = String(b.base[lang] || b.base.ru || b.base.en || "").toLowerCase();
+    return aa.localeCompare(bb, lang === "ru" ? "ru" : (lang === "uk" ? "uk" : "en"));
+  });
+}
+
+function renderRows(entries){
+  return entries.map(e=>{
+    const he = e.base.he;
+    const tr = e.base[getLang()] || e.base.ru || e.base.en || "";
+    const heEsc = esc(he);
+    const trEsc = esc(tr);
+    return `<div class="listRow">
+      <button type="button" class="listItemBtn" data-he="${heEsc}" title="Открыть склонение и примеры">
+        <span class="listHe">${heEsc}</span>
+        <span class="listTr">${trEsc}</span>
+      </button>
+    </div>`;
+  }).join("");
+}
+
+function renderSimpleList(title, entries){
+  if(!listResults) return;
+  listResults.removeAttribute("hidden");
+  listResults.style.display = "block";
+  positionListResults();
+  listResults.innerHTML = `
+    <div class="small" style="margin:6px 0 10px; text-align:center;"><b>${title}</b> (${entries.length})</div>
+    ${renderRows(entries) || '<div class="small" style="text-align:center;">Пусто.</div>'}
+  `;
+}
+
+function renderGroupedList(preps, words){
+  if(!listResults) return;
+  const p = sortEntriesByHebrew(preps);
+  const w = sortEntriesByHebrew(words);
+  listResults.removeAttribute("hidden");
+  listResults.style.display = "block";
+  positionListResults();
+  listResults.innerHTML = `
+    <div class="small" style="margin:6px 0 10px; text-align:center;"><b>${t().all}</b> (${p.length + w.length})</div>
+    <div class="small" style="margin:8px 0 6px; text-align:center;"><b>${t().preps}</b> (${p.length})</div>
+    ${renderRows(p)}
+    <div class="small" style="margin:12px 0 6px; text-align:center; border-top:1px solid #eee; padding-top:10px;"><b>${t().words}</b> (${w.length})</div>
+    ${renderRows(w)}
+  `;
+}
+
+function renderSortedList(entries){
+  if(!listResults) return;
+  const preps = [];
+  const words = [];
+  for(const e of (entries || [])){
+    if(isPrepositionEntry(e.base)) preps.push(e);
+    else words.push(e);
+  }
+  const p = sortEntriesByTranslation(preps);
+  const w = sortEntriesByTranslation(words);
+  listResults.removeAttribute("hidden");
+  listResults.style.display = "block";
+  positionListResults();
+  listResults.innerHTML = `
+    <div class="small" style="margin:6px 0 10px; text-align:center;"><b>${t().sorted}</b> (${p.length + w.length})</div>
+    <div class="small" style="margin:8px 0 6px; text-align:center;"><b>${t().preps}</b> (${p.length})</div>
+    ${renderRows(p)}
+    <div class="small" style="margin:12px 0 6px; text-align:center; border-top:1px solid #eee; padding-top:10px;"><b>${t().words}</b> (${w.length})</div>
+    ${renderRows(w)}
+  `;
+}
+
+function updateListTranslations(){
+  if(!listResults) return;
+  // Update ONLY translations inside the currently opened list (buttons)
+  const lang = getLang();
+  const btns = listResults.querySelectorAll(".listItemBtn");
+  if(!btns || !btns.length) return;
+
+  // Build a fast lookup: he -> base item with translations
+  const map = new Map();
+  // Prefer external lists if they exist, otherwise TABLES
+  const pools = []
+    .concat(Array.isArray(window.LIST_265_ALL) ? window.LIST_265_ALL : [])
+    .concat(Array.isArray(window.LIST_265_PREPS) ? window.LIST_265_PREPS : [])
+    .concat(Array.isArray(window.LIST_265_WORDS) ? window.LIST_265_WORDS : [])
+    .concat(Array.isArray(window.LIST_NA_SLUCHU) ? window.LIST_NA_SLUCHU : []);
+
+  for(const it of pools){
+    if(it && it.he && !map.has(it.he)) map.set(it.he, it);
+  }
+  // Add TABLES as fallback
+  const all = collectAllEntries();
+  for(const e of all){
+    const b = e && e.base;
+    if(b && b.he && !map.has(b.he)) map.set(b.he, b);
+  }
+
+  for(const btn of btns){
+    const he = btn.getAttribute("data-he") || "";
+    const it = map.get(he);
+    if(!it) continue;
+    const tr = it[lang] || it.ru || it.en || "";
+    const trEl = btn.querySelector(".listTr");
+    if(trEl) trEl.textContent = tr;
+  }
+}
+
+
+const DAILY_HE = new Set([
+  "בֵּין","אַחֲרֵי","לִפְנֵי","מֵעַל","תַּחַת","מוּל","בְּתוֹךְ","לְתוֹךְ","מִחוּץ ל־",
+  "צַד","יְלָד","יְלָדָה","בַּיִת","יוֹם","עִיר","חֲנוּת","מַחְבֶּרֶת","סֵפֶר"
+]);
+
+const EXCLUDED_FROM_NA_SLUCHU_HE = new Set([
+  "אוֹטוֹ","אִינְטֶרְנֶט","אָרוֹן","אֹרֶז","בֵּית חוֹלִים","בֵּית סֵפֶר","בָּנָנָה","בַּרְזֶל","גְּבִינָה","דֶּלֶת",
+  "הָאוֹפַנַּיִם","הָאֹזְנִיּוֹת","ז׳ָקֵט","זְכוּכִית","תַּפּוּחַ","תִּיק","שֵׂעָר","שָׁעוֹן","שִׂמְלָה","שִׁדָּה",
+  "קִיר","צַלַּחַת","פְּלַסְטִיק","עֵץ","סַפָּה","סְוֶדֶר","נַעֲלַיִם","נַעַל","נְיָר","מִשְׁקָפַיִם",
+  "מְעִיל","מִכְנָסַיִם","מִטָּה","מַדָּף","מַגָּף","לֶחֶם","כִּסֵּא","כִּירַיִם","טֶלֶוִיזְיָה","חֲצָאִית",
+  "חֻלְצָה","חָלָב"
+].map(stripNiqqud));
+
+function filterNaSluhuEntries(entries){
+  return (entries || []).filter(e => {
+    const he = e && e.base && e.base.he ? stripNiqqud(String(e.base.he)) : "";
+    return he && !EXCLUDED_FROM_NA_SLUCHU_HE.has(he);
+  });
+}
+
+function makeEntryFromListItem(item){
+  const he = (item && item.he) ? String(item.he) : "";
+  const ru = (item && item.ru) ? String(item.ru) : "";
+  // In the provided txt lists we only have RU; use it as fallback for UK/EN
+  return { base: { he, ru, uk: ru, en: ru }, key: he };
+}
+
+function getListByMode(mode){
+  if(mode === "personal") return null;
+  if(mode === "daily"){
+    if(Array.isArray(window.DAILY_FROM_TABLES)) return window.DAILY_FROM_TABLES;
+    return [];
+  }
+  return [];
+}
+
+function showMode(mode){
+  if(mode === "personal"){
+    if(favPanel) favPanel.classList.remove("menuOpen");
+    if(listMenu){
+      listMenu.style.display = "none";
+      listMenu.setAttribute("hidden","");
+    }
+    openPersonal();
+    return;
+  }
+
+  if(favPanel){
+    favPanel.classList.remove("menuOpen");
+    favPanel.classList.remove("personalOpen");
+  }
+  if(listMenu){
+    listMenu.style.display = "none";
+    listMenu.setAttribute("hidden","");
+  }
+  listMode = mode;
+
+  const all = collectAllEntries();
+  const filtered = filterNaSluhuEntries(all);
+  const preps = sortEntriesByHebrew(filtered.filter(e => isPrepositionEntry(e.base)));
+  const words = sortEntriesByHebrew(filtered.filter(e => !isPrepositionEntry(e.base)));
+
+  if(mode === "all"){
+    renderGroupedList(preps, words);
+    return;
+  }
+  if(mode === "sorted"){
+    renderSortedList(filtered);
+    return;
+  }
+}
+
+// Click on a list item => open declension & examples
+if(listResults){
+  listResults.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".listItemBtn");
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const he = btn.getAttribute("data-he") || "";
+    if(he && input){
+      input.value = he;
+      onQuery();
+    }
+  });
+}
+
+
+// Header click: toggle ONLY the menu (does NOT clear declension/examples on the right)
+
+function positionListMenu(){
+  if(!favHeader || !listMenu) return;
+  const r = favHeader.getBoundingClientRect();
+  const centerX = r.left + r.width/2;
+  const topY = r.bottom + 8;
+
+  listMenu.style.position = "fixed";
+  listMenu.style.left = `${Math.round(centerX)}px`;
+  listMenu.style.top = `${Math.round(topY)}px`;
+  listMenu.style.transform = "translateX(-50%)";
+
+  // keep inside viewport a bit
+  const mr = 8;
+  const w = listMenu.offsetWidth || 0;
+  const minX = mr + w/2;
+  const maxX = window.innerWidth - mr - w/2;
+  const clampedX = Math.min(Math.max(centerX, minX), maxX);
+  if(Number.isFinite(clampedX)){
+    listMenu.style.left = `${Math.round(clampedX)}px`;
+  }
+}
+
+function positionListResults(){
+  if(!favPanel || !listResults) return;
+  const r = favPanel.getBoundingClientRect();
+  const gap = 8;
+  listResults.style.position = "fixed";
+  listResults.style.left = `${Math.round(r.left)}px`;
+  listResults.style.top  = `${Math.round(r.bottom + gap)}px`;
+  listResults.style.width = `${Math.round(r.width)}px`;
+  // keep inside viewport
+  const bottomPad = 12;
+  const maxH = Math.max(120, window.innerHeight - (r.bottom + gap) - bottomPad);
+  listResults.style.maxHeight = `${Math.round(maxH)}px`;
+}
+
+
+window.addEventListener("resize", ()=>{ if(favPanel && favPanel.classList.contains("menuOpen")) positionListMenu();
+  positionListResults(); });
+window.addEventListener("scroll", ()=>{ if(favPanel && favPanel.classList.contains("menuOpen")) positionListMenu();
+  positionListResults(); }, true);
+
+if(favHeader && favPanel){
+  favHeader.style.cursor = "pointer";
+  favHeader.addEventListener("click", (e)=>{
+    if(Date.now() < __suppressMenuToggleUntil) return;
+
+    // If results panel is open, clicking "Список" should close it (and not open menu)
+    if(listResults && !listResults.hasAttribute("hidden") && listResults.style.display !== "none"){
+      closeResults();
+      if(favPanel) favPanel.classList.remove("menuOpen");
+      if(listMenu){ listMenu.style.display = "none";
+      listMenu.setAttribute("hidden",""); if(listMenu.setAttribute) listMenu.setAttribute("hidden",""); }
+      return;
+    }
+    e.stopPropagation();
+
+    // Toggle ONLY the menu. Do not touch right panel.
+    const willOpen = !favPanel.classList.contains("menuOpen");
+    favPanel.classList.toggle("menuOpen", willOpen);
+    favPanel.classList.remove("personalOpen");
+
+    if(willOpen){
+      positionListMenu();
+  positionListResults();
+      listMenu.removeAttribute("hidden");
+      listMenu.removeAttribute("hidden");
+      listMenu.style.display = "block";
+    }else{
+      listMenu.style.display = "none";
+      listMenu.setAttribute("hidden","");
+      listMenu.setAttribute("hidden","");
+    }
+  });
+}
+
+// Menu item clicks
+if(listMenu){
+  listMenu.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".listMenuItem");
+    if(!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    
+    __suppressMenuToggleUntil = Date.now() + 350;
+const mode = btn.getAttribute("data-mode") || "none";
+
+    // Close the dropdown FIRST (do not depend on CSS or later handlers)
+    if(favPanel) favPanel.classList.remove("menuOpen");
+    if(listMenu){ listMenu.style.display = "none";
+      listMenu.setAttribute("hidden",""); listMenu.setAttribute("hidden",""); }
+      listMenu.setAttribute("hidden","");
+
+    // Then do the action
+    showMode(mode);
+
+    // Safety: ensure dropdown stays closed
+    if(favPanel) favPanel.classList.remove("menuOpen");
+    if(listMenu){ listMenu.style.display = "none";
+      listMenu.setAttribute("hidden",""); listMenu.setAttribute("hidden",""); }
+      listMenu.setAttribute("hidden","");
+  });
+}
+
+// Outside click closes menu + personal dropdown (but keeps right panel as-is)
+document.addEventListener("click", (e)=>{
+  if(!favPanel) return;
+  if(favPanel.contains(e.target)) return;
+  if(favPanel.classList.contains("menuOpen") || favPanel.classList.contains("personalOpen")){
+    favPanel.classList.remove("menuOpen");
+    favPanel.classList.remove("personalOpen");
+    if(listMenu){ listMenu.style.display = "none";
+      listMenu.setAttribute("hidden",""); listMenu.setAttribute("hidden",""); }
+      listMenu.setAttribute("hidden","");
+  }
+}, true);  // capture = true so it works reliably
+
+const FAV_LS_KEY = "hebrewtrainers_favorites_v1";
+
+function loadFavs(){
+  try{
+    const raw = localStorage.getItem(FAV_LS_KEY);
+    const arr = JSON.parse(raw || "[]");
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){
+    return [];
+  }
+}
+
+function saveFavs(arr){
+  try{ localStorage.setItem(FAV_LS_KEY, JSON.stringify(arr||[])); }catch(e){}
+}
+
+function favKey(s){
+  // dedupe by hebrew-without-niqqud OR latin lowercased
+  const q = normalizeQuery(String(s||""));
+  if(!q.raw) return "";
+  if(/[\u0590-\u05FF]/.test(q.raw)){
+    return stripNiqqud(q.raw);
+  }
+  return String(q.raw).toLowerCase();
+}
+
+function addCurrentToFavs(){
+  if(!input) return;
+  const raw = String(input.value || "").trim();
+  const q = normalizeQuery(raw);
+  if(!q.raw) return;
+
+  let favs = loadFavs();
+
+  const k = favKey(raw);
+  if(!k) return;
+
+  // prevent duplicates
+  const existing = new Set(favs.map(favKey));
+  if(existing.has(k)){
+    // still open list to show it's there
+    if(favPanel){ favPanel.classList.remove("favCollapsed"); favPanel.classList.add("personalOpen"); favPanel.classList.remove("menuOpen"); }
+    renderFavs();
+    return;
+  }
+
+    // Store Hebrew base when possible (so translations update correctly)
+  const all = collectAllEntries();
+  const found = all.find(x => x.base && (x.base.he === raw || x.base.ru === raw || x.base.en === raw || x.base.uk === raw));
+  const storeVal = (found && found.base && found.base.he) ? found.base.he : raw;
+  favs.unshift(storeVal);
+  // keep list reasonable
+  if(favs.length > 200) favs = favs.slice(0, 200);
+
+  saveFavs(favs);
+  if(favPanel){ favPanel.classList.remove("favCollapsed"); favPanel.classList.add("personalOpen"); favPanel.classList.remove("menuOpen"); }
+  renderFavs();
+}
+
+function removeFavAt(idx){
+  let favs = loadFavs();
+  if(idx < 0 || idx >= favs.length) return;
+  favs.splice(idx, 1);
+  saveFavs(favs);
+  renderFavs();
+}
+
+function renderFavs(){
+  if(!favListEl || !favEmptyEl) return;
+
+  const lang = getLang();
+  const s = t();
+  const favs = loadFavs();
+  favListEl.innerHTML = "";
+
+  const dd = document.getElementById("favDropdown");
+  if(!favs.length){
+    if(dd) dd.classList.remove("hasItems");
+    favEmptyEl.style.display = "block";
+    favEmptyEl.textContent = s.favEmpty;
+    return;
+  }
+  if(dd) dd.classList.add("hasItems");
+  favEmptyEl.style.display = "none";
+
+  // Resolve stored item (could be he/ru/en/uk) to a TABLES entry
+  const all = collectAllEntries();
+  function resolveEntry(val){
+    const v = String(val||"").trim();
+    if(!v) return null;
+    // exact he match first
+    let e = all.find(x => (x.base && x.base.he) === v);
+    if(e) return e;
+    // match by translations
+    e = all.find(x => x.base && (x.base.ru === v || x.base.en === v || x.base.uk === v));
+    return e || null;
+  }
+
+  favs.forEach((item, idx)=>{
+    const entry = resolveEntry(item);
+    const he = entry?.base?.he || item;
+    const tr = entry ? (entry.base[lang] || entry.base.ru || entry.base.en || "") : "";
+
+    const row = document.createElement("div");
+    row.className = "favItem";
+
+    const cell = document.createElement("div");
+    cell.className = "favItemCell";
+
+    const btn = document.createElement("button");
+    btn.className = "favItemBtn";
+    btn.type = "button";
+    btn.title = s.open;
+    btn.innerHTML = `
+      <span class="listHe">${esc(he)}</span>
+      ${tr ? `<span class="listTr">${esc(tr)}</span>` : ``}
+    `;
+    btn.addEventListener("click", ()=>{
+      input.value = he; // always query by Hebrew base when possible
+      onQuery();
+    });
+
+    const del = document.createElement("button");
+    del.className = "favDel";
+    del.type = "button";
+    del.title = s.del;
+    del.textContent = "×";
+    del.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      removeFavAt(idx);
+    });
+
+    cell.appendChild(btn);
+    cell.appendChild(del);
+    row.appendChild(cell);
+    favListEl.appendChild(row);
+  });
+}
+
+// Initial render
+renderFavs();
+
+// Initial open (שלום) + run declension/examples
+(function(){
+  try{
+    if(typeof input !== "undefined" && input){
+      input.value = "שלום";
+    }
+    if(typeof onQuery === "function"){
+      onQuery();
+    }
+  }catch(e){}
+})();
+</script>
+<script>
+/* Автоматически увеличивает ИВРИТ только в примерах (внутри #tableWrapper),
+   даже если app.js не ставит классы/dir/lang. */
+(function(){
+  const wrapper = document.getElementById('tableWrapper');
+  if (!wrapper) return;
+
+  const HEBREW_RE = /(?:\([\u0590-\u05FF]+\)|[\u0590-\u05FF]+)/g;
+
+function normalizeHebrew(s){
+  return (s||"").replace(/[^\u0590-\u05FF]+/g,"").trim();
+}
+
+function cleanupDuplicates(scope){
+  const root = scope || wrapper;
+
+  // Pattern A: badge element sits next to sentence element inside same parent
+  // Remove any small sibling whose Hebrew-only text equals the bolded Hebrew in the sentence.
+  root.querySelectorAll('*').forEach(parent=>{
+    // find bolded hebrew inside this parent
+    const bold = parent.querySelector('b, strong');
+    if (!bold) return;
+
+    const boldHe = normalizeHebrew(bold.textContent);
+    if (!boldHe) return;
+
+    // check element children for a "badge-like" standalone token that equals boldHe
+    const kids = Array.from(parent.children);
+    if (kids.length < 2) return;
+
+    // remove badges that are short and equal to boldHe and are not the bold itself
+    kids.forEach((el, idx)=>{
+      if (el === bold || el.contains(bold)) return;
+      const he = normalizeHebrew(el.textContent);
+      if (!he) return;
+
+      // heuristic: short token and exact match
+      if (he === boldHe && he.length <= 6){
+        // avoid deleting if this element also contains other visible text beyond the token
+        const plain = (el.textContent||"").trim();
+        if (plain.length <= 12){
+          el.remove();
+        }
+      }
+    });
+  });
+
+  // Pattern B: badge element is previous sibling of a sentence container
+  root.querySelectorAll('b, strong').forEach(bold=>{
+    const boldHe = normalizeHebrew(bold.textContent);
+    if (!boldHe) return;
+
+    // find closest "line" container
+    const line = bold.closest('p, div, tr, td, li') || bold.parentElement;
+    if (!line) return;
+
+    const prev = line.previousElementSibling;
+    if (!prev) return;
+
+    const prevHe = normalizeHebrew(prev.textContent);
+    if (prevHe === boldHe && prevHe.length <= 6){
+      const plain = (prev.textContent||"").trim();
+      if (plain.length <= 12){
+        prev.remove();
+      }
+    }
+  });
+}
+
+  function wrapHebrewInNode(root){
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node){
+        if (!node.nodeValue) return NodeFilter.FILTER_REJECT;
+        if (!HEBREW_RE.test(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+        // Не трогаем, если уже внутри .ex-he
+        if (node.parentElement && node.parentElement.closest('.ex-he')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const toProcess = [];
+    while (walker.nextNode()) toProcess.push(walker.currentNode);
+
+    toProcess.forEach(textNode=>{
+      const text = textNode.nodeValue;
+      let lastIdx = 0;
+      const frag = document.createDocumentFragment();
+      HEBREW_RE.lastIndex = 0;
+      let m;
+      while ((m = HEBREW_RE.exec(text)) !== null){
+        const start = m.index;
+        const end = start + m[0].length;
+        if (start > lastIdx) frag.appendChild(document.createTextNode(text.slice(lastIdx, start)));
+        const span = document.createElement('span');
+        span.className = 'ex-he';
+        span.textContent = m[0];
+        frag.appendChild(span);
+        lastIdx = end;
+      }
+      if (lastIdx < text.length) frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+      textNode.parentNode.replaceChild(frag, textNode);
+    });
+  }
+
+  // Первичная обработка (если уже есть контент)
+  wrapHebrewInNode(wrapper);
+  cleanupDuplicates(wrapper);
+
+  // Наблюдаем изменения (когда app.js перерисовывает примеры)
+  const obs = new MutationObserver(muts=>{
+    let touched = false;
+    for (const mut of muts){
+      if (mut.addedNodes && mut.addedNodes.length){
+        mut.addedNodes.forEach(n=>{
+          if (n.nodeType === 1){ wrapHebrewInNode(n); touched = true; }      // element
+          else if (n.nodeType === 3){ wrapHebrewInNode(wrapper); touched = true; } // text
+        });
+      }
+    }
+    if (touched) cleanupDuplicates(wrapper);
+  });
+  obs.observe(wrapper, {subtree:true, childList:true, characterData:true});
+})();
+</script>
+
+
+
+
+
+<script>
+  // Обновлять ТОЛЬКО перевод в списке при смене языка
+  if (window.HebrewLex && HebrewLex.initListLangSync) {
+    HebrewLex.initListLangSync({ langSelectSelector: "#langSelectect", containerSelector: "#listResults" });
+  }
+</script>
+
+
+
+
+<script>
+(function(){
+  const btn = document.getElementById("speakBase");
+  const popup = document.getElementById("speechHelpPopup");
+  const closeBtn = document.getElementById("speechHelpClose");
+  if(!btn || !popup) return;
+
+  function openPopup(){
+    popup.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+  }
+  function closePopup(){
+    popup.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+  }
+
+  btn.addEventListener("click", function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if(popup.hidden) openPopup(); else closePopup();
+  });
+
+  if(closeBtn){
+    closeBtn.addEventListener("click", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      closePopup();
+    });
+  }
+
+  document.addEventListener("click", function(e){
+    if(popup.hidden) return;
+    if(popup.contains(e.target) || btn.contains(e.target)) return;
+    closePopup();
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape") closePopup();
+  });
+})();
+</script>
+<script>
+(function(){
+
+function autoSize(el){
+  if(!el) return;
+
+  const span = document.createElement("span");
+  const style = getComputedStyle(el);
+
+  span.style.position = "absolute";
+  span.style.visibility = "hidden";
+  span.style.whiteSpace = "pre";
+  span.style.font = style.font;
+
+  span.textContent = el.value || el.placeholder || "";
+  document.body.appendChild(span);
+
+  const minW = el.id === "queryHebrew" ? 120 : 110;
+  const maxW = el.id === "queryHebrew" ? 260 : 260;
+  const width = Math.max(minW, Math.min(maxW, span.offsetWidth + 30));
+  el.style.setProperty("width", width + "px", "important");
+  el.style.setProperty("flex", "0 0 auto", "important");
+
+  span.remove();
+}
+
+function bind(el){
+  if(!el) return;
+  ["input","keyup","change"].forEach(e => {
+    el.addEventListener(e, () => autoSize(el));
+  });
+  autoSize(el);
+}
+
+function init(){
+  bind(document.getElementById("queryHebrew"));
+  bind(document.getElementById("manualHebrewInput"));
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+}else{
+  init();
+}
+
+})();
+</script>
+
+<script id="three-fields-scheme-override">
+document.addEventListener("DOMContentLoaded", function(){
+  const input = document.getElementById("queryHebrew");
+  const langSel = document.getElementById("langSelect");
+  const wrap = document.getElementById("tableWrapper");
+  const plusBtn = document.getElementById("genPlus");
+  const minusBtn = document.getElementById("genMinus");
+  const manualHebrewWrap = document.getElementById("manualHebrewWrap");
+  const manualHebrewInput = document.getElementById("manualHebrewInput");
+  const manualGenderWrap = document.getElementById("manualGenderWrap");
+  const manualGenderSelect = document.getElementById("manualGenderSelect");
+  const manualHelpPopup = document.getElementById("manualHelpPopup");
+  const manualHelpPopupText = document.getElementById("manualHelpPopupText");
+  const genMenu = document.getElementById("genMenu");
+
+  const defaultMainPlaceholder = input ? (input.getAttribute("placeholder") || "вставьте предлог / слово") : "";
+
+  function isHebrew(t){ return /[\u0590-\u05FF]/.test(String(t || "")); }
+  function hasNikkud(t){ return /[\u0591-\u05C7]/.test(String(t || "")); }
+
+  function setHelpText(){
+    if(manualHelpPopupText){
+      manualHelpPopupText.textContent =
+        "Вставьте иврит с огласовками и перевод, затем выберите род или местоимение. Иврит с огласовками можно взять в Google Translate, Morfix, Pealim или Dicta Nakdan.";
+    }
+  }
+
+  function closeOldMenu(){
+    if(genMenu) genMenu.style.display = "none";
+  }
+
+  function setManualPlaceholders(){
+    if(input) input.setAttribute("placeholder", "перевод");
+    if(manualHebrewInput) manualHebrewInput.setAttribute("placeholder", "иврит");
+  }
+
+  function restoreMainPlaceholder(){
+    if(input) input.setAttribute("placeholder", defaultMainPlaceholder);
+  }
+
+  function showThreeFieldsFromTerm(term){
+    closeOldMenu();
+    setHelpText();
+    setManualPlaceholders();
+
+    if(manualHebrewWrap){
+      manualHebrewWrap.classList.add("show");
+      manualHebrewWrap.setAttribute("aria-hidden", "false");
+    }
+    if(manualGenderWrap){
+      manualGenderWrap.classList.add("show");
+      manualGenderWrap.setAttribute("aria-hidden", "false");
+    }
+    if(manualHelpPopup){
+      manualHelpPopup.classList.add("show");
+      manualHelpPopup.setAttribute("aria-hidden", "false");
+    }
+
+    if(isHebrew(term)){
+      if(manualHebrewInput) manualHebrewInput.value = term;
+      if(input) input.value = "";
+      if(input) input.focus();
+    } else {
+      if(input) input.value = term;
+      if(manualHebrewInput) manualHebrewInput.value = "";
+      if(manualHebrewInput) manualHebrewInput.focus();
+    }
+
+    if(typeof autoSizeInputByContent === "function"){
+      if(input) autoSizeInputByContent(input);
+      if(manualHebrewInput) autoSizeInputByContent(manualHebrewInput);
+    }
+
+    if(typeof renderStatusMessage === "function"){
+      renderStatusMessage("Предлог или слово не находится в базе данных");
+    }
+  }
+
+  // Override hideManualMode so typing in translation does not instantly collapse the 3-field row
+  const oldHideManualMode = (typeof hideManualMode === "function") ? hideManualMode : null;
+  window.__manualThreeFieldsLocked = false;
+
+  window.hideManualMode = function(force){
+    if(window.__manualThreeFieldsLocked && !force){
+      return;
+    }
+    if(manualHebrewWrap){
+      manualHebrewWrap.classList.remove("show");
+      manualHebrewWrap.setAttribute("aria-hidden", "true");
+    }
+    if(manualGenderWrap){
+      manualGenderWrap.classList.remove("show");
+      manualGenderWrap.setAttribute("aria-hidden", "true");
+    }
+    if(manualHelpPopup){
+      manualHelpPopup.classList.remove("show");
+      manualHelpPopup.setAttribute("aria-hidden", "true");
+    }
+    restoreMainPlaceholder();
+    if(manualHebrewInput) manualHebrewInput.classList.remove("manualTarget");
+    if(typeof autoSizeInputByContent === "function"){
+      if(input) autoSizeInputByContent(input);
+      if(manualHebrewInput) autoSizeInputByContent(manualHebrewInput);
+    }
+  };
+
+  function isManualModeOpenNow(){
+    return !!(manualHebrewWrap && manualHebrewWrap.classList.contains("show"));
+  }
+
+  function submitThreeFields(){
+    const tr = (input && input.value ? input.value : "").trim();
+    const he = (manualHebrewInput && manualHebrewInput.value ? manualHebrewInput.value : "").trim();
+
+    setHelpText();
+    if(!tr || !he || !hasNikkud(he)){
+      if(manualHebrewWrap) manualHebrewWrap.classList.add("show");
+      if(manualGenderWrap) manualGenderWrap.classList.add("show");
+      if(manualHelpPopup) manualHelpPopup.classList.add("show");
+      if(typeof renderStatusMessage === "function"){
+        renderStatusMessage("Предлог или слово не находится в базе данных");
+      }
+      if(!tr && input) input.focus();
+      else if(manualHebrewInput) manualHebrewInput.focus();
+      return;
+    }
+
+    window.__manualThreeFieldsLocked = false;
+    if(typeof submitManualCreate === "function"){
+      submitManualCreate();
+    }
+  }
+
+  function searchTablesOnly(term){
+    if(typeof findEntry === "function"){
+      return findEntry(term);
+    }
+    return null;
+  }
+
+  function handlePlus(e){
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    closeOldMenu();
+
+    const term = (input && input.value ? input.value : "").trim();
+    if(!term && !isManualModeOpenNow()) return false;
+
+    // If already in manual three-field mode, second + submits
+    if(isManualModeOpenNow()){
+      submitThreeFields();
+      return false;
+    }
+
+    // First try only tables.js as requested
+    const found = searchTablesOnly(term);
+    if(found && found.entry){
+      if(typeof renderEntry === "function"){
+        renderEntry(found);
+        return false;
+      }
+    }
+
+    // Not found in tables.js -> show 3 fields
+    window.__manualThreeFieldsLocked = true;
+    showThreeFieldsFromTerm(term);
+    return false;
+  }
+
+  if(plusBtn){
+    plusBtn.onclick = handlePlus;
+    plusBtn.addEventListener("click", handlePlus, true);
+  }
+
+  if(minusBtn){
+    minusBtn.addEventListener("click", function(){
+      window.__manualThreeFieldsLocked = false;
+      if(typeof hideManualMode === "function") hideManualMode(true);
+      restoreMainPlaceholder();
+    }, true);
+  }
+
+  setHelpText();
+});
+</script>
+
+
+<script id="gender-pronoun-switch-clean">
+(function(){
+  function init(){
+    const queryInput = document.getElementById("queryHebrew");
+    const hebrewInput = document.getElementById("manualHebrewInput");
+    const select = document.getElementById("manualGenderSelect");
+    if(!select) return;
+
+    const WORD_VALUES = new Set(["m","f","n","pl"]);
+    const PREP_VALUES = new Set(["acc","dat","ins"]);
+
+    const prepRu = new Set([
+      "в","во","на","о","об","обо","к","ко","у","с","со","от","из","для","без",
+      "перед","передо","за","под","подо","над","надо","между","внутри","вне",
+      "вокруг","напротив","рядом","касательно","относительно","ради","помимо",
+      "кроме","подобно","как","по направлению"
+    ]);
+
+    const prepHe = new Set([
+      "בְּ","ב","לְ","ל","מִן","מ","עִם","עַל","אֶל","אֵצֶל","בִּשְׁבִיל","בִּגְלַל",
+      "לִפְנֵי","אַחֲרֵי","בֵּין","תַּחַת","מֵעַל","בְּתוֹךְ","לְתוֹךְ","מִחוּץ","מִחוּץ ל־",
+      "מוּל","סָבִיב","לְצַד","בִּלְעֲדֵי","כְּמוֹ","לְמַעַן","בְּעַד","זוּלַת","לְעֵבֶר","לְגַבֵּי","עַל־יְדֵי","לְמוּל"
+    ]);
+
+    function detectMode(){
+      const vals = [];
+      [queryInput, hebrewInput].forEach(el => {
+        if(!el) return;
+        const v = (el.value || "").trim();
+        if(v) vals.push(v);
+      });
+      for(const raw of vals){
+        if(prepHe.has(raw) || prepRu.has(raw.toLowerCase())) return "prep";
+      }
+      return "word";
+    }
+
+    function applyMode(){
+      const mode = detectMode();
+      const current = select.value || "";
+      Array.from(select.options).forEach(opt => {
+        const v = opt.value || "";
+        if(v === ""){
+          opt.hidden = false;
+          return;
+        }
+        opt.hidden = mode === "prep" ? !PREP_VALUES.has(v) : !WORD_VALUES.has(v);
+      });
+      if(mode === "prep" && !PREP_VALUES.has(current)) select.value = "";
+      if(mode === "word" && !WORD_VALUES.has(current)) select.value = "";
+    }
+
+    [queryInput, hebrewInput].forEach(el => {
+      if(!el) return;
+      el.addEventListener("input", applyMode);
+      el.addEventListener("change", applyMode);
+      el.addEventListener("blur", applyMode);
+    });
+
+    applyMode();
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+
+<script id="input-direction-only-fix">
+(function(){
+  function applyDirectionFix(){
+    const mainInput = document.getElementById("queryHebrew");
+    const hebrewInput = document.getElementById("manualHebrewInput");
+
+    if(mainInput){
+      mainInput.setAttribute("dir", "auto");
+      mainInput.style.textAlign = "start";
+    }
+
+    if(hebrewInput){
+      hebrewInput.setAttribute("dir", "rtl");
+      hebrewInput.style.textAlign = "right";
+      hebrewInput.addEventListener("input", function(){
+        hebrewInput.setAttribute("dir", "rtl");
+        hebrewInput.style.textAlign = "right";
+      });
+    }
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", applyDirectionFix);
+  } else {
+    applyDirectionFix();
+  }
+})();
+</script>
+
+<script id="highlight-input-word-only">
+(function(){
+  const inputEl = document.getElementById("queryHebrew");
+  const container = document.getElementById("tableWrapper");
+  if(!inputEl || !container) return;
+
+  function stripNiqqud(s){
+    return String(s || "")
+      .normalize("NFD")
+      .replace(/[\u0591-\u05C7]/g, "")
+      .normalize("NFC")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function isHebrewText(s){
+    return /[\u0590-\u05FF]/.test(String(s || ""));
+  }
+
+  function normalizeValue(s, query){
+    const raw = String(s || "").replace(/\s+/g, " ").trim();
+    if(!raw) return "";
+    if(isHebrewText(query) && isHebrewText(raw)){
+      return stripNiqqud(raw);
+    }
+    return raw.toLowerCase();
+  }
+
+  function clearHighlights(){
+    container.querySelectorAll(".hl").forEach(el => {
+      el.replaceWith(document.createTextNode(el.textContent || ""));
+    });
+  }
+
+  function candidateElements(){
+    return Array.from(container.querySelectorAll("div, p, td, span"))
+      .filter(el => {
+        if(!el) return false;
+        if(el.closest("#emptyHint, .statusMessageBlock, .statusHelpPopup")) return false;
+        if(el.children.length > 0) return false;
+        const txt = String(el.textContent || "").replace(/\s+/g, " ").trim();
+        return !!txt;
+      });
+  }
+
+  function applyHighlight(){
+    const query = String(inputEl.value || "").replace(/\s+/g, " ").trim();
+    clearHighlights();
+    if(!query) return;
+
+    const target = normalizeValue(query, query);
+    if(!target) return;
+
+    candidateElements().forEach(el => {
+      const current = normalizeValue(el.textContent || "", query);
+      if(current === target){
+        const span = document.createElement("span");
+        span.className = "hl";
+        span.textContent = el.textContent;
+        el.textContent = "";
+        el.appendChild(span);
+      }
+    });
+  }
+
+  let timer = null;
+  function queueApply(){
+    clearTimeout(timer);
+    timer = setTimeout(applyHighlight, 80);
+  }
+
+  inputEl.addEventListener("input", queueApply);
+  inputEl.addEventListener("change", queueApply);
+  inputEl.addEventListener("keyup", queueApply);
+
+  const observer = new MutationObserver(() => {
+    if(String(inputEl.value || "").trim()){
+      queueApply();
+    }
+  });
+  observer.observe(container, { childList: true, subtree: true });
+
+  if(String(inputEl.value || "").trim()){
+    queueApply();
+  }
+})();
+</script>
+</body>
+</html>
 

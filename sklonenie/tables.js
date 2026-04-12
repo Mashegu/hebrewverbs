@@ -25949,3 +25949,4 @@ TABLES["שׁוּק"] = TABLES["shuk"];
 TABLES["рынок"] = TABLES["shuk"];
 TABLES["ринок"] = TABLES["shuk"];
 TABLES["market"] = TABLES["shuk"];
+

@@ -140,6 +140,107 @@ table td.hebrew, table th#thHebrew {
 }
 
 
+
+
+/* === Озвучка как в склонении === */
+.speak-hebrew-word,
+.speak-hebrew-word:hover,
+.speak-hebrew-word:focus,
+.speak-hebrew-word:active{
+  text-decoration:none !important;
+  outline:none !important;
+}
+.speak-hebrew-word-btn{
+  appearance:none;
+  -webkit-appearance:none;
+  background:transparent;
+  border:none;
+  padding:0;
+  margin:0;
+  color:inherit;
+  font:inherit;
+  line-height:inherit;
+  cursor:pointer;
+  direction:rtl;
+  text-decoration:none !important;
+  outline:none !important;
+  box-shadow:none !important;
+}
+.speak-hebrew-word-btn:hover,
+.speak-hebrew-word-btn:focus,
+.speak-hebrew-word-btn:active{
+  text-decoration:none !important;
+  outline:none !important;
+  box-shadow:none !important;
+}
+.speechHelpPopup{
+  position:absolute;
+  top:calc(100% + 8px);
+  left:50%;
+  transform:translateX(-50%);
+  width:320px;
+  max-width:min(92vw, 360px);
+  z-index:9999;
+}
+.speechHelpInner{
+  position:relative;
+  background:#f5f5f5;
+  border:2px solid #6ab8ff;
+  border-radius:18px;
+  box-shadow:0 8px 22px rgba(0,0,0,.10);
+  padding:14px 16px 12px;
+  text-align:left;
+}
+.speechHelpClose{
+  position:absolute;
+  top:10px;
+  right:12px;
+  border:1px solid #bdbdbd;
+  border-radius:12px;
+  background:#fff;
+  cursor:pointer;
+  padding:4px 12px;
+  font-size:15px;
+}
+.speechHelpTitle{
+  font-weight:800;
+  font-size:18px;
+  margin:2px 72px 10px 0;
+}
+.speechHelpList{
+  margin:0;
+  padding-left:22px;
+  font-size:14px;
+  line-height:1.4;
+}
+.speechHelpList li{ margin:0 0 8px; }
+.speakBaseBtn{
+  width:52px;
+  height:34px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:2px solid #7d7d7d !important;
+  border-radius:8px;
+  background:#fff;
+  color:#4f4f4f;
+  font-weight:700;
+  padding:0 !important;
+  line-height:1;
+}
+.speakBaseBtn:hover{ background:#f7f7f7; }
+.speakBaseBtn:focus,
+.speakBaseBtn:active{ outline:none; box-shadow:none; }
+.speakBaseIcon{ 
+  display:inline-flex; 
+  align-items:center; 
+  justify-content:center; 
+  line-height:1; 
+  font-size:22px; 
+  font-weight:900;
+}#centerControls{ position:relative; }
+#helpBox{ display:none !important; }
+
 </style>
 <script src="tables.js"></script>
 
@@ -251,7 +352,18 @@ document.getElementById("closeHelp").onclick = function() {
     </select>
 
     <button id="toggleExamples">Примеры</button>
-    <button id="toggleHelp">🔊 </button>
+    <button id="toggleHelp" class="speakBaseBtn" title="Как работает озвучка" aria-haspopup="dialog" aria-expanded="false"><span class="speakBaseIcon" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" focusable="false" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"></path><path d="M16.5 8.5c1.9 1.4 1.9 5.6 0 7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"></path><path d="M19.5 6c3.4 2.8 3.4 9.2 0 12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"></path></svg></span></button>
+<div id="speechHelpPopup" class="speechHelpPopup" hidden>
+  <div class="speechHelpInner">
+    <button id="speechHelpClose" class="speechHelpClose">×</button>
+    <div id="speechHelpTitle" class="speechHelpTitle">Как работает озвучка:</div>
+    <ul class="speechHelpList">
+      <li><b>Нажмите прямо на иврит</b></li>
+      <li>Озвучка запускается через <b>Google Переводчик</b></li>
+      <li>Перевод и примеры не озвучиваются.</li>
+    </ul>
+  </div>
+</div>
 
     <!-- === Меню сортировки === -->
     <div class="sort-menu" id="sortMenu">
@@ -268,7 +380,7 @@ document.getElementById("closeHelp").onclick = function() {
   <div></div>
 </div>
 <div id="examplesBox" style="display:none;"></div>
-<div id="helpBox" style="display:none; margin:10px auto; padding:10px; border:1px solid #aaa; background:#f5f5f5; width:90%; text-align:left; line-height:1.6;"></div>
+<div id="helpBox" hidden aria-hidden="true"></div>
 </div>
 <div id="tableWrapper">
 <table dir="rtl" id="conjugationTable">
@@ -361,6 +473,13 @@ let currentVerb = "קרא";
 let currentLang = "ru";
 
 
+
+function renderVerbLabel(el){
+  const heb = el.dataset.he || "";
+  const tr = el.dataset[currentLang] || "";
+  el.innerHTML = `<button type="button" class="speak-hebrew-word-btn speak-hebrew-word" data-he="${heb.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}">${heb}</button> — <span class="translation">${tr}</span>`;
+}
+
 // ✅ Примеры
 function showExamples(verb){
   const box=document.getElementById("examplesBox");
@@ -386,10 +505,12 @@ function buildTable(verb){
     const title=`${uiTexts[currentLang][tense]}`;
     tbody.insertAdjacentHTML("beforeend", `<tr class="tense-header"><td colspan="4">${title}</td></tr>`);
     rows.forEach(f=>{
+      const personSpeak = String(f.person.he || '').replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      const combinedSpeak = `${personSpeak} ${f.he}`.replace(/\s+/g, ' ').trim();
       tbody.insertAdjacentHTML("beforeend",
         `<tr>
-          <td>${f.person.he}</td>
-          <td>${f.he}</td>
+          <td><button type="button" class="speak-hebrew-word-btn speak-hebrew-word" data-he="${combinedSpeak}">${f.person.he}</button></td>
+          <td><button type="button" class="speak-hebrew-word-btn speak-hebrew-word" data-he="${combinedSpeak}">${f.he}</button></td>
           <td>${f[currentLang]}</td>
           <td>${f.tr}</td>
         </tr>`);
@@ -410,11 +531,7 @@ function updateUI(){
   document.getElementById("toggleExamples").textContent = t.examplesBtn;
 
   // Обновляем список инфинитивов
-  document.querySelectorAll(".verb").forEach(el => {
-    const heb = el.dataset.he;
-    const tr = el.dataset[currentLang]; 
-    el.textContent = `${heb} — ${tr}`;
-  });
+  document.querySelectorAll(".verb").forEach(renderVerbLabel);
 
   // Переводим элементы выпадающего меню сортировки
   const sortBtn   = document.getElementById("sortMenuBtn");
@@ -570,6 +687,7 @@ const names = themeNames[currentLang] || themeNames.ru;
 // ✅ Запуск
 window.addEventListener("DOMContentLoaded",()=>{
   document.querySelectorAll(".verb").forEach(el=>{
+    renderVerbLabel(el);
     el.addEventListener("click",()=>{
       document.querySelectorAll(".verb").forEach(v=>v.classList.remove("active"));
       el.classList.add("active");
@@ -972,6 +1090,101 @@ document.addEventListener("DOMContentLoaded", () => {
 
   updateHelp();
 });
+</script>
+
+
+<script>
+(function(){
+  const btn = document.getElementById("toggleHelp");
+  const popup = document.getElementById("speechHelpPopup");
+  const closeBtn = document.getElementById("speechHelpClose");
+  const verbsPanel = document.getElementById("verbsPanel");
+  const tableWrapper = document.getElementById("tableWrapper");
+  let activeAudio = null;
+
+  function setPopup(open){
+    if(!popup || !btn) return;
+    popup.hidden = !open;
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function stopCurrentAudio(){
+    try{
+      if(activeAudio){
+        activeAudio.pause();
+        activeAudio.currentTime = 0;
+      }
+    }catch(e){}
+    activeAudio = null;
+  }
+
+  function speakHebrewWord(text){
+    const clean = String(text || "")
+      .replace(/\s*\([^)]*\)\s*/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if(!clean) return;
+    stopCurrentAudio();
+    const url = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=he&q=" + encodeURIComponent(clean);
+    const audio = new Audio(url);
+    audio.preload = "auto";
+    activeAudio = audio;
+    audio.play().catch(function(err){
+      console.warn("Google TTS playback failed", err);
+    });
+  }
+
+  function bindPlayArea(root){
+    if(!root) return;
+    root.addEventListener("pointerup", function(e){
+      const target = e.target.closest('.speak-hebrew-word');
+      if(!target) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const text = target.getAttribute('data-he') || target.textContent || '';
+      setPopup(false);
+      speakHebrewWord(text);
+    });
+    root.addEventListener("click", function(e){
+      const target = e.target.closest('.speak-hebrew-word');
+      if(!target) return;
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  }
+
+  if(btn){
+    btn.addEventListener("click", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      setPopup(popup ? popup.hidden : false);
+    });
+  }
+
+  if(closeBtn){
+    closeBtn.addEventListener("click", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      setPopup(false);
+    });
+  }
+
+  bindPlayArea(verbsPanel);
+  bindPlayArea(tableWrapper);
+
+  document.addEventListener("click", function(e){
+    if(!popup || popup.hidden) return;
+    if(popup.contains(e.target) || (btn && btn.contains(e.target))) return;
+    setPopup(false);
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){
+      stopCurrentAudio();
+      setPopup(false);
+    }
+  });
+})();
 </script>
 
 </body>

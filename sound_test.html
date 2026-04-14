@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Sound Test</title>
+</head>
+<body>
+<h2>Проверка звука</h2>
+
+<button onclick="testGoogle()">Google TTS</button>
+<button onclick="testVoice()">Browser Voice</button>
+
+<pre id="log"></pre>
+
+<script>
+function log(t){
+  document.getElementById('log').textContent += t + "\n";
+}
+
+function testGoogle(){
+  log("Google start");
+  const url="https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=he&q=לקרוא";
+  const a=new Audio(url);
+  a.play()
+    .then(()=>log("Google OK"))
+    .catch(e=>log("Google ERROR: " + e));
+}
+
+function testVoice(){
+  log("Voice start");
+  const u=new SpeechSynthesisUtterance("לקרוא");
+  u.lang="he-IL";
+  speechSynthesis.speak(u);
+}
+</script>
+
+</body>
+</html>

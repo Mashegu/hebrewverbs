@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>Declension</title></head>
+<body style="font-family:Arial; text-align:center; margin-top:50px;">
+<h2>Склонение</h2>
+<button onclick="speak('עברית')" style="font-size:20px; padding:10px;">🔊 עברית</button>
+<script>
+function speak(text){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "he-IL";
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+</script>
+</body></html>

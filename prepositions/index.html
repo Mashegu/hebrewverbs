@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hebrew-declension</title>
+
+<style>
+body{
+  margin:0;
+  background:#f3f6fb;
+  color:#1f2937;
+  font-family:Arial,sans-serif;
+}
+.wrap{
+  max-width:900px;
+  margin:0 auto;
+  padding:32px 20px 48px;
+}
+h1{
+  text-align:center;
+  color:#1e3a8a;
+  font-size:56px;
+  margin:24px 0 36px;
+  font-weight:800;
+}
+.card{
+  background:#fff;
+  border-radius:18px;
+  padding:34px 36px;
+  box-shadow:0 4px 20px rgba(0,0,0,.06);
+}
+h2{
+  margin:0 0 20px;
+  font-size:34px;
+  color:#1f2937;
+  font-weight:800;
+}
+p{
+  font-size:22px;
+  line-height:1.4;
+  margin:0 0 14px;
+}
+ul{
+  font-size:20px;
+  margin:10px 0 20px 20px;
+}
+a{
+  color:#3165dd;
+  font-weight:700;
+  text-decoration:none;
+}
+a:hover{
+  text-decoration:underline;
+}
+.section{
+  margin-top:32px;
+  padding-top:24px;
+  border-top:1px solid #dbe3f0;
+}
+</style>
+
+<style id="click-hebrew-sound-style">
+.speak-hebrew-word{
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color: transparent;
+}
+.speak-hebrew-word,
+.speak-hebrew-word:hover,
+.speak-hebrew-word:focus,
+.speak-hebrew-word:active{
+  text-decoration:none !important;
+  outline:none !important;
+}
+</style>
+
+</head>
+
+<body>
+<div class="wrap">
+  <h1>hebrew-declension</h1>
+
+  <div class="card">
+    <h2>Интерактивный тренажёр по склонению в иврите</h2>
+
+    <p><strong>hebrew-declension</strong> — это удобный тренажёр для изучения склонения предлогов и слов в иврите.</p>
+
+    <ul>
+      <li>Склонение предлогов и слов</li>
+      <li>Формы с переводом</li>
+      <li>Примеры употребления</li>
+      <li>Озвучка иврита</li>
+    </ul>
+
+    <p>Скачать архив с тренажёром одним кликом.</p>
+
+    <p><strong>После скачивания откройте файл Declension.html на компьютере.</strong></p>
+
+    <p>
+      📦 <a class="btn" href="./prepositions.html">Открыть спряжение</a>
+    </p>
+
+    <div class="section">
+      <h2 style="font-size:28px;margin-bottom:16px;">Полезные ссылки</h2>
+
+      <p>
+        🌐 Онлайн-тренажёры:
+        <a href="https://hebrewtrainers.co.il/" target="_blank" rel="noopener noreferrer">hebrewtrainers.co.il</a>
+      </p>
+
+      <p>
+        📱 Приложение в Google Play и App Store:
+        <strong>Declension Tutor</strong><br>
+        <span style="font-size:18px;color:#64748b;">
+          Наберите название в телефоне
+        </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script id="click-hebrew-sound-script">
+(function(){
+  const HEBREW_RE = /[\u0590-\u05FF]/;
+
+  function cleanHebrew(text){
+    return String(text || "")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/[^\u0590-\u05FF\s־-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function speakHebrew(text){
+    const he = cleanHebrew(text);
+    if(!he) return;
+
+    try{
+      const audio = new Audio("https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=iw&q=" + encodeURIComponent(he));
+      audio.play().catch(function(){
+        if("speechSynthesis" in window){
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(he);
+          u.lang = "he-IL";
+          window.speechSynthesis.speak(u);
+        }
+      });
+    }catch(e){
+      if("speechSynthesis" in window){
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(he);
+        u.lang = "he-IL";
+        window.speechSynthesis.speak(u);
+      }
+    }
+  }
+
+  function wrapHebrewTextNodes(root){
+    const skip = new Set(["SCRIPT", "STYLE", "TEXTAREA", "INPUT", "SELECT", "OPTION"]);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node){
+        if(!node.nodeValue || !HEBREW_RE.test(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+        if(node.parentElement && skip.has(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;
+        if(node.parentElement && node.parentElement.classList.contains("speak-hebrew-word")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const nodes = [];
+    while(walker.nextNode()) nodes.push(walker.currentNode);
+
+    nodes.forEach(function(node){
+      const span = document.createElement("span");
+      span.className = "speak-hebrew-word";
+      span.lang = "he";
+      span.dir = "rtl";
+      span.textContent = node.nodeValue;
+      node.parentNode.replaceChild(span, node);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    wrapHebrewTextNodes(document.body);
+
+    document.addEventListener("click", function(e){
+      const el = e.target.closest(".speak-hebrew-word, .he, [lang='he']");
+      if(!el) return;
+      const text = el.textContent || "";
+      if(!HEBREW_RE.test(text)) return;
+      speakHebrew(text);
+    });
+  });
+})();
+</script>
+
+
+<script>
+document.addEventListener("click", function(e){
+  const el = e.target.closest(".he, [lang='he']");
+  if(!el) return;
+
+  const text = el.textContent.trim();
+  if(!text) return;
+
+  const audio = new Audio(
+    "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=iw&q=" 
+    + encodeURIComponent(text)
+  );
+  audio.play();
+});
+</script>
+
+</body>
+</html>

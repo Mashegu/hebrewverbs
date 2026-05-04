@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect x="36" y="36" width="952" height="952" rx="174" fill="#f5e800"/>
+  <circle cx="512" cy="512" r="404" fill="none" stroke="#1469af" stroke-width="41"/>
+  <polygon points="512,189 804,707 220,707" fill="none" stroke="#1469af" stroke-width="46" stroke-linejoin="round"/>
+  <polygon points="512,835 220,317 804,317" fill="none" stroke="#1469af" stroke-width="46" stroke-linejoin="round"/>
+  <text x="512" y="585" text-anchor="middle" font-family="David, DejaVu Serif, serif" font-size="205" fill="#1469af">С</text>
+</svg>

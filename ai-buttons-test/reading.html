@@ -109,6 +109,13 @@ function render(rec,key){
    html+='<div class="sentence"><div class="num">'+(i+1)+'</div><div class="he-row"><button type="button" class="speak-btn" aria-label="🔊" data-speak-hebrew="1" data-speak-text="'+esc(x.he||"")+'">🔊</button><div class="he example-hebrew" lang="he" dir="rtl" data-speak-hebrew="1" data-speak-text="'+esc(x.he||"")+'">'+esc(x.he||"")+'</div></div><div class="tr">'+esc(tr)+'</div></div>';
  });
  box.innerHTML=html;
+ box.querySelectorAll("[data-speak-hebrew]").forEach(function(el){
+   el.addEventListener("click",function(e){
+     e.preventDefault();
+     e.stopPropagation();
+     speakHebrew(el.getAttribute("data-speak-text")||el.textContent);
+   });
+ });
 }
 function levelInstruction(){
  if(LEVEL==="advanced")return "Продвинутый уровень: естественные более длинные предложения, разнообразная лексика и грамматика, связный текст примерно уровня B1–B2.";
@@ -331,14 +338,6 @@ document.getElementById("removeBtn").addEventListener("click",function(e){
  if(!hit){st.textContent="";return}
  var d=db();delete d[hit.key];save(d);render(null);st.textContent=UI[LANG].removed;
 });
-document.addEventListener("click",function(e){
- var x=e.target.closest&&e.target.closest("[data-speak-hebrew], .example-hebrew");
- if(!x)return;
- e.preventDefault();
- e.stopPropagation();
- if(e.stopImmediatePropagation)e.stopImmediatePropagation();
- speakHebrew(x.getAttribute("data-speak-text")||x.textContent);
-},true);
 refresh();
 })();
 </script>

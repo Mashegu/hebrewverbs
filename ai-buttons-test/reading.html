@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif}
+.read-app{width:min(100%,430px);margin:0 auto;padding:10px 10px 34px}
+.search{position:relative;width:min(100%,390px);margin:0 auto}
+#topicInput{width:100%;height:48px;border:2px solid #111;border-radius:10px;background:#fff;padding:0 44px 0 12px;font-size:17px;text-align:center;outline:none}
+#clearBtn{display:none;position:absolute;right:5px;top:5px;width:38px;height:38px;border:0;background:transparent;font-size:25px;cursor:pointer}
+.level-wrap{width:min(100%,390px);margin:9px auto 6px;text-align:center}.level-label{font-size:14px;font-weight:700;margin-bottom:6px}.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.level-btn{min-height:40px;border:1px solid #c7a727;border-radius:10px;background:#fff;padding:5px 6px;font-size:14px;font-weight:700;cursor:pointer}.level-btn.active{background:#fff2a8;border:2px solid #c7a727}.actions{display:flex;align-items:center;justify-content:center;gap:10px;margin:9px auto 12px;width:min(100%,390px)}
+.actions a{display:inline-flex;align-items:center;justify-content:center;width:58px;height:58px;border:2px solid #111;border-radius:13px;background:#fff;color:#111;text-decoration:none;font-size:31px;cursor:pointer}
+#aiBtn{font-size:28px;text-decoration:underline;text-underline-offset:3px}
+.note{width:min(100%,390px);margin:0 auto 10px;text-align:center;font-size:14px;line-height:1.3;color:#555}
+#status{min-height:18px;text-align:center;font-size:14px;font-weight:700;margin:0 auto 8px}
+.texts{width:min(100%,390px);margin:0 auto}
+.topic-title{text-align:center;font-size:20px;font-weight:900;margin:8px 0 10px}
+.sentence{border:1px solid #ddd;border-radius:10px;overflow:hidden;margin:0 0 9px;background:#fff}
+.he-row{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 8px 6px}.he{direction:rtl;text-align:center;font-family:David,"Times New Roman",serif;font-size:31px;font-weight:900;line-height:1.15;padding:2px 4px;cursor:pointer}.speak-btn{border:0;background:transparent;font-size:23px;line-height:1;cursor:pointer;padding:4px;flex:0 0 auto}
+.tr{text-align:center;background:#efefef;font-size:16px;font-weight:700;line-height:1.25;padding:7px 9px}
+.num{font-size:12px;color:#666;text-align:center;padding-top:4px}
+</style>
+
+<style id="remove-all-inner-headers">
+.mobile-header{display:none!important;}
+</style>
+
+</head>
+<body>
+<div class="read-app">
+  <div class="search">
+    <input id="topicInput" autocomplete="off" placeholder="Введите тему, например: банк">
+    <button id="clearBtn" type="button">×</button>
+  </div>
+  <div class="level-wrap">
+    <div class="level-label" id="levelLabel">Сложность</div>
+    <div class="levels">
+      <button type="button" class="level-btn active" data-level="beginner" id="levelBeginner">Начальный</button>
+      <button type="button" class="level-btn" data-level="intermediate" id="levelIntermediate">Средний</button>
+      <button type="button" class="level-btn" data-level="advanced" id="levelAdvanced">Продвинутый</button>
+    </div>
+  </div>
+  <div class="actions">
+    <a id="aiBtn" href="#" target="_blank" rel="noopener noreferrer">AI</a>
+    <a id="addBtn" href="#">+</a>
+    <a id="removeBtn" href="#">−</a>
+  </div>
+  <div class="note" id="note"></div>
+  <div id="status"></div>
+  <div class="texts" id="texts"></div>
+</div>
+<script>
+(function(){
+"use strict";
+/* READING_DESKTOP_SYSTEM_V1 */
+var LANG="ru";
+var LEVEL="beginner";
+var KEY="hebrewReadingTextsDB_V1";
+var UI={
+ ru:{ph:"Введите тему, например: банк",note:"Выберите сложность, введите тему и нажмите AI. В ответе появится блок кода со значком копирования. Скопируйте код и нажмите +.",added:"Текст добавлен.",removed:"Текст удалён.",bad:"Не удалось распознать код из буфера.",paste:"Вставьте скопированный код READING_TEXTS и нажмите OK:",empty:"Введите тему.",level:"Сложность",beginner:"Начальный",intermediate:"Средний",advanced:"Продвинутый"},
+ uk:{ph:"Введіть тему, наприклад: банк",note:"Виберіть складність, введіть тему й натисніть AI. У відповіді з’явиться блок коду зі значком копіювання. Скопіюйте код і натисніть +.",added:"Текст додано.",removed:"Текст видалено.",bad:"Не вдалося розпізнати код з буфера.",paste:"Вставте скопійований код READING_TEXTS і натисніть OK:",empty:"Введіть тему.",level:"Складність",beginner:"Початковий",intermediate:"Середній",advanced:"Просунутий"},
+ en:{ph:"Enter a topic, for example: bank",note:"Choose a level, enter a topic, and press AI. The answer will contain a code block with a copy icon. Copy the code and press +.",added:"Text added.",removed:"Text deleted.",bad:"Could not recognize the clipboard code.",paste:"Paste the copied READING_TEXTS code and press OK:",empty:"Enter a topic.",level:"Difficulty",beginner:"Beginner",intermediate:"Intermediate",advanced:"Advanced"}
+};
+function norm(v){return String(v||"").toLocaleLowerCase().replace(/\s+/g," ").trim()}
+function db(){try{var x=JSON.parse(localStorage.getItem(KEY)||"{}");return x&&typeof x==="object"&&!Array.isArray(x)?x:{}}catch(_e){return {}}}
+function save(x){try{localStorage.setItem(KEY,JSON.stringify(x))}catch(_e){}}
+function esc(v){return String(v||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function levelOf(rec){
+ var l=String(rec&&rec.level||"beginner");
+ return /^(beginner|intermediate|advanced)$/.test(l)?l:"beginner";
+}
+function baseTopicKey(key,rec){
+ var explicit=String(rec&&rec._topicKey||"").trim();
+ if(explicit)return explicit;
+ return String(key||"").replace(/@@(?:beginner|intermediate|advanced)$/,"");
+}
+function storageKey(topicKey,level){
+ return String(topicKey||"").trim()+"@@"+String(level||"beginner");
+}
+function sameTopic(q,key,rec){
+ var w=norm(q),t=rec&&rec.topic||{},base=baseTopicKey(key,rec);
+ return norm(base)===w||norm(t.ru)===w||norm(t.uk)===w||norm(t.en)===w||norm(t.he)===w;
+}
+function find(q,level){
+ var d=db(),ks=Object.keys(d),wantLevel=level||LEVEL;
+ for(var i=0;i<ks.length;i++){
+   var k=ks[i],r=d[k]||{};
+   if(sameTopic(q,k,r)&&levelOf(r)===wantLevel){
+     return {key:k,data:r,topicKey:baseTopicKey(k,r)};
+   }
+ }
+ /* Если выбранного уровня нет, другой уровень не подставляем. */
+ return null;
+}
+function label(rec,key){
+ var t=rec&&rec.topic||{};
+ return String(t[LANG]||t.ru||t.uk||t.en||t.he||key||"");
+}
+function render(rec,key){
+ var box=document.getElementById("texts");
+ if(!rec){box.innerHTML="";return}
+ var rows=Array.isArray(rec.sentences)?rec.sentences:[];
+ var html='<div class="topic-title">'+esc(label(rec,key))+'</div>';
+ rows.forEach(function(x,i){
+   if(!x)return;
+   var tr=String(x[LANG]||x.ru||x.uk||x.en||"");
+   html+='<div class="sentence"><div class="num">'+(i+1)+'</div><div class="he-row"><button type="button" class="speak-btn" aria-label="🔊" data-he="'+esc(x.he||"")+'">🔊</button><div class="he" lang="he" dir="rtl" data-he="'+esc(x.he||"")+'">'+esc(x.he||"")+'</div></div><div class="tr">'+esc(tr)+'</div></div>';
+ });
+ box.innerHTML=html;
+}
+function levelInstruction(){
+ if(LEVEL==="advanced")return "Продвинутый уровень: естественные более длинные предложения, разнообразная лексика и грамматика, связный текст примерно уровня B1–B2.";
+ if(LEVEL==="intermediate")return "Средний уровень: предложения умеренной длины, полезная повседневная лексика и немного более сложные конструкции, примерно A2–B1.";
+ return "Начальный уровень: очень понятные короткие предложения, частотная лексика и простая грамматика, примерно A1–A2.";
+}
+function promptFor(q){
+ return [
+ 'Для учебного раздела "Чтение текстов" создай ровно 10 коротких, естественных и полезных предложений на тему: '+q+'.',
+ levelInstruction(),
+ 'Каждое предложение должно быть на современном иврите с правильными огласовками.',
+ 'Дай точные переводы каждого предложения на русский, украинский и английский.',
+ 'Предложения должны образовывать связный мини-текст по теме и подходить для практики чтения.',
+ 'ОБЯЗАТЕЛЬНО верни ответ в одном Markdown-блоке ```javascript, чтобы у блока в интерфейсе был стандартный значок копирования.',
+ 'Вне блока кода не пиши ничего.',
+ 'Формат строго такой:',
+ 'READING_TEXTS["key"] = {',
+ '  topic:{he:"...",ru:"...",uk:"...",en:"..."},',
+ '  level:"'+LEVEL+'",',
+ '  sentences:[',
+ '    {he:"...",ru:"...",uk:"...",en:"..."},',
+ '    ... ровно 10 объектов ...',
+ '  ]',
+ '};'
+ ].join("\n");
+}
+function refresh(){
+ var inp=document.getElementById("topicInput"),q=String(inp.value||"").trim(),hit=find(q);
+ document.getElementById("clearBtn").style.display=q?"block":"none";
+ document.getElementById("levelLabel").textContent=UI[LANG].level;
+ document.getElementById("levelBeginner").textContent=UI[LANG].beginner;
+ document.getElementById("levelIntermediate").textContent=UI[LANG].intermediate;
+ document.getElementById("levelAdvanced").textContent=UI[LANG].advanced;
+ document.querySelectorAll(".level-btn").forEach(function(b){b.classList.toggle("active",b.dataset.level===LEVEL)});
+ var ai=document.getElementById("aiBtn");
+ ai.href=q?"https://chatgpt.com/?q="+encodeURIComponent(promptFor(q)):"#";
+ document.getElementById("note").textContent=UI[LANG].note;
+ document.getElementById("status").textContent="";
+ render(hit&&hit.data,hit&&hit.key);
+}
+async function clip(){
+ var readers=[];
+ try{if(navigator.clipboard&&navigator.clipboard.readText)readers.push(function(){return navigator.clipboard.readText()})}catch(_e){}
+ try{if(parent&&parent!==window&&parent.navigator&&parent.navigator.clipboard&&parent.navigator.clipboard.readText)readers.push(function(){return parent.navigator.clipboard.readText()})}catch(_e){}
+ for(var i=0;i<readers.length;i++){try{var t=await readers[i]();if(String(t||"").trim())return String(t)}catch(_e){}}
+ return "";
+}
+function parse(text){
+ text=String(text||"").trim().replace(/^```(?:javascript|js)?\s*/i,"").replace(/\s*```$/,"");
+ var m=text.match(/READING_TEXTS\s*\[\s*["']([^"']+)["']\s*\]\s*=\s*([\s\S]*?)\s*;?\s*$/);
+ if(!m)return null;
+ try{
+   var obj=(new Function("return ("+m[2]+")"))();
+   if(!obj||!Array.isArray(obj.sentences)||obj.sentences.length!==10)return null;
+   for(var i=0;i<obj.sentences.length;i++)if(!obj.sentences[i]||!String(obj.sentences[i].he||"").trim())return null;
+   if(!obj.topic||typeof obj.topic!=="object")obj.topic={ru:m[1],uk:m[1],en:m[1],he:""};
+   return {key:m[1],data:obj};
+ }catch(_e){return null}
+}
+var activeAudio = null;
+var activeFrame = null;
+var lastSiteSpeakText = '';
+var lastSiteSpeakTime = 0;
+
+function cleanHebrewText(text){
+  return String(text || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s*\([^)]*\)\s*/g, ' ')
+    .replace(/[^\u0590-\u05FF\s׳״־-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function stopAll(){
+  try { if (activeAudio) { activeAudio.onended=null; activeAudio.onerror=null; activeAudio.onabort=null; activeAudio.onstalled=null; activeAudio.pause(); activeAudio.currentTime = 0; } } catch(e) {}
+  activeAudio = null;
+  try { if (activeFrame && activeFrame.parentNode) activeFrame.parentNode.removeChild(activeFrame); } catch(e) {}
+  activeFrame = null;
+  try { document.querySelectorAll('iframe[data-tts-frame="1"]').forEach(function(f){f.remove();}); } catch(e) {}
+  try { if (window.speechSynthesis) { window.speechSynthesis.cancel(); } } catch(e) {}
+}
+
+function browserSpeak(text){
+  try{
+    if (!('speechSynthesis' in window)) return false;
+    var synth = window.speechSynthesis;
+    var voices = synth.getVoices ? synth.getVoices() : [];
+    var heVoice = voices.find(function(v){ return /^(he|iw)(-|_)?/i.test(v.lang || ''); }) ||
+                  voices.find(function(v){ return /Hebrew|עברית/i.test((v.name || '') + ' ' + (v.lang || '')); });
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = heVoice ? heVoice.lang : 'he-IL';
+    if (heVoice) u.voice = heVoice;
+    u.rate = 0.82;
+    u.pitch = 1;
+    u.volume = 1;
+    synth.cancel();
+    if (synth.resume) synth.resume();
+    setTimeout(function(){ try { synth.speak(u); } catch(e){} }, 0);
+    return true;
+  }catch(e){ return false; }
+}
+
+function desktopBrowserSpeak(text){
+  try{
+    if(!window.speechSynthesis||typeof window.SpeechSynthesisUtterance!=="function")return false;
+    var synth=window.speechSynthesis;
+    var voices=synth.getVoices?synth.getVoices():[];
+    var voice=voices.find(function(v){return /^(he|iw)(-|_)?/i.test(v.lang||"");})||
+              voices.find(function(v){return /Hebrew|עברית/i.test((v.name||"")+" "+(v.lang||""));});
+    var utter=new SpeechSynthesisUtterance(text);
+    utter.lang=voice?voice.lang:"he-IL";
+    if(voice)utter.voice=voice;
+    utter.rate=0.82;
+    utter.pitch=1;
+    utter.volume=1;
+    synth.cancel();
+    if(synth.resume)synth.resume();
+    synth.speak(utter);
+    return true;
+  }catch(e){return false;}
+}
+
+function iframeTts(url){
+  try{
+    var f = document.createElement('iframe');
+    f.setAttribute('allow', 'autoplay');
+    f.setAttribute('referrerpolicy', 'no-referrer');
+    f.style.position = 'fixed';
+    f.style.left = '-20px';
+    f.style.top = '-20px';
+    f.style.width = '1px';
+    f.style.height = '1px';
+    f.style.opacity = '0.01';
+    f.style.border = '0';
+    f.src = url;
+    document.body.appendChild(f);
+    activeFrame = f;
+    return true;
+  }catch(e){ return false; }
+}
+
+function audioTts(url, fail){
+  try{
+    var a = new Audio();
+    a.preload = 'auto';
+    a.setAttribute('referrerpolicy', 'no-referrer');
+    try { a.referrerPolicy = 'no-referrer'; } catch(e) {}
+    a.src = url;
+    activeAudio = a;
+    var done = false;
+    function onFail(){ if(done) return; done = true; if(fail) fail(); }
+    a.onerror = onFail;
+    a.onabort = onFail;
+    a.onstalled = onFail;
+    var p = a.play();
+    if (p && p.catch) p.catch(onFail);
+    return true;
+  }catch(e){ if(fail) fail(); return false; }
+}
+
+function speakHebrew(text){
+  var clean = cleanHebrewText(text);
+  if (!clean) return false;
+  var now = Date.now();
+  if (clean === lastSiteSpeakText && (now - lastSiteSpeakTime) < 900) return false;
+  lastSiteSpeakText = clean;
+  lastSiteSpeakTime = now;
+  stopAll();
+
+  if(!/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||"")){
+    if(desktopBrowserSpeak(clean))return true;
+  }
+
+  var q = encodeURIComponent(clean);
+  var url = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=he&q=' + q;
+  return audioTts(url,function(){
+    browserSpeak(clean);
+  });
+}
+
+window.speakHebrewWord = speakHebrew;
+window.speakHebrew = speakHebrew;
+
+if (window.speechSynthesis && window.speechSynthesis.getVoices) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
+}
+window.getReadingAiUrl=function(topicKey,level){
+ var oldLevel=LEVEL;
+ if(/^(beginner|intermediate|advanced)$/.test(level||""))LEVEL=level;
+ var q=String(topicKey||"").trim();
+ var url=q?"https://chatgpt.com/?q="+encodeURIComponent(promptFor(q)):"#";
+ LEVEL=oldLevel;
+ return url;
+};
+
+window.openReadingTopicLevel=function(topicKey,level){
+ if(/^(beginner|intermediate|advanced)$/.test(level||""))LEVEL=level;
+ var inp=document.getElementById("topicInput");
+ if(inp)inp.value=String(topicKey||"");
+ refresh();
+};
+window.applyCleanLanguage=function(l){
+ if(!/^(ru|uk|en)$/.test(l))l="ru";
+ LANG=l;document.documentElement.lang=l;
+ document.getElementById("topicInput").placeholder=UI[l].ph;
+ refresh();
+};
+document.querySelectorAll(".level-btn").forEach(function(b){
+ b.addEventListener("click",function(){
+   LEVEL=b.dataset.level||"beginner";
+   refresh();
+ });
+});
+document.getElementById("topicInput").addEventListener("input",refresh);
+document.getElementById("clearBtn").addEventListener("click",function(){document.getElementById("topicInput").value="";refresh();document.getElementById("topicInput").focus()});
+document.getElementById("addBtn").addEventListener("click",function(e){
+ e.preventDefault();
+ (async function(){
+   var text=await clip(),st=document.getElementById("status");
+   if(!String(text||"").trim())text=window.prompt(UI[LANG].paste,"")||"";
+   var p=parse(text);
+   if(!p){st.textContent=UI[LANG].bad;return}
+   var d=db();
+   p.data.level=LEVEL;
+   p.data._topicKey=p.key;
+   d[storageKey(p.key,LEVEL)]=p.data;
+   save(d);
+   document.getElementById("topicInput").value=p.key;
+   st.textContent=UI[LANG].added;
+   render(p.data,p.key);
+ })();
+});
+document.getElementById("removeBtn").addEventListener("click",function(e){
+ e.preventDefault();
+ var inp=document.getElementById("topicInput"),q=String(inp.value||"").trim(),hit=find(q),st=document.getElementById("status");
+ if(!hit){st.textContent="";return}
+ var d=db();delete d[hit.key];save(d);render(null);st.textContent=UI[LANG].removed;
+});
+document.addEventListener("click",function(e){
+ var x=e.target.closest&&e.target.closest(".speak-btn,.he");
+ if(!x)return;
+ e.preventDefault();
+ e.stopPropagation();
+ if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+ speakHebrew(x.getAttribute("data-he")||x.textContent);
+},true);
+refresh();
+})();
+</script>
+</body>
+</html>

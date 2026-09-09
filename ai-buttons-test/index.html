@@ -260,7 +260,7 @@ body.home-mode .shell-header{display:none!important}
 body.home-mode .frame{display:none!important}
 body.home-mode .welcome{display:flex!important}
 .welcome{display:none!important;position:absolute;inset:0;align-items:flex-start;justify-content:center;padding:24px 18px;overflow:auto;background:#fff}
-.home-card{width:min(100%,560px);margin:auto 0;border:0;border-radius:0;padding:6px 0 10px;background:#fff;box-shadow:none;text-align:center}
+.home-card{width:min(100%,960px);margin:auto 0;border:0;border-radius:0;padding:6px 0 10px;background:#fff;box-shadow:none;text-align:center}
 .home-brand{font-size:26px;line-height:1.05;margin:0 0 6px;color:#111;}
 .home-he{font-size:33px;direction:rtl;line-height:1.1;margin:0;color:#0b69c7}
 .home-he-row{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin:0 0 18px;}
@@ -272,6 +272,30 @@ body.home-mode .welcome{display:flex!important}
 .home-lang button{min-width:72px;height:53px;border:1px solid #d7b432;background:#fff;border-radius:13px;padding:7px 15px;font-size:24px;cursor:pointer}
 .home-lang button.active{background:#fff2a8;border-color:#d1ad28}
 .home-actions{display:grid;gap:16px;width:min(100%,500px);margin:0 auto}
+.home-section-menu{display:flex;flex-direction:column;align-items:center;gap:16px;width:min(100%,620px);margin:0 auto 18px;padding:2px 1px 8px}
+.home-section-menu.hidden{display:none}
+.home-menu-title{margin:0 0 2px;text-align:center;font-size:30px;line-height:1.15;color:#111}
+.home-section-links{display:flex;flex-direction:column;align-items:stretch;gap:10px;width:min(100%,520px);margin:0 auto}
+.home-language-group{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:7px;width:100%;padding-bottom:14px;border-bottom:1px solid #ddd}
+.home-section-menu button{display:block;width:100%;min-height:54px;border:1px solid #bfc5cc;background:#fff;border-radius:12px;padding:10px 14px;font-size:17px;font-weight:700;line-height:1.2;cursor:pointer;text-align:center;touch-action:manipulation}
+.home-section-menu button:hover,.home-section-menu button:focus-visible{border-color:#0b69c7;background:#f5f9ff}
+.home-section-menu .home-menu-lang{min-width:42px;font-size:14px;padding:7px 8px}
+.home-menu-divider{display:none}
+.home-menu-lang-label{width:100%;font-size:16px;font-weight:700;color:#333;text-align:center;white-space:nowrap}
+.home-language-group .home-menu-lang{width:auto;min-width:72px;min-height:44px;text-align:center}
+.home-language-group .home-menu-lang.active{border:2px solid #0b69c7;color:#075cae;background:#fff}
+.home-feature-cards{display:none;gap:14px;width:min(100%,620px);margin:0 auto}
+.home-feature-cards.open{display:grid}
+.home-detail-head{display:flex;align-items:center;justify-content:center;gap:16px;width:100%;margin:0 auto 4px}
+.home-detail-title{margin:0;font-size:25px;line-height:1.15;color:#111}
+.home-feature-back{display:flex;align-items:center;gap:7px;border:0;background:transparent;color:#0b69c7;font-size:16px;font-weight:700;line-height:1.15;cursor:pointer;padding:5px}
+.home-feature-back-arrow{font-size:38px;font-weight:900;line-height:.8}
+.home-feature-card{display:none;border:1px solid #d7d7d7;border-radius:16px;background:#fff;padding:18px 20px;text-align:left;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.home-feature-card.active{display:block}
+.home-feature-title{margin:0;font-size:20px;line-height:1.2}
+.home-feature-text{margin:10px 0 16px;color:#333;font-size:16px;line-height:1.48}
+.home-feature-open{display:block;width:100%;min-height:46px;border:2px solid #111;border-radius:13px;background:#fff;color:#111;font-size:17px;font-weight:700;cursor:pointer}
+.home-feature-open:hover{background:#eef6ff}
 .home-bottom-space{height:48px;flex:0 0 48px}
 .home-action{width:100%;min-height:74px;border:2px solid #d9aa13;border-radius:20px;background:#fff8cf;color:#111;padding:10px 42px 10px 18px;cursor:pointer;text-align:left}
 .home-action:hover{background:#fff2a8}
@@ -292,6 +316,14 @@ body:not(.home-mode) .home-return{display:none}
   .home-action{min-height:72px;padding:9px 40px 9px 16px}
   .home-action-title{font-size:15px;}
   .home-action-text{font-size:14px;}
+  .home-section-menu{width:100%;gap:13px;margin-bottom:14px}
+  .home-section-menu .home-section-links button{min-height:56px;white-space:normal;font-size:16px;padding:9px 12px}
+  .home-section-menu .home-menu-lang{width:auto;min-width:64px;height:44px;font-size:15px;text-align:center}
+  .home-feature-card{padding:16px 15px}
+  .home-feature-text{font-size:16px;line-height:1.42}
+  .home-detail-head{justify-content:flex-start;gap:8px;flex-wrap:wrap}
+  .home-detail-title{font-size:22px}
+  .home-feature-back{font-size:14px}
 }
 
 </style>
@@ -887,43 +919,29 @@ h1,h2,h3,h4,h5,h6,
 
     <div class="welcome" id="welcome">
       <div class="home-card">
-        <h1 class="home-brand" id="welcomeTitle">Иврит с ИИ</h1>
-        <div class="home-he-row">
-          <div class="home-he" id="homeHebrewSpeak" lang="he" dir="rtl" role="button" tabindex="0" title="Прослушать עִבְרִית" aria-label="Прослушать עִבְרִית">עִבְרִית</div>
-          <div class="home-he-translation" id="homeHebrewTranslation">с профессиональной<br>озвучкой и переводом</div>
-        </div>
-        <div class="home-lang-label" id="homeLangLabel">Язык перевода</div>
-        <div class="home-lang" aria-label="Язык перевода">
-          <button type="button" data-home-lang="ru">RU</button>
-          <button type="button" data-home-lang="uk">UK</button>
-          <button type="button" data-home-lang="en">EN</button>
-        </div>
-        <div class="home-actions">
-          <button type="button" class="home-action" data-home-section="verbs">
-            <span class="home-open-icon">›</span>
-            <span class="home-action-title" id="homeVerbsTitle">Спряжение глаголов</span>
-            <span class="home-action-text" id="homeVerbsText">Иврит в таблицах спряжения и примерах с озвучкой; корни и употребляемые биньяны</span>
-          </button>
-          <button type="button" class="home-action" data-home-section="preps">
-            <span class="home-open-icon">›</span>
-            <span class="home-action-title" id="homePrepsTitle">Склонение предлогов и слов</span>
-            <span class="home-action-text" id="homePrepsText">Иврит в таблицах склонения и примерах с озвучкой</span>
-          </button>
-          <button type="button" class="home-action" data-home-section="roots">
-            <span class="home-open-icon">›</span>
-            <span class="home-action-title" id="homeRootsTitle">Корни иврита</span>
-            <span class="home-action-text" id="homeRootsText">Корни иврита: из 7 биньянов показываются только реально употребляемые для данного корня; спряжение и примеры с озвучкой</span>
-          </button>
-          <button type="button" class="home-action" data-home-section="reading">
-            <span class="home-open-icon">›</span>
-            <span class="home-action-title" id="homeReadingTitle">Чтение текстов</span>
-            <span class="home-action-text" id="homeReadingText">Введите тему — ИИ создаст учебный текст из 10 предложений с переводом и озвучкой</span>
-          </button>
-        </div>
-
-        <div class="site-user-guide" id="siteUserGuide">
-          <div class="site-user-guide-title" id="siteUserGuideTitle"></div>
-          <div class="site-user-guide-text" id="siteUserGuideText"></div>
+        <nav class="home-section-menu" id="homeSectionMenu" aria-label="Разделы и язык перевода">
+          <h1 class="home-menu-title" id="homeMenuTitle">Иврит с ИИ</h1>
+          <div class="home-language-group">
+            <button type="button" class="home-menu-lang" data-home-lang="ru">RU</button>
+            <button type="button" class="home-menu-lang" data-home-lang="uk">UK</button>
+            <button type="button" class="home-menu-lang" data-home-lang="en">EN</button>
+          </div>
+          <div class="home-section-links">
+            <button type="button" data-home-feature="reading">Чтение текстов</button>
+            <button type="button" data-home-feature="exercise">Упражнения</button>
+            <button type="button" data-home-feature="verbs">Спряжение глаголов</button>
+            <button type="button" data-home-feature="preps">Склонение предлогов и слов</button>
+          </div>
+        </nav>
+        <div class="home-feature-cards" id="homeFeatureCards">
+          <div class="home-detail-head">
+            <button type="button" class="home-feature-back" id="homeFeatureBack" aria-label="На главную страницу" title="На главную страницу"><span class="home-feature-back-arrow">❮</span><span id="homeFeatureBackText">На главную страницу</span></button>
+            <h1 class="home-detail-title" id="homeDetailTitle">Иврит с ИИ</h1>
+          </div>
+          <article class="home-feature-card" data-home-card="reading"><h2 class="home-feature-title"></h2><div class="home-feature-text"></div><button type="button" class="home-feature-open" data-home-open="reading">Открыть</button></article>
+          <article class="home-feature-card" data-home-card="exercise"><h2 class="home-feature-title"></h2><div class="home-feature-text"></div><button type="button" class="home-feature-open" data-home-open="exercise">Открыть</button></article>
+          <article class="home-feature-card" data-home-card="verbs"><h2 class="home-feature-title"></h2><div class="home-feature-text"></div><button type="button" class="home-feature-open" data-home-open="verbs">Открыть</button></article>
+          <article class="home-feature-card" data-home-card="preps"><h2 class="home-feature-title"></h2><div class="home-feature-text"></div><button type="button" class="home-feature-open" data-home-open="preps">Открыть</button></article>
         </div>
 
         <div class="home-bottom-space" aria-hidden="true"></div>
@@ -1152,9 +1170,27 @@ en:{
 
 function currentT(){return T[lang]||T.ru}
 
+var HOME_FEATURE_TEXT={
+ ru:{reading:["Чтение текстов","Раздел создаёт связные учебные тексты на выбранную тему. Нажмите «Открыть», выберите сложность и введите тему, например «школа». AI формирует запрос на текст из 10 предложений на иврите с правильными огласовками и переводами RU / UK / EN. Скопируйте готовый код и нажмите +, чтобы добавить текст в личную базу. Кнопка ☰ открывает список сохранённых тем, нажатие на тему открывает текст. Кнопка − удаляет текущую добавленную тему. Нажмите предложение на иврите или значок звука для прослушивания."],exercise:["Упражнения","Раздел предназначен для проверки морфологии современного иврита. Нажмите «Открыть», затем через ☰ выберите тему морфологии и уровень сложности. Первый клик AI создаёт запрос на одно задание: перевод на RU / UK / EN и четыре предложения на иврите без огласовок, из которых только одно правильное. Скопируйте код и нажмите +. Выберите ответ и нажмите AI✓ для проверки. Скопируйте заключение ИИ и снова нажмите +, чтобы вставить его в выделенное поле. Кнопка − удаляет текущее упражнение."],verbs:["Спряжение глаголов","Раздел содержит полную таблицу спряжения глагола: инфинитив, настоящее, прошедшее и будущее время, повелительное наклонение, все лица и числа. Формы на иврите даны с правильными огласовками, переводом RU / UK / EN и прослушиванием. Нажмите «Открыть» и введите глагол на иврите или его перевод. Если записи нет, нажмите AI, скопируйте готовый код и добавьте его кнопкой +. Кнопка ☰ открывает глаголы личной базы, а − удаляет только текущую добавленную запись. Внутри раздела доступны примеры, корень и реально употребляемые биньяны."],preps:["Склонение предлогов и слов","Раздел показывает полное склонение предлогов и слов по лицам, родам и числам. Формы и примеры на иврите представлены с правильными огласовками, переводами RU / UK / EN и прослушиванием. Нажмите «Открыть» и введите предлог, слово или перевод. Если таблицы нет, нажмите AI, скопируйте готовый код и добавьте его кнопкой +. Кнопка ☰ открывает сохранённые записи, нажатие на запись открывает таблицу. Кнопка − удаляет только текущую запись, добавленную пользователем."],open:"Открыть"},
+ uk:{reading:["Читання текстів","Розділ створює зв’язні навчальні тексти на вибрану тему. Натисніть «Відкрити», виберіть складність і введіть тему. AI формує запит на 10 речень івритом із правильними огласовками та перекладами RU / UK / EN. Скопіюйте код і натисніть +, щоб додати текст до особистої бази. Кнопка ☰ відкриває збережені теми, а − видаляє поточну додану тему. Натисніть речення івритом або значок звуку для прослуховування."],exercise:["Вправи","Розділ перевіряє морфологію сучасного івриту. Натисніть «Відкрити», через ☰ виберіть тему морфології та складність. Перший клік AI створює запит на переклад RU / UK / EN і чотири речення івритом без огласовок, серед яких одне правильне. Скопіюйте код і натисніть +. Виберіть відповідь і натисніть AI✓. Скопіюйте висновок та знову натисніть +, щоб вставити його у виділене поле. Кнопка − видаляє вправу."],verbs:["Дієвідмінювання дієслів","Розділ містить повну таблицю дієвідмінювання: інфінітив, теперішній, минулий і майбутній час, наказовий спосіб, усі особи й числа. Форми мають правильні огласовки, переклади RU / UK / EN та озвучення. Натисніть «Відкрити» і введіть дієслово або переклад. Якщо запису немає, використайте AI, скопіюйте код і натисніть +. Кнопка ☰ відкриває особисту базу, а − видаляє лише поточний доданий запис. Усередині доступні приклади, корінь і вживані біньяни."],preps:["Відмінювання прийменників і слів","Розділ показує повне відмінювання за особами, родами й числами. Форми та приклади мають правильні огласовки, переклади RU / UK / EN та озвучення. Натисніть «Відкрити» і введіть прийменник, слово або переклад. Якщо таблиці немає, використайте AI, скопіюйте код і натисніть +. Кнопка ☰ відкриває збережені записи, а − видаляє лише поточний запис, доданий користувачем."],open:"Відкрити"},
+ en:{reading:["Reading texts","This section creates coherent study texts on a chosen topic. Press Open, choose a difficulty, and enter a topic. AI prepares a request for 10 Hebrew sentences with correct niqqud and RU / UK / EN translations. Copy the code and press + to add it to your personal database. ☰ opens saved topics, while − removes the current user-added topic. Tap a Hebrew sentence or the audio icon to hear it."],exercise:["Exercises","This section checks Modern Hebrew morphology. Press Open, then use ☰ to choose a morphology category and difficulty. The first AI press requests RU / UK / EN translations and four unpointed Hebrew options with one correct answer. Copy the code and press +. Choose an answer and press AI✓ for feedback. Copy the feedback and press + again to place it in the highlighted field. − removes the current exercise."],verbs:["Verb conjugation","This section provides a complete verb table: infinitive, present, past, future, imperative, all persons and numbers. Hebrew forms have correct niqqud, RU / UK / EN translations, and audio. Press Open and enter a Hebrew verb or translation. If it is missing, use AI, copy the code, and press +. ☰ opens your database, while − removes only the current user-added entry. Examples, the root, and attested binyanim are available inside."],preps:["Declension of prepositions and words","This section shows full declension by person, gender, and number. Hebrew forms and examples have correct niqqud, RU / UK / EN translations, and audio. Press Open and enter a preposition, word, or translation. If no table exists, use AI, copy the code, and press +. ☰ opens saved entries, while − removes only the current user-added entry."],open:"Open"}
+};
+function updateHomeFeatures(){
+  var d=HOME_FEATURE_TEXT[lang]||HOME_FEATURE_TEXT.ru;
+  var languageLabel=document.getElementById("homeMenuLangLabel");if(languageLabel)languageLabel.textContent=lang==="uk"?"Мова перекладу":(lang==="en"?"Translation language":"Язык перевода");
+  var backText=lang==="uk"?"На головну сторінку":(lang==="en"?"To the home page":"На главную страницу");
+  var detailBack=document.getElementById("homeFeatureBack");if(detailBack){detailBack.title=backText;detailBack.setAttribute("aria-label",backText);}
+  var detailBackText=document.getElementById("homeFeatureBackText");if(detailBackText)detailBackText.textContent=backText;
+  var detailTitle=document.getElementById("homeDetailTitle");if(detailTitle)detailTitle.textContent=lang==="uk"?"Іврит з ШІ":(lang==="en"?"Hebrew with AI":"Иврит с ИИ");
+  var menuTitle=document.getElementById("homeMenuTitle");if(menuTitle)menuTitle.textContent=lang==="uk"?"Іврит з ШІ":(lang==="en"?"Hebrew with AI":"Иврит с ИИ");
+  document.querySelectorAll("[data-home-feature]").forEach(function(b){var x=d[b.dataset.homeFeature];if(x)b.textContent=x[0];});
+  document.querySelectorAll("[data-home-card]").forEach(function(card){var x=d[card.dataset.homeCard];if(!x)return;var h=card.querySelector(".home-feature-title"),p=card.querySelector(".home-feature-text"),o=card.querySelector(".home-feature-open");if(h)h.textContent=x[0];if(p)p.textContent=x[1];if(o)o.textContent=d.open;});
+}
+
 function updateLabels(){
   var d=currentT();
   document.documentElement.lang=lang;
+  updateHomeFeatures();
   document.getElementById("shellTitle").textContent=loggedIn?(section==="verbs"?d.verbs:(section==="preps"?d.preps:(section==="roots"?d.roots:(section==="reading"?d.reading:d.examples)))):d.title;
   document.querySelector('[data-section="verbs"]').textContent=d.verbs;
   document.querySelector('[data-section="preps"]').textContent=d.preps;
@@ -1162,7 +1198,7 @@ function updateLabels(){
   var ml=document.getElementById("menuLangLabel");if(ml)ml.textContent=d.langLabel;
   document.getElementById("authBtn").textContent=loggedIn?d.logout:d.login;
   var ma=document.getElementById("menuAuthBtn");if(ma)ma.textContent=loggedIn?d.logout:d.login;
-  document.getElementById("welcomeTitle").textContent=d.welcomeTitle;
+  var welcomeTitle=document.getElementById("welcomeTitle");if(welcomeTitle)welcomeTitle.textContent=d.welcomeTitle;
   var wt=document.getElementById("welcomeText");if(wt)wt.textContent=d.welcomeText;
   document.getElementById("welcomeLogin").textContent=d.enter;
   var hvt=document.getElementById("homeVerbsTitle"), hpt=document.getElementById("homePrepsTitle"), het=document.getElementById("homeExamplesTitle"), hrt=document.getElementById("homeRootsTitle"), hrd=document.getElementById("homeReadingTitle");
@@ -1208,7 +1244,31 @@ function updateLabels(){
   document.querySelectorAll("[data-shell-lang]").forEach(function(b){
     b.classList.toggle("active", b.dataset.shellLang===lang);
   });
-  document.querySelectorAll("[data-home-section]").forEach(function(b){b.addEventListener("click",function(){openFromHome(b.dataset.homeSection);});});
+document.querySelectorAll("[data-home-section]").forEach(function(b){b.addEventListener("click",function(){openFromHome(b.dataset.homeSection);});});
+document.querySelectorAll("[data-home-feature]").forEach(function(b){b.addEventListener("click",function(){
+  var key=b.dataset.homeFeature;
+  document.querySelectorAll("[data-home-card]").forEach(function(card){card.classList.toggle("active",card.dataset.homeCard===key);});
+  var menu=document.getElementById("homeSectionMenu"),cards=document.getElementById("homeFeatureCards");
+  if(menu)menu.classList.add("hidden");
+  if(cards)cards.classList.add("open");
+});});
+var homeFeatureBack=document.getElementById("homeFeatureBack");if(homeFeatureBack)homeFeatureBack.addEventListener("click",function(){
+  var menu=document.getElementById("homeSectionMenu"),cards=document.getElementById("homeFeatureCards");
+  if(cards)cards.classList.remove("open");
+  document.querySelectorAll("[data-home-card]").forEach(function(card){card.classList.remove("active");});
+  if(menu)menu.classList.remove("hidden");
+});
+var homeFeatureBack=document.getElementById("homeFeatureBack");if(homeFeatureBack)homeFeatureBack.addEventListener("click",function(){
+  var menu=document.getElementById("homeSectionMenu"),cards=document.getElementById("homeFeatureCards");
+  if(cards)cards.classList.remove("open");
+  document.querySelectorAll("[data-home-card]").forEach(function(card){card.classList.remove("active");});
+  if(menu)menu.classList.remove("hidden");
+});
+document.querySelectorAll("[data-home-open]").forEach(function(b){b.addEventListener("click",function(){
+  var key=b.dataset.homeOpen;
+  if(key==="exercise"){window.location.href="index-plus.html?lang="+encodeURIComponent(lang);return;}
+  openFromHome(key);
+});});
 document.querySelectorAll("[data-home-lang]").forEach(function(b){b.addEventListener("click",function(){lang=b.dataset.homeLang;localStorage.setItem("hebrewUnifiedLang",lang);updateLabels();syncAllLang();});});
 var homeReturnBtn=document.getElementById("homeReturnBtn"); if(homeReturnBtn) homeReturnBtn.addEventListener("click",showHome);
 var shellHomeBack=document.getElementById("shellHomeBack"); if(shellHomeBack) shellHomeBack.addEventListener("click",function(e){
@@ -1816,6 +1876,14 @@ window.openRootVerbInAI=function(q){
 
 function showHome(){
   homeSectionGroup="all";
+  var homeMenu=document.getElementById("homeSectionMenu"),homeCards=document.getElementById("homeFeatureCards");
+  if(homeMenu)homeMenu.classList.remove("hidden");
+  if(homeCards)homeCards.classList.remove("open");
+  document.querySelectorAll("[data-home-card]").forEach(function(card){card.classList.remove("active");});
+  var homeMenu=document.getElementById("homeSectionMenu"),homeCards=document.getElementById("homeFeatureCards");
+  if(homeMenu)homeMenu.classList.remove("hidden");
+  if(homeCards)homeCards.classList.remove("open");
+  document.querySelectorAll("[data-home-card]").forEach(function(card){card.classList.remove("active");});
   var listPage=document.getElementById("databaseListPage");
   if(listPage){listPage.classList.remove("open");listPage.setAttribute("aria-hidden","true");}
   closeSavedDropdown();

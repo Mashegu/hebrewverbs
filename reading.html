@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif}
@@ -54,6 +55,7 @@ html,body{margin:0;background:#fff;color:#111;font-family:Arial,Helvetica,sans-s
 <script>
 (function(){
 "use strict";
+/* READING_AUDIO_COPIED_FROM_PREP_EXAMPLES_V8 */
 var LANG="ru";
 var LEVEL="beginner";
 var KEY="hebrewReadingTextsDB_V1";
@@ -167,117 +169,73 @@ function parse(text){
    return {key:m[1],data:obj};
  }catch(_e){return null}
 }
-var activeAudio = null;
-var activeFrame = null;
-var lastSiteSpeakText = '';
-var lastSiteSpeakTime = 0;
-
+var activeAudio=null;
 function cleanHebrewText(text){
-  return String(text || '')
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s*\([^)]*\)\s*/g, ' ')
-    .replace(/[^\u0590-\u05FF\s׳״־-]/g, ' ')
-    .replace(/\s+/g, ' ')
+  return String(text || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s*\([^)]*\)\s*/g, " ")
+    .replace(/[^\u0590-\u05FF\s׳״־-]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
-
-function stopAll(){
-  try { if (activeAudio) { activeAudio.onended=null; activeAudio.onerror=null; activeAudio.onabort=null; activeAudio.onstalled=null; activeAudio.pause(); activeAudio.currentTime = 0; } } catch(e) {}
-  activeAudio = null;
-  try { if (activeFrame && activeFrame.parentNode) activeFrame.parentNode.removeChild(activeFrame); } catch(e) {}
-  activeFrame = null;
-  try { document.querySelectorAll('iframe[data-tts-frame="1"]').forEach(function(f){f.remove();}); } catch(e) {}
-  try { if (window.speechSynthesis) { window.speechSynthesis.cancel(); } } catch(e) {}
-}
-
-function browserSpeak(text){
+function stopCurrentAudio(){
   try{
-    if (!('speechSynthesis' in window)) return false;
-    var synth = window.speechSynthesis;
-    var voices = synth.getVoices ? synth.getVoices() : [];
-    var heVoice = voices.find(function(v){ return /^(he|iw)(-|_)?/i.test(v.lang || ''); }) ||
-                  voices.find(function(v){ return /Hebrew|עברית/i.test((v.name || '') + ' ' + (v.lang || '')); });
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = heVoice ? heVoice.lang : 'he-IL';
-    if (heVoice) u.voice = heVoice;
-    u.rate = 0.82;
-    u.pitch = 1;
-    u.volume = 1;
-    synth.cancel();
-    if (synth.resume) synth.resume();
-    setTimeout(function(){ try { synth.speak(u); } catch(e){} }, 0);
-    return true;
-  }catch(e){ return false; }
-}
-
-function iframeTts(url){
-  try{
-    var f = document.createElement('iframe');
-    f.setAttribute('allow', 'autoplay');
-    f.setAttribute('referrerpolicy', 'no-referrer');
-    f.style.position = 'fixed';
-    f.style.left = '-20px';
-    f.style.top = '-20px';
-    f.style.width = '1px';
-    f.style.height = '1px';
-    f.style.opacity = '0.01';
-    f.style.border = '0';
-    f.src = url;
-    document.body.appendChild(f);
-    activeFrame = f;
-    return true;
-  }catch(e){ return false; }
-}
-
-function audioTts(url, fail){
-  try{
-    var a = new Audio();
-    a.preload = 'auto';
-    a.setAttribute('referrerpolicy', 'no-referrer');
-    try { a.referrerPolicy = 'no-referrer'; } catch(e) {}
-    a.src = url;
-    activeAudio = a;
-    var done = false;
-    function onFail(){ if(done) return; done = true; if(fail) fail(); }
-    a.onerror = onFail;
-    a.onabort = onFail;
-    a.onstalled = onFail;
-    var p = a.play();
-    if (p && p.catch) p.catch(onFail);
-    return true;
-  }catch(e){ if(fail) fail(); return false; }
-}
-
-function speakHebrew(text){
-  var clean = cleanHebrewText(text);
-  if (!clean) return false;
-  var now = Date.now();
-  if (clean === lastSiteSpeakText && (now - lastSiteSpeakTime) < 900) return false;
-  lastSiteSpeakText = clean;
-  lastSiteSpeakTime = now;
-  stopAll();
-
-  var q = encodeURIComponent(clean);
-  var url = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=he&q=' + q;
-  try{
-    var a = new Audio(url);
-    a.preload = 'auto';
-    a.setAttribute('referrerpolicy', 'no-referrer');
-    try { a.referrerPolicy = 'no-referrer'; } catch(e) {}
-    activeAudio = a;
-    var p = a.play();
-    if (p && p.catch) p.catch(function(){});
+    if(activeAudio){
+      activeAudio.pause();
+      activeAudio.currentTime=0;
+    }
+    if(window.speechSynthesis){
+      window.speechSynthesis.cancel();
+    }
   }catch(e){}
-  return false;
+  activeAudio=null;
 }
-
-window.speakHebrewWord = speakHebrew;
-window.speakHebrew = speakHebrew;
-
-if (window.speechSynthesis && window.speechSynthesis.getVoices) {
-  window.speechSynthesis.getVoices();
-  window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
+function speakWithBrowser(clean){
+  if(!window.speechSynthesis)return;
+  try{
+    var utter=new SpeechSynthesisUtterance(clean);
+    utter.lang="he-IL";
+    utter.rate=0.85;
+    utter.pitch=1;
+    utter.volume=1;
+    var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
+    var heVoice=voices.find(function(v){
+      return String(v.lang||"").toLowerCase().indexOf("he")===0;
+    });
+    if(heVoice)utter.voice=heVoice;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  }catch(e){}
 }
+function speakHebrewWord(text){
+  var clean=cleanHebrewText(text);
+  if(!clean)return;
+  stopCurrentAudio();
+  var url="https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=he&q="+
+            encodeURIComponent(clean);
+  var audio=new Audio(url);
+  audio.preload="auto";
+  activeAudio=audio;
+  audio.addEventListener("error",function(){
+    speakWithBrowser(clean);
+  },{once:true});
+  try{
+    var p=audio.play();
+    if(p&&typeof p.catch==="function"){
+      p.catch(function(){speakWithBrowser(clean);});
+    }
+  }catch(e){
+    speakWithBrowser(clean);
+  }
+}
+try{
+  if(window.speechSynthesis&&window.speechSynthesis.getVoices){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged=function(){
+      window.speechSynthesis.getVoices();
+    };
+  }
+}catch(e){}
 window.getReadingAiUrl=function(topicKey,level){
  var oldLevel=LEVEL;
  if(/^(beginner|intermediate|advanced)$/.test(level||""))LEVEL=level;
@@ -331,13 +289,15 @@ document.getElementById("removeBtn").addEventListener("click",function(e){
  var d=db();delete d[hit.key];save(d);render(null);st.textContent=UI[LANG].removed;
 });
 document.addEventListener("click",function(e){
- var x=e.target.closest&&e.target.closest(".speak-btn,.he");
- if(!x)return;
+ var he=e.target.closest(".speak-btn,.he");
+ if(!he)return;
  e.preventDefault();
  e.stopPropagation();
- if(e.stopImmediatePropagation)e.stopImmediatePropagation();
- speakHebrew(x.getAttribute("data-he")||x.textContent);
-},true);
+ speakHebrewWord(he.getAttribute("data-he")||he.textContent||"");
+});
+document.addEventListener("keydown",function(e){
+ if(e.key==="Escape")stopCurrentAudio();
+});
 refresh();
 })();
 </script>

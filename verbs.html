@@ -1899,20 +1899,7 @@ let currentLang = "ru";
   }
 
   function prompt(q){
-    var l=getLang();
-
-    if(l==='uk'){
-      return 'Привіт, Володю! Зроби повну таблицю відмінювання дієслова івриту: ' + q +
-      '. Коментарі й уся таблиця мають бути українською мовою. Потрібні: інфінітив, теперішній час, минулий час, майбутній час, наказовий спосіб. Іврит обов’язково з оголосками. Переклад кожної форми тільки українською мовою.';
-    }
-
-    if(l==='en'){
-      return 'Hi, Volodya! Make a complete Hebrew verb conjugation table for: ' + q +
-      '. All comments and the entire table must be in English. Include: infinitive, present tense, past tense, future tense, and imperative mood. Hebrew must include niqqud. Translate each form only into English.';
-    }
-
-    return 'Привет, Володя! Сделай полную таблицу спряжения глагола иврита: ' + q +
-    '. Комментарии и вся таблица должны быть на русском языке. Нужны: инфинитив, настоящее время, прошедшее время, будущее время, повелительное наклонение. Иврит обязательно с огласовками. Перевод каждой формы только на русский язык.';
+    return 'Сделай полную таблицу спряжения глагола иврита: '+q+'. Для каждой личной формы обязательно дай полный перевод вместе с местоимением сразу на трёх языках: ru — русский, uk — украинский, en — английский. В каждом переводе укажи лицо, род и число ТОЛЬКО сокращённо: ru — 1 л., м. р., ед. ч.; uk — 1 ос., чол. р., одн.; en — 1st p., m., sg. Допустимые сокращения: ж. р., мн. ч., жен. р., множ., f., pl.; общий род — общ. р. / спіл. р. / c. g. Иврит и местоимения должны быть с правильными огласовками. Не пропускай местоимения, род или число.';
   }
 
   function showAI(q){
@@ -2951,10 +2938,7 @@ window.firebaseConfig = {
   });
 
   function directPrompt(q){
-    var l=getLang();
-    if(l==='uk')return 'Привіт, Володю! Зроби повне відмінювання дієслова івриту: '+q+'. Потрібні інфінітив, теперішній, минулий, майбутній час і наказовий спосіб. Іврит обов’язково з правильними оголосками. Для КОЖНОЇ особової форми обов’язково вкажи person:{he:"займенник івритом з оголосками"}, поле he з формою дієслова та повний переклад із займенником. Збережи структуру infinitive, present, past, future, imperative. Поверни РІВНО один Markdown-блок ```javascript``` з готовим JavaScript-кодом verbsDB, без пояснень до або після блоку.';
-    if(l==='en')return 'Hi, Volodya! Make the complete Hebrew conjugation for: '+q+'. Include infinitive, present, past, future and imperative. Hebrew must include correct niqqud. For EVERY personal form include person:{he:"Hebrew pronoun with niqqud"}, the Hebrew verb form in he, and the full translation including the pronoun (for example: I write, you write, he writes). Preserve the infinitive, present, past, future, imperative structure. Return EXACTLY one Markdown ```javascript``` block containing ready-to-paste verbsDB JavaScript code, with no text before or after it.';
-    return 'Привет, Володя! Сделай полное спряжение глагола иврита: '+q+'. Нужны инфинитив, настоящее, прошедшее, будущее время и повелительное наклонение. Иврит обязательно с правильными огласовками. Для КАЖДОЙ личной формы обязательно укажи person:{he:"местоимение на иврите с огласовками"}, поле he с формой глагола и полный перевод с местоимением: «я пишу», «ты пишешь», «он пишет» и т. д. Сохрани структуру infinitive, present, past, future, imperative. Не сокращай переводы и не пропускай местоимения. Верни РОВНО один Markdown-блок ```javascript``` с готовым JavaScript-кодом verbsDB для прямой вставки, без текста до или после блока.';
+    return 'Привет, Володя! Сделай полное спряжение глагола иврита: '+q+'. Нужны инфинитив, настоящее, прошедшее, будущее время и повелительное наклонение. Иврит обязательно с правильными огласовками. Для КАЖДОЙ личной формы обязательно укажи person:{he:"местоимение на иврите с огласовками"}, поле he с формой глагола и ТРИ полных перевода вместе с местоимением: ru — на русском, uk — на украинском, en — на английском. Лицо, род и число в переводах пиши ТОЛЬКО сокращённо. Формат: ru:"ты пишешь (2 л., м. р., ед. ч.)", uk:"ти пишеш (2 ос., чол. р., одн.)", en:"you write (2nd p., m., sg.)". Используй также сокращения: ж. р., мн. ч.; жін. р., множ.; f., pl. Для общей по роду формы укажи: общ. р. / спіл. р. / c. g. Не заменяй полный перевод одним инфинитивом и не пропускай местоимение, лицо, род или число. Сохрани структуру infinitive, present, past, future, imperative. Верни РОВНО один Markdown-блок ```javascript``` с готовым JavaScript-кодом verbsDB для прямой вставки, без текста до или после блока.';
   }
   window.__verbDirectPrompt=directPrompt;
   function bindDirectCell(){
@@ -3725,10 +3709,9 @@ window.firebaseConfig = {
     return t.length>=3;
   }
   function promptForAI(q){
-    q=String(q||'').trim(); var l=activeLang();
-    if(l==='uk') return 'Привіт, Володю! Зроби повне відмінювання дієслова івриту: '+q+'. Усі назви розділів і переклади мають бути українською мовою. Іврит обов’язково з оголосками. Потрібні всі форми: інфінітив; теперішній час — 11 форм; минулий час — 9 форм; майбутній час — 9 форм; наказовий спосіб — 4 форми. КРИТИЧНО ВАЖЛИВО: уся відповідь має складатися РІВНО з одного Markdown-блоку ```javascript ... ```. Усередині цього єдиного блоку має бути тільки готовий JavaScript-код verbsDB для прямого вставлення в сайт. Не додавай жодного тексту, пояснень, заголовків, коментарів чи інших блоків до або після нього.';
-    if(l==='en') return 'Hi, Volodya! Make the full Hebrew conjugation of the verb: '+q+'. All section names and translations must be in English. Hebrew must include niqqud. Required forms: infinitive; present tense — 11 forms; past tense — 9 forms; future tense — 9 forms; imperative — 4 forms. CRITICAL: the entire response must consist of EXACTLY one Markdown block ```javascript ... ```. Inside that single block, output only the ready verbsDB JavaScript code for direct insertion into the site. Do not add any text, explanations, headings, comments, or any other blocks before or after it.';
-    return 'Привет, Володя! Сделай полное спряжение глагола иврита: '+q+'. Все названия разделов и переводы должны быть на русском языке. Иврит обязательно с огласовками. Нужны все формы: инфинитив; настоящее время — 11 форм; прошедшее время — 9 форм; будущее время — 9 форм; повелительное наклонение — 4 формы. КРИТИЧЕСКИ ВАЖНО: весь ответ должен состоять РОВНО из одного Markdown-блока ```javascript ... ```. Внутри этого единственного блока должен быть только готовый JavaScript-код verbsDB для прямой вставки в сайт. Никакого текста, пояснений, заголовков, комментариев или других блоков до или после него не добавляй.';
+    q=String(q||'').trim();
+    if(typeof window.__verbDirectPrompt==='function')return window.__verbDirectPrompt(q);
+    return 'Сделай полное спряжение глагола иврита: '+q+'. Для каждой формы дай полный перевод на русском, украинском и английском языках с обязательным указанием лица, рода и числа. Иврит — с правильными огласовками. Верни только один JavaScript-блок verbsDB.';
   }
   function ensureAuthButtons(){
     var toolbar=document.querySelector('.mobile-header .toolbar');

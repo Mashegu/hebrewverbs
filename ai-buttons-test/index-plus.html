@@ -170,57 +170,51 @@
     if(!item)return text;
     return text.slice(item.start,item.end).trim();
   }
-  var activeAudio=null;
-  var lastSiteSpeakText="";
-  var lastSiteSpeakTime=0;
-  function cleanHebrewText(text){
-    return String(text||"").replace(/<[^>]*>/g," ").replace(/\s*\([^)]*\)\s*/g," ").replace(/[^\u0590-\u05FF\s׳״־-]/g," ").replace(/\s+/g," ").trim();
-  }
+  var activeAudio=null,lastSiteSpeakText="",lastSiteSpeakTime=0;
+  function cleanHebrewText(text){return String(text||"").replace(/\u00a0/g," ").replace(/\s+/g," ").trim();}
   function stopAll(){
-    try{if(activeAudio){activeAudio.onended=null;activeAudio.onerror=null;activeAudio.onabort=null;activeAudio.onstalled=null;activeAudio.pause();activeAudio.currentTime=0;}}catch(_ee){}
+    try{if(activeAudio){activeAudio.pause();activeAudio.currentTime=0;activeAudio.src="";}}catch(_e){}
+    activeAudio=null;
     try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(_e){}
   }
-  function speakWithBrowser(clean){
-    if(!window.speechSynthesis)return;
+  function speakWithBrowser(text){
     try{
-      var utter=new SpeechSynthesisUtterance(clean);utter.lang="he-IL";utter.rate=.82;utter.pitch=1;utter.volume=1;
-      var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
-      var heVoice=voices.find(function(v){return /^(he|iw)(-|_)?/i.test(v.lang||"");})||voices.find(function(v){return /Hebrew|עברית/i.test((v.name||"")+" "+(v.lang||""));});
-      if(heVoice)utter.voice=heVoice;
-      window.speechSynthesis.cancel();if(window.speechSynthesis.resume)window.speechSynthesis.resume();
-      setTimeout(function(){try{window.speechSynthesis.speak(utter);}catch(_e){}},0);
-    }catch(_e){}
+      if(!window.speechSynthesis||typeof window.SpeechSynthesisUtterance!=="function")return false;
+      var synth=window.speechSynthesis,voices=synth.getVoices?synth.getVoices():[],voice=null;
+      for(var i=0;i<voices.length;i++){
+        var voiceLang=String(voices[i].lang||""),voiceName=String(voices[i].name||"");
+        if(/^(he|iw)(-|_)?/i.test(voiceLang)||/Hebrew|עברית/i.test(voiceName+" "+voiceLang)){voice=voices[i];break;}
+      }
+      var utter=new SpeechSynthesisUtterance(text);
+      utter.lang=voice?voice.lang:"he-IL";if(voice)utter.voice=voice;
+      utter.rate=.82;utter.pitch=1;utter.volume=1;
+      synth.cancel();try{if(synth.resume)synth.resume();}catch(_e){}
+      synth.speak(utter);return true;
+    }catch(_e){return false;}
+  }
+  function googleSpeak(text){
+    var used=false;
+    function fallback(){if(used)return;used=true;speakWithBrowser(text);}
+    try{
+      var audio=new Audio("https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=he&q="+encodeURIComponent(text));
+      audio.preload="auto";activeAudio=audio;
+      audio.addEventListener("error",fallback,{once:true});
+      audio.addEventListener("abort",fallback,{once:true});
+      audio.addEventListener("stalled",fallback,{once:true});
+      var playPromise=audio.play();
+      if(playPromise&&typeof playPromise.catch==="function")playPromise.catch(fallback);
+      return true;
+    }catch(_e){fallback();return false;}
   }
   function speakHebrew(text){
-    var clean=cleanHebrewText(text);if(!clean)return;
-    var now=Date.now();if(clean===lastSiteSpeakText&&now-lastSiteSpeakTime<900)return false;
+    var clean=cleanHebrewText(text);if(!clean)return false;
+    var now=Date.now();if(clean===lastSiteSpeakText&&now-lastSiteSpeakTime<350)return false;
     lastSiteSpeakText=clean;lastSiteSpeakTime=now;
-    stopAll();
-    var url="https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=he&q="+encodeURIComponent(clean);
-    try{
-      var audio=document.getElementById("exerciseHebrewAudio");
-      if(!audio){
-        audio=document.createElement("audio");
-        audio.id="exerciseHebrewAudio";
-        audio.preload="auto";
-        audio.setAttribute("playsinline","");
-        audio.setAttribute("referrerpolicy","no-referrer");
-        audio.style.display="none";
-        document.body.appendChild(audio);
-      }
-      activeAudio=audio;
-      audio.onerror=function(){speakWithBrowser(clean);};
-      audio.onabort=function(){speakWithBrowser(clean);};
-      audio.src=url;
-      audio.load();
-      var playPromise=audio.play();
-      if(playPromise&&playPromise.catch)playPromise.catch(function(){speakWithBrowser(clean);});
-    }catch(_e){speakWithBrowser(clean);}
-    return false;
+    stopAll();googleSpeak(clean);return true;
   }
   window.speakHebrewWord=speakHebrew;
   window.speakHebrew=speakHebrew;
-  try{if(window.speechSynthesis&&window.speechSynthesis.getVoices){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}}catch(_e){}
+  try{if(window.speechSynthesis&&window.speechSynthesis.getVoices){window.speechSynthesis.getVoices();if(window.speechSynthesis.addEventListener)window.speechSynthesis.addEventListener("voiceschanged",function(){try{window.speechSynthesis.getVoices();}catch(_e){}});}}catch(_e){}
   function renderConclusion(raw){
     lastConclusionRaw=cleanConclusion(raw);
     var text=escapeHtml(conclusionForLanguage(lastConclusionRaw,lang));

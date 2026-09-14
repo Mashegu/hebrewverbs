@@ -1,4 +1,43 @@
 <!DOCTYPE html>
+<script>
+/* Инициализация базы примеров до загрузки основного кода. */
+window.examplesDB = window.examplesDB || {};
+
+/* Открытие таблицы выбранного глагола. */
+document.addEventListener("click", function (event) {
+  if (!(event.target instanceof Element)) return;
+
+  /* Кнопка удаления сохраняет своё обычное действие. */
+  if (event.target.closest(".inf-delete")) return;
+
+  var card = event.target.closest("#verbsPanel .verb");
+  var tableButton = event.target.closest("#tableBtn");
+
+  if (!card && !tableButton) return;
+
+  if (typeof window.openInfinitiveCard !== "function") return;
+
+  if (!card) {
+    card =
+      document.querySelector("#verbsPanel .verb.active") ||
+      document.querySelector("#verbsPanel .verb");
+  }
+
+  if (!card) return;
+
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  document.querySelectorAll("#verbsPanel .verb.active")
+    .forEach(function (item) {
+      item.classList.remove("active");
+    });
+
+  card.classList.add("active");
+  window.openInfinitiveCard(card);
+}, true);
+</script>
+<!DOCTYPE html>
 
 <html lang="ru">
 <head>

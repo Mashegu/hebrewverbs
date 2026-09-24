@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Упражнения по морфологии иврита с проверкой через ИИ">
+  <title>Упражнения по морфологии — Иврит с ИИ</title>
+  <style>
+    :root{--blue:#0868c9;--gold:#d6a400;--pale:#fff2a8;--ink:#111;--muted:#5b5b5b;--line:#d8d8d8;--ok:#18864b;--bad:#c7342f;--site-hebrew-font:David,"Times New Roman",serif;--site-hebrew-size:34px}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:#fff;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+    button,input,select{font:inherit}
+    .app{width:min(100%,540px);margin:0 auto;min-height:100vh;padding-bottom:28px}
+    .header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #ccc;padding:8px 10px}
+    .header-box{display:grid;grid-template-columns:minmax(0,1fr) 54px 58px;min-height:78px;border:2px solid var(--gold);border-radius:15px;background:var(--pale);overflow:hidden}
+    .header-title{display:flex;align-items:center;padding:12px 16px;color:var(--blue);font-size:clamp(21px,5.7vw,30px);font-weight:800;line-height:1.05}
+    .header-icon{display:flex;align-items:center;justify-content:center;border:0;border-left:1px solid #d9c264;background:transparent;font-size:31px;cursor:pointer}
+    .header-home{color:var(--blue);font-size:46px;font-weight:900;line-height:1;text-decoration:none}
+    main{padding:18px 14px}
+    h1{margin:0 0 6px;text-align:center;font-size:25px}
+    .lead{margin:0 auto 18px;max-width:440px;text-align:center;color:var(--muted);font-size:16px;line-height:1.35}
+    .form{display:grid;gap:13px}
+    label{display:grid;gap:6px;font-weight:700;font-size:16px}
+    select,input[type=text]{width:100%;height:50px;border:2px solid #222;border-radius:11px;background:#fff;padding:0 13px;color:#111;font-size:17px;outline:none}
+    select:focus,input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(8,104,201,.13)}
+    .difficulty{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+    .level{height:46px;border:1.5px solid var(--gold);border-radius:10px;background:#fff;font-weight:700;cursor:pointer}
+    .level.active{background:var(--pale)}
+    .actions{display:flex;justify-content:center;gap:10px;margin:3px 0 0}
+    .square{display:inline-flex;align-items:center;justify-content:center;width:62px;height:62px;border:2px solid #111;border-radius:14px;background:#fff;color:#111;text-decoration:none;font-size:31px;cursor:pointer}
+    .square.ai{font-size:27px;text-decoration:underline;text-underline-offset:4px}
+    .instructions{margin:10px auto 6px;text-align:center;color:#333;font-size:15px;line-height:1.45}
+    .status{min-height:20px;margin:8px 0;text-align:center;font-weight:700;color:var(--blue)}
+    .exercise{display:none;margin-top:18px}
+    .exercise.open{display:block}
+    .exercise-head{margin-bottom:12px;text-align:center}
+    .exercise-head h2{margin:0 0 4px;font-size:24px}
+    .exercise-meta{color:var(--muted);font-size:14px}
+    .task{margin:0 0 12px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff}
+    .number{padding:6px 10px;text-align:center;color:#666;font-size:13px}
+    .translation{padding:11px 12px;background:#dedede;text-align:left;font-size:17px;font-weight:700;line-height:1.3}
+    .choices{display:grid;gap:7px;padding:10px}
+    .choice-row{display:flex;align-items:stretch;gap:6px}
+    .choice{display:flex;flex:1;grid-template-columns:auto 1fr;align-items:center;gap:9px;padding:10px;border:2px solid var(--line);border-radius:10px;direction:rtl;font-family:var(--site-hebrew-font);font-size:var(--site-hebrew-size);font-weight:900;line-height:1.08;cursor:pointer}
+    [lang="he"]{font-family:var(--site-hebrew-font)!important;font-size:var(--site-hebrew-size)!important;font-weight:900!important;line-height:1.08!important}
+    .choice input{width:21px;height:21px;margin:0;accent-color:var(--blue);flex:0 0 auto}
+    .choice-text{flex:1;cursor:pointer}
+    .choice-speak{flex:0 0 46px;border:2px solid var(--line);border-radius:10px;background:#fff;padding:3px 5px;font-size:23px;line-height:1;cursor:pointer}
+    .choice.correct{border-color:var(--ok);background:#effff4}
+    .choice.wrong{border-color:var(--bad);background:#fff1f0}
+    .check{display:block;width:min(100%,300px);min-height:52px;margin:17px auto 7px;border:2px solid var(--blue);border-radius:12px;background:var(--blue);color:#fff;font-weight:800;font-size:18px;cursor:pointer}
+    .local-result{display:none;margin:12px auto;padding:12px;border-radius:12px;background:#f3f7fb;text-align:center;font-weight:700;line-height:1.4}
+    .local-result.open{display:block}
+    .ai-check{display:none;width:min(100%,300px);min-height:50px;margin:10px auto;border:2px solid #111;border-radius:12px;background:#fff;font-weight:800;cursor:pointer}
+    .ai-check.open{display:block}
+    .ai-conclusion{display:none;margin:16px 0 8px;padding:14px;border:2px solid var(--blue);border-radius:14px;background:#f4f9ff}
+    .ai-conclusion.open{display:block}
+    .ai-conclusion h3{margin:0 0 10px;text-align:center;color:var(--blue);font-size:21px}
+    .conclusion-input{display:block;width:100%;min-height:150px;border:2px solid #111;border-radius:10px;background:#fff;padding:12px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;line-height:1.25;color:#111;white-space:pre-wrap;overflow-wrap:anywhere}
+    .conclusion-input:empty::before{content:attr(data-placeholder);color:#777}
+    .conclusion-input .hebrew-conclusion{font-family:var(--site-hebrew-font)!important;font-size:var(--site-hebrew-size)!important;font-weight:900!important;line-height:1.08!important;direction:rtl;unicode-bidi:isolate;cursor:pointer}
+    .conclusion-input .hebrew-conclusion.unpointed{font-family:David,"Times New Roman",serif!important;font-size:23px!important;font-weight:700!important;line-height:1.18!important}
+    .conclusion-input .conclusion-translation{display:block;margin:-12px -12px 12px;padding:11px 12px;background:#dedede;text-align:left;font-weight:700}
+    .conclusion-input .conclusion-label{display:block;margin-top:10px;font-weight:800}
+    .conclusion-input .conclusion-form{display:block;margin-top:7px;font-weight:700}
+    .conclusion-input .conclusion-correct-form{display:block;margin-top:7px;font-weight:800}
+    .conclusion-input .analysis-translation{display:block;margin:8px 0 0;padding:7px 9px;background:#d9d9d9;text-align:left;font-weight:700}
+    .conclusion-input .analysis-hebrew{display:block;padding:5px 9px 8px;text-align:right;direction:rtl}
+    .overlay{position:fixed;inset:0;z-index:20;display:none;background:transparent}
+    .overlay.open{display:flex!important;align-items:flex-start;justify-content:center;padding:20px 12px}
+    .drawer{position:relative!important;display:block!important;visibility:visible!important;opacity:1!important;width:min(94vw,430px);height:auto;max-height:calc(100vh - 40px);overflow:auto;padding:18px;background:#fff!important;color:#111!important;border:3px solid var(--gold);border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.45)}
+    .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .drawer-head h2{margin:0;font-size:22px}.close-menu{border:0;background:none;font-size:34px;cursor:pointer}
+    .topics{display:grid;gap:7px}.topic{min-height:45px;padding:0 14px;border:1px solid #bbb;border-radius:9px;background:#fff;text-align:left;font-size:17px;cursor:pointer}.topic.active{border:2px solid var(--blue);background:#eef7ff;color:var(--blue);font-weight:800}
+    .small{margin:9px auto 0;text-align:center;color:#666;font-size:13px;line-height:1.35}
+    @media(max-width:380px){main{padding-left:9px;padding-right:9px}.sentence{font-size:22px}.difficulty{gap:4px}.level{font-size:14px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-box">
+      <div class="header-title" id="headerTitle">Упражнения по морфологии</div>
+      <button class="header-icon" type="button" aria-label="Выбрать раздел морфологии" id="menuBtn">☰</button>
+      <a class="header-icon header-home" href="index.html" aria-label="На главную страницу" title="На главную страницу">❮</a>
+    </div>
+  </header>
+  <main>
+    <h1 id="selectedCategory">Выберите морфологию</h1>
+    <p class="lead" id="leadText">В каждом задании выберите одно правильное предложение на иврите.</p>
+
+    <section class="form" aria-label="Настройки упражнения">
+      <label><span id="difficultyLabel">Сложность</span>
+        <span class="difficulty" id="levels">
+          <button class="level active" type="button" data-level="simple">Начальный</button>
+          <button class="level" type="button" data-level="medium">Средний</button>
+          <button class="level" type="button" data-level="advanced">Продвинутый</button>
+        </span>
+      </label>
+
+      <div class="actions" aria-label="AI, добавить, удалить">
+        <a class="square ai" id="aiCreate" href="#" target="_blank" rel="noopener">AI</a>
+        <button class="square" id="addExercise" type="button" aria-label="Добавить упражнение">+</button>
+        <button class="square" id="removeExercise" type="button" aria-label="Удалить упражнение">−</button>
+      </div>
+      <div class="instructions" id="instructions"></div>
+      <div class="status" id="status" aria-live="polite"></div>
+    </section>
+
+    <section class="exercise" id="exercise">
+      <div class="exercise-head"><h2 id="exerciseTitle"></h2><div class="exercise-meta" id="exerciseMeta"></div></div>
+      <div id="tasks"></div>
+      <section class="ai-conclusion" id="aiConclusion" aria-label="Заключение ИИ">
+        <h3 id="conclusionTitle">Заключение ИИ</h3>
+        <div class="conclusion-input" id="conclusionInput" data-placeholder="Здесь появится заключение ИИ" aria-live="polite" aria-readonly="true" role="textbox" tabindex="0"></div>
+      </section>
+    </section>
+  </main>
+</div>
+<div class="overlay" id="overlay"><aside class="drawer"><div class="drawer-head"><h2 id="drawerTitle">Раздел морфологии</h2><button class="close-menu" id="closeMenu" type="button" aria-label="Закрыть">×</button></div><div class="topics" id="topics"></div></aside></div>
+
+<script>
+(function(){
+  "use strict";
+  var categoryNames={
+    ru:{nouns:"Существительные",adjectives:"Прилагательные",numerals:"Числительные",pronouns:"Местоимения",verbs:"Глаголы",adverbs:"Наречия",prepositions:"Предлоги",conjunctions:"Союзы"},
+    uk:{nouns:"Іменники",adjectives:"Прикметники",numerals:"Числівники",pronouns:"Займенники",verbs:"Дієслова",adverbs:"Прислівники",prepositions:"Прийменники",conjunctions:"Сполучники"},
+    en:{nouns:"Nouns",adjectives:"Adjectives",numerals:"Numerals",pronouns:"Pronouns",verbs:"Verbs",adverbs:"Adverbs",prepositions:"Prepositions",conjunctions:"Conjunctions"}
+  };
+  var levelNames={
+    ru:{simple:"начальный",medium:"средний",advanced:"продвинутый"},
+    uk:{simple:"початковий",medium:"середній",advanced:"просунутий"},
+    en:{simple:"beginner",medium:"intermediate",advanced:"advanced"}
+  };
+  var UI={
+    ru:{header:"Упражнения по морфологии",choose:"Выберите морфологию",lead:"В каждом задании выберите одно правильное предложение на иврите.",difficulty:"Сложность",levels:["Начальный","Средний","Продвинутый"],drawer:"Раздел морфологии",close:"Закрыть",instructions:"AI — сначала создать задание, затем проверить ответ.<br>+ — сначала вставить код, затем заключение ИИ.<br>− — удалить текущее упражнение.",conclusion:"Заключение ИИ",placeholder:"Здесь появится заключение ИИ",after:"После проверки нажмите значок копирования в ответе ИИ, вернитесь на страницу и нажмите основную кнопку +.",ready:"Упражнение готово.",chooseCategory:"Сначала нажмите ☰ и выберите раздел морфологии.",chooseAnswer:"Сначала выберите один вариант.",copyConclusion:"Скопируйте заключение ИИ и нажмите главную кнопку +.",pasteConclusion:"Вставьте заключение ИИ:",pasteCode:"Вставьте код MORPH_QUIZ из ответа AI:",inserted:"Заключение ИИ вставлено.",badCode:"Код не добавлен: ",badShape:"Нужно одно задание, три перевода и четыре варианта",removed:"Упражнение удалено.",createAI:"Создать задание с помощью ИИ",checkAI:"Проверить ответ с помощью ИИ"},
+    uk:{header:"Вправи з морфології",choose:"Виберіть розділ морфології",lead:"У кожному завданні виберіть одне правильне речення івритом.",difficulty:"Складність",levels:["Початковий","Середній","Просунутий"],drawer:"Розділ морфології",close:"Закрити",instructions:"AI — спочатку створити завдання, потім перевірити відповідь.<br>+ — спочатку вставити код, потім висновок ШІ.<br>− — видалити поточну вправу.",conclusion:"Висновок ШІ",placeholder:"Тут з’явиться висновок ШІ",after:"Після перевірки натисніть значок копіювання у відповіді ШІ, поверніться на сторінку й натисніть основну кнопку +.",ready:"Вправу готово.",chooseCategory:"Спочатку натисніть ☰ і виберіть розділ морфології.",chooseAnswer:"Спочатку виберіть один варіант.",copyConclusion:"Скопіюйте висновок ШІ та натисніть основну кнопку +.",pasteConclusion:"Вставте висновок ШІ:",pasteCode:"Вставте код MORPH_QUIZ із відповіді AI:",inserted:"Висновок ШІ вставлено.",badCode:"Код не додано: ",badShape:"Потрібне одне завдання, три переклади й чотири варіанти",removed:"Вправу видалено.",createAI:"Створити завдання за допомогою ШІ",checkAI:"Перевірити відповідь за допомогою ШІ"},
+    en:{header:"Morphology exercises",choose:"Choose a morphology topic",lead:"In each task, choose the one correct Hebrew sentence.",difficulty:"Difficulty",levels:["Beginner","Intermediate","Advanced"],drawer:"Morphology topic",close:"Close",instructions:"AI — first create a task, then check the answer.<br>+ — first paste the code, then the AI conclusion.<br>− — delete the current exercise.",conclusion:"AI conclusion",placeholder:"The AI conclusion will appear here",after:"After checking, use the copy icon in the AI response, return to this page, and press the main + button.",ready:"Exercise ready.",chooseCategory:"First press ☰ and choose a morphology topic.",chooseAnswer:"First choose one option.",copyConclusion:"Copy the AI conclusion and press the main + button.",pasteConclusion:"Paste the AI conclusion:",pasteCode:"Paste the MORPH_QUIZ code from the AI response:",inserted:"AI conclusion inserted.",badCode:"Code was not added: ",badShape:"One task, three translations, and four options are required",removed:"Exercise deleted.",createAI:"Create an exercise with AI",checkAI:"Check the answer with AI"}
+  };
+  var EXTRA_UI={"ru": {"site": "Иврит с ИИ", "home": "На главную страницу", "settings": "Настройки упражнения", "actions": "ИИ, добавить, удалить", "add": "Добавить упражнение", "remove": "Удалить упражнение", "listen": "Прослушать", "missingCode": "Не найден объект MORPH_QUIZ", "correct": "Выбранный вариант верен", "wrong": "Выбранный вариант неверен", "morphology": "Морфология", "retry": "Для перевода заключения на этот язык повторите проверку AI✓ и вставьте новый ответ.", "badConclusion": "Заключение не добавлено: нужны переводы RU / UK / EN, выбранное предложение и морфология."}, "uk": {"site": "Іврит із ШІ", "home": "На головну сторінку", "settings": "Налаштування вправи", "actions": "ШІ, додати, видалити", "add": "Додати вправу", "remove": "Видалити вправу", "listen": "Прослухати", "missingCode": "Не знайдено об’єкт MORPH_QUIZ", "correct": "Обраний варіант правильний", "wrong": "Обраний варіант неправильний", "morphology": "Морфологія", "retry": "Щоб перекласти висновок цією мовою, повторіть перевірку AI✓ і вставте нову відповідь.", "badConclusion": "Висновок не додано: потрібні переклади RU / UK / EN, обране речення та морфологія."}, "en": {"site": "Hebrew with AI", "home": "To the home page", "settings": "Exercise settings", "actions": "AI, add, delete", "add": "Add exercise", "remove": "Delete exercise", "listen": "Listen", "missingCode": "MORPH_QUIZ object not found", "correct": "Selected option is correct", "wrong": "Selected option is incorrect", "morphology": "Morphology", "retry": "To translate the conclusion into this language, check it again with AI✓ and paste the new response.", "badConclusion": "Conclusion not added: RU / UK / EN translations, the selected sentence and morphology are required."}};
+  Object.keys(EXTRA_UI).forEach(function(l){Object.assign(UI[l],EXTRA_UI[l]);});
+  var POS_NAMES={"ru": {"noun": "существительное", "adjective": "прилагательное", "numeral": "числительное", "pronoun": "местоимение", "verb": "глагол", "adverb": "наречие", "preposition": "предлог", "conjunction": "союз", "particle": "частица", "article": "артикль", "other": "другая часть речи"}, "uk": {"noun": "іменник", "adjective": "прикметник", "numeral": "числівник", "pronoun": "займенник", "verb": "дієслово", "adverb": "прислівник", "preposition": "прийменник", "conjunction": "сполучник", "particle": "частка", "article": "артикль", "other": "інша частина мови"}, "en": {"noun": "noun", "adjective": "adjective", "numeral": "numeral", "pronoun": "pronoun", "verb": "verb", "adverb": "adverb", "preposition": "preposition", "conjunction": "conjunction", "particle": "particle", "article": "article", "other": "other part of speech"}};
+  var allowed=/^(ru|uk|en)$/;
+  var requestedLang=new URLSearchParams(location.search).get("lang");
+  var lang=allowed.test(requestedLang||"")?requestedLang:(localStorage.getItem("hebrewUnifiedLang")||"ru");
+  if(!allowed.test(lang))lang="ru";
+  var currentLevel="simple",currentCategory="",currentExercise=null,awaitingConclusion=false,lastCheckedAnswer=null;
+  function $(id){return document.getElementById(id);}
+  function ui(){return UI[lang]||UI.ru;}
+  function categoryName(key){return (categoryNames[lang]||categoryNames.ru)[key]||key||"";}
+  function levelName(key){return (levelNames[lang]||levelNames.ru)[key]||key||"";}
+  function translated(value){if(typeof value==="string")return value;return value&&(value[lang]||value.ru||value.uk||value.en)||"";}
+  var CREATE_PROMPTS={"ru": ["Создай упражнение по морфологии современного иврита. Раздел: ", "Сложность: ", "Создай ровно 1 задание с 4 вариантами одного предложения на иврите БЕЗ огласовок. Только один вариант должен быть грамматически правильным; остальные три должны содержать реалистичные морфологические ошибки выбранного раздела. Дай полный перевод правильного предложения на русском, украинском и английском: только естественный перевод без грамматических пометок. Все три перевода должны соответствовать одному правильному предложению. Верни только один блок кода javascript в следующем формате. correct — индекс правильного ответа от 0 до 3."], "uk": ["Створи вправу з морфології сучасного івриту. Розділ: ", "Складність: ", "Створи рівно 1 завдання з 4 варіантами одного речення івритом БЕЗ знаків оголосовування. Лише один варіант має бути граматично правильним; решта три мають містити реалістичні морфологічні помилки вибраного розділу. Дай повний переклад правильного речення російською, українською й англійською: лише природний переклад без граматичних позначок. Усі три переклади мають відповідати одному правильному реченню. Поверни лише один блок коду javascript у наведеному форматі. correct — індекс правильної відповіді від 0 до 3."], "en": ["Create a Modern Hebrew morphology exercise. Topic: ", "Difficulty: ", "Create exactly 1 task with 4 variants of one Hebrew sentence WITHOUT niqqud. Exactly one option must be grammatically correct; the other three must contain realistic morphological errors for the selected topic. Provide a full translation of the correct sentence into Russian, Ukrainian and English: only natural translations, without grammatical annotations. All three translations must match the same correct sentence. Return only one javascript code block in the following format. correct is the index of the correct answer, from 0 to 3."]};
+  function promptText(){
+    var p=CREATE_PROMPTS[lang];
+    return p[0]+categoryName(currentCategory)+". "+p[1]+levelName(currentLevel)+".\n"+p[2]+"\nMORPH_QUIZ = "+JSON.stringify({category:currentCategory,level:currentLevel,tasks:[{translation:{ru:"...",uk:"...",en:"..."},options:["...","...","...","..."],correct:0}]})+";";
+  }
+  var FEEDBACK_PROMPTS={"ru": "Проверь выбранный ответ в упражнении по морфологии современного иврита. Верни ТОЛЬКО один блок кода json с объектом по схеме ниже. Обязательно заполни ВСЕ поля ru, uk и en естественными переводами на русский, украинский и английский соответственно: пользователь переключает язык без нового запроса. selectedHe — ТОЛЬКО выбранное пользователем предложение с правильными огласовками. Сохрани выбранные слова и грамматическую ошибку, если она есть; не подменяй выбранный ответ правильным. Не добавляй второе полное предложение и заголовки «Перевод», «Выбранный вариант», «Правильный вариант». explanation — краткое объяснение правильности или ошибки на трёх языках; при ошибке укажи конкретную исправленную форму с огласовками, но не повторяй полное правильное предложение. Не придумывай ошибку, если ответ верен. morphology — полный разбор правильного предложения по отдельным словам: he с корректными огласовками, translation без грамматических пометок на трёх языках, pos — часть речи, features — грамматические характеристики на трёх языках (род, число, лицо, время и т. п. только где применимо; иначе «неизменяемое» и его переводы). Для pos используй только noun, adjective, numeral, pronoun, verb, adverb, preposition, conjunction, particle, article, other. В features не дублируй название части речи: его добавит интерфейс на выбранном языке. Не изменяй схему. Данные упражнения:", "uk": "Перевір обрану відповідь у вправі з морфології сучасного івриту. Поверни ЛИШЕ один блок коду json з об’єктом за наведеною схемою. Обов’язково заповни ВСІ поля ru, uk та en природними перекладами російською, українською й англійською відповідно: користувач перемикає мову без нового запиту. selectedHe — ЛИШЕ обране користувачем речення з правильним нікудом. Збережи обрані слова й граматичну помилку, якщо вона є; не замінюй обрану відповідь правильною. Не додавай друге повне речення та заголовки «Переклад», «Обраний варіант», «Правильний варіант». explanation — коротке пояснення правильності або помилки трьома мовами; за наявності помилки вкажи конкретну виправлену форму з нікудом, але не повторюй повне правильне речення. Не вигадуй помилку, якщо відповідь правильна. morphology — повний розбір правильного речення за окремими словами: he з правильним нікудом, translation без граматичних позначок трьома мовами, pos — частина мови, features — граматичні характеристики трьома мовами (рід, число, особа, час тощо лише там, де це доречно; інакше «незмінюване» та його переклади). Для pos використовуй лише noun, adjective, numeral, pronoun, verb, adverb, preposition, conjunction, particle, article, other. У features не дублюй назву частини мови: її додасть інтерфейс вибраною мовою. Не змінюй схему. Дані вправи:", "en": "Check the selected answer in this Modern Hebrew morphology exercise. Return ONLY one json code block containing an object following the schema below. Fill in ALL ru, uk and en fields with natural Russian, Ukrainian and English translations respectively: the user switches language without another request. selectedHe must contain ONLY the sentence selected by the user, with correct niqqud. Preserve the selected words and any grammatical error; do not replace the selected answer with the correct one. Do not add a second full sentence or headings such as Translation, Selected option or Correct option. explanation is a short explanation of why the answer is correct or incorrect in all three languages; for an error, include the specific corrected form with niqqud, without repeating the complete correct sentence. Do not invent an error if the answer is correct. morphology is a complete word-by-word analysis of the correct sentence: he with correct niqqud, translation without grammatical labels in all three languages, pos for the part of speech, and features for grammatical characteristics in all three languages (gender, number, person, tense, etc. only where applicable; otherwise use invariant and its translations). Allowed pos values: noun, adjective, numeral, pronoun, verb, adverb, preposition, conjunction, particle, article, other. Do not repeat the part of speech in features: the interface adds its localized name. Do not change the schema. Exercise data:"};
+  function feedbackPrompt(data){
+    var template={selectedHe:"...",explanation:{ru:"...",uk:"...",en:"..."},morphology:[{he:"...",translation:{ru:"...",uk:"...",en:"..."},pos:"noun",features:{ru:"...",uk:"...",en:"..."}}]};
+    return FEEDBACK_PROMPTS[lang]+"\n"+JSON.stringify(data)+"\n```json\n"+JSON.stringify(template,null,2)+"\n```";
+  }
+  function updateAiLink(){
+    $("aiCreate").href="#";
+    $("selectedCategory").textContent=currentCategory?categoryName(currentCategory):ui().choose;
+  }
+  function validate(data){
+    return data&&categoryNames.ru[data.category]&&levelNames.ru[data.level]&&Array.isArray(data.tasks)&&data.tasks.length===1&&data.tasks.every(function(t){var x=t&&t.translation;return t&&((typeof x==="string")||(x&&typeof x.ru==="string"&&typeof x.uk==="string"&&typeof x.en==="string"))&&Array.isArray(t.options)&&t.options.length===4&&Number.isInteger(t.correct)&&t.correct>=0&&t.correct<4;});
+  }
+  function parseCode(raw){
+    var text=String(raw||"").replace(/^\s*```(?:javascript|js)?\s*/i,"").replace(/\s*```\s*$/i,"").trim();
+    var match=text.match(/MORPH_QUIZ\s*=\s*([\s\S]+?);?\s*$/);
+    if(!match)throw new Error(ui().missingCode);
+    return Function('"use strict";return ('+match[1].replace(/;\s*$/,"")+');')();
+  }
+  function cleanConclusion(raw){
+    return String(raw||"").replace(/^\s*```(?:text|markdown|json|javascript|js)?\s*/i,"").replace(/\s*```\s*$/i,"").trim();
+  }
+  var lastConclusionRaw="",lastConclusionLanguage="";
+  function conclusionForLanguage(raw,targetLang){
+    var text=cleanConclusion(raw),parts=[],re=/(^|\n)\s*(?:#{1,3}\s*)?(?:\*{1,2})?\s*(RU|UK|EN)\s*(?:—|-|:)[^\n]*(?:\n|$)/gim,match;
+    while((match=re.exec(text))){parts.push({lang:match[2].toLowerCase(),start:match.index+(match[1]?match[1].length:0),contentStart:re.lastIndex});}
+    if(!parts.length)return lastConclusionLanguage&&targetLang!==lastConclusionLanguage?"":text;
+    var wanted=String(targetLang||"ru").toLowerCase(),item=null;
+    for(var i=0;i<parts.length;i++){if(parts[i].lang===wanted){item=parts[i];item.end=i+1<parts.length?parts[i+1].start:text.length;break;}}
+    if(!item)return "";
+    return text.slice(item.contentStart,item.end).trim();
+  }
+  var activeAudio=null;
+  var lastSiteSpeakText="";
+  var lastSiteSpeakTime=0;
+  function cleanHebrewText(text){
+    return String(text||"").replace(/<[^>]*>/g," ").replace(/\s*\([^)]*\)\s*/g," ").replace(/[^\u0590-\u05FF\s׳״־-]/g," ").replace(/\s+/g," ").trim();
+  }
+  function stopAll(){
+    try{if(activeAudio){activeAudio.onended=null;activeAudio.onerror=null;activeAudio.onabort=null;activeAudio.onstalled=null;activeAudio.pause();activeAudio.currentTime=0;}}catch(_ee){}
+    try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(_e){}
+  }
+  function speakWithBrowser(clean){
+    if(!window.speechSynthesis)return;
+    try{
+      var utter=new SpeechSynthesisUtterance(clean);utter.lang="he-IL";utter.rate=.82;utter.pitch=1;utter.volume=1;
+      var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
+      var heVoice=voices.find(function(v){return /^(he|iw)(-|_)?/i.test(v.lang||"");})||voices.find(function(v){return /Hebrew|עברית/i.test((v.name||"")+" "+(v.lang||""));});
+      if(heVoice)utter.voice=heVoice;
+      window.speechSynthesis.cancel();if(window.speechSynthesis.resume)window.speechSynthesis.resume();
+      setTimeout(function(){try{window.speechSynthesis.speak(utter);}catch(_e){}},0);
+    }catch(_e){}
+  }
+  function speakHebrew(text){
+    var clean=cleanHebrewText(text);if(!clean)return;
+    var now=Date.now();if(clean===lastSiteSpeakText&&now-lastSiteSpeakTime<900)return false;
+    lastSiteSpeakText=clean;lastSiteSpeakTime=now;
+    stopAll();
+    var url="https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=he&q="+encodeURIComponent(clean);
+    try{
+      var audio=document.getElementById("exerciseHebrewAudio");
+      if(!audio){
+        audio=document.createElement("audio");
+        audio.id="exerciseHebrewAudio";
+        audio.preload="auto";
+        audio.setAttribute("playsinline","");
+        audio.setAttribute("referrerpolicy","no-referrer");
+        audio.style.display="none";
+        document.body.appendChild(audio);
+      }
+      activeAudio=audio;
+      audio.onerror=function(){speakWithBrowser(clean);};
+      audio.onabort=function(){speakWithBrowser(clean);};
+      audio.src=url;
+      audio.load();
+      var playPromise=audio.play();
+      if(playPromise&&playPromise.catch)playPromise.catch(function(){speakWithBrowser(clean);});
+    }catch(_e){speakWithBrowser(clean);}
+    return false;
+  }
+  window.speakHebrewWord=speakHebrew;
+  window.speakHebrew=speakHebrew;
+  try{if(window.speechSynthesis&&window.speechSynthesis.getVoices){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}}catch(_e){}
+  function tri(value){return value&&["ru","uk","en"].every(function(l){return typeof value[l]==="string"&&value[l].trim();});}
+  function feedbackObject(raw){
+    var text=cleanConclusion(raw).replace(/^MORPH_FEEDBACK\s*=\s*/,"").replace(/;\s*$/,"");
+    if(text.charAt(0)!=="{")return null;
+    var data=JSON.parse(text);
+    if(!data||typeof data.selectedHe!=="string"||!/[\u0590-\u05FF]/.test(data.selectedHe)||!tri(data.explanation)||!Array.isArray(data.morphology)||!data.morphology.length||!data.morphology.every(function(w){return w&&typeof w.he==="string"&&w.he.trim()&&tri(w.translation)&&POS_NAMES.ru[w.pos]&&tri(w.features);}))throw new Error(ui().badConclusion);
+    return data;
+  }
+  function hebrewMarkup(text){
+    return escapeHtml(text).replace(/([\u0590-\u05FF\uFB1D-\uFB4F]+(?:[ \t.,!?;:״׳'()־–—-]+[\u0590-\u05FF\uFB1D-\uFB4F]+)*)/g,function(hebrew){
+      var formClass=/[\u0591-\u05C7]/.test(hebrew)?"pointed":"unpointed";
+      return '<span class="hebrew-conclusion '+formClass+'" lang="he" dir="rtl" role="button" tabindex="0" title="'+escapeHtml(ui().listen)+'" aria-label="'+escapeHtml(ui().listen+': '+hebrew)+'">'+hebrew+'</span>';
+    });
+  }
+  function conclusionTop(selectedHe){
+    var item=currentExercise&&currentExercise.tasks[0];
+    var selected=lastCheckedAnswer;
+    var verdict=item&&selected!==null?(selected===item.correct?ui().correct:ui().wrong):"";
+    return '<span class="conclusion-translation">'+escapeHtml(item?translated(item.translation):"")+'</span>'+
+      (verdict?'<span class="conclusion-label">'+verdict+'</span>':"")+
+      (selectedHe?'\n'+hebrewMarkup(selectedHe):"");
+  }
+  function renderConclusion(raw){
+    var cleaned=cleanConclusion(raw),data=feedbackObject(cleaned);
+    if(cleaned!==lastConclusionRaw)lastConclusionLanguage=lang;
+    lastConclusionRaw=cleaned;
+    if(data){
+      var text=conclusionTop(data.selectedHe)+'\n<span class="conclusion-form">'+hebrewMarkup(data.explanation[lang])+'</span>'+
+        '<span class="conclusion-label">'+ui().morphology+'</span>';
+      text+=data.morphology.map(function(w){return '<span class="analysis-translation">'+escapeHtml(w.translation[lang]+" ("+POS_NAMES[lang][w.pos]+"; "+w.features[lang]+")")+'</span><span class="analysis-hebrew">'+hebrewMarkup(w.he)+'</span>';}).join("");
+      $("conclusionInput").innerHTML=text;
+      return;
+    }
+    // Compatibility with previously copied plain-text conclusions.
+    var localized=conclusionForLanguage(cleaned,lang),inAnalysis=false,section="translation",selectedHe="",body=[];
+    localized.split(/\r?\n/).forEach(function(line){
+      var probe=line.replace(/^\s*(?:#{1,6}\s*)?(?:\*{1,2}|_{1,2})?\s*/,"").replace(/(?:\*{1,2}|_{1,2})?\s*$/,"").trim();
+      if(!probe)return;
+      if(/^(Перевод|Переклад|Translation)(?:\s|$|:)/i.test(probe)){section="translation";return;}
+      if(/^(Выбранный вариант|Обраний варіант|Selected option)(?:\s|$|:)/i.test(probe)){section="selected";return;}
+      if(/^(Правильный вариант|Правильний варіант|Correct option)(?:\s|$|:)/i.test(probe)){section="correct";return;}
+      if(/^(Морфология|Морфологія|Morphology)(?:\s|$|:)/i.test(probe)){inAnalysis=true;section="analysis";body.push('<span class="conclusion-label">'+ui().morphology+'</span>');return;}
+      if(section==="translation")return;
+      if(section==="selected"&&/^[\u0590-\u05FF\s.,!?;:״׳'()־–—-]+$/.test(probe)){selectedHe+=(selectedHe?" ":"")+probe;return;}
+      if(section==="correct"&&/^[\u0590-\u05FF\s.,!?;:״׳'()־–—-]+$/.test(probe))return;
+      if(inAnalysis){body.push('<span class="'+(/[\u0590-\u05FF]/.test(probe)?'analysis-hebrew':'analysis-translation')+'">'+hebrewMarkup(probe.replace(/^\s*[•*-]\s*/,""))+'</span>');return;}
+      section="explanation";body.push('<span class="conclusion-form">'+hebrewMarkup(probe)+'</span>');
+    });
+    if(!selectedHe&&currentExercise&&lastCheckedAnswer!==null)selectedHe=currentExercise.tasks[0].options[lastCheckedAnswer];
+    $("conclusionInput").innerHTML=conclusionTop(selectedHe)+(localized?body.join("\n"):'<span class="conclusion-form">'+escapeHtml(ui().retry)+'</span>');
+  }
+  function render(data){
+    currentExercise=data;lastCheckedAnswer=null;
+    currentCategory=data.category;currentLevel=data.level;
+    $("exerciseTitle").textContent=categoryName(data.category);
+    $("exerciseMeta").textContent=categoryName(data.category)+" · "+levelName(data.level);
+    $("tasks").innerHTML=data.tasks.map(function(t,i){return '<article class="task" data-correct="'+t.correct+'"><div class="number">'+(i+1)+'</div><div class="translation">'+escapeHtml(translated(t.translation))+'</div><div class="choices">'+t.options.map(function(option,j){return '<div class="choice-row"><label class="choice"><input type="radio" name="task'+i+'" value="'+j+'"><span class="choice-text" lang="he" dir="rtl" data-he="'+escapeHtml(option)+'">'+escapeHtml(option)+'</span></label><button class="choice-speak" type="button" data-he="'+escapeHtml(option)+'" aria-label="'+escapeHtml(ui().listen)+'">🔊</button></div>';}).join("")+'</div></article>';}).join("");
+    $("exercise").classList.add("open");
+    $("aiConclusion").classList.remove("open");
+    $("conclusionInput").textContent="";
+    lastConclusionRaw="";
+    awaitingConclusion=false;
+    $("status").textContent=ui().ready;
+    $("aiCreate").textContent="AI✓";$("aiCreate").setAttribute("aria-label",ui().checkAI);
+    renderTopics();updateAiLink();
+    try{localStorage.setItem("hebrewMorphQuiz",JSON.stringify(data));}catch(_e){}
+  }
+  function escapeHtml(value){return String(value||"").replace(/[&<>\"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch];});}
+  function renderTopics(){$("topics").innerHTML=Object.keys(categoryNames.ru).map(function(key){return '<button class="topic'+(key===currentCategory?' active':'')+'" type="button" data-category="'+key+'">'+categoryName(key)+'</button>';}).join("");}
+  async function clipboard(){try{if(navigator.clipboard&&navigator.clipboard.readText)return await navigator.clipboard.readText();}catch(_e){}return "";}
+  function resetExercise(){currentExercise=null;lastCheckedAnswer=null;lastConclusionRaw="";lastConclusionLanguage="";awaitingConclusion=false;$("exercise").classList.remove("open");$("tasks").innerHTML="";$("aiConclusion").classList.remove("open");$("aiCreate").textContent="AI";$("aiCreate").setAttribute("aria-label",ui().createAI);}
+  function applyLanguage(next,save){
+    if(!allowed.test(next||""))return;
+    lang=next;
+    if(save!==false)try{localStorage.setItem("hebrewUnifiedLang",lang);}catch(_e){}
+    document.documentElement.lang=lang;
+    document.title=ui().header+" — "+ui().site;
+    document.querySelector('meta[name="description"]').setAttribute("content",ui().header);
+    var home=document.querySelector(".header-home");home.title=ui().home;home.setAttribute("aria-label",ui().home);
+    $("menuBtn").setAttribute("aria-label",ui().drawer);
+    document.querySelector(".form").setAttribute("aria-label",ui().settings);
+    document.querySelector(".actions").setAttribute("aria-label",ui().actions);
+    $("addExercise").setAttribute("aria-label",ui().add);
+    $("removeExercise").setAttribute("aria-label",ui().remove);
+    $("aiConclusion").setAttribute("aria-label",ui().conclusion);
+    document.querySelectorAll(".choice-speak").forEach(function(b){b.setAttribute("aria-label",ui().listen);});
+    $("status").textContent="";
+    $("headerTitle").textContent=ui().header;
+    $("leadText").textContent=ui().lead;
+    $("difficultyLabel").textContent=ui().difficulty;
+    document.querySelectorAll(".level").forEach(function(button,index){button.textContent=ui().levels[index];});
+    $("instructions").innerHTML=ui().instructions;
+    $("drawerTitle").textContent=ui().drawer;
+    $("closeMenu").setAttribute("aria-label",ui().close);
+    $("conclusionTitle").textContent=ui().conclusion;
+    $("conclusionInput").setAttribute("data-placeholder",ui().placeholder);
+    if(currentExercise){
+      $("exerciseTitle").textContent=categoryName(currentExercise.category);
+      $("exerciseMeta").textContent=categoryName(currentExercise.category)+" · "+levelName(currentExercise.level);
+      document.querySelectorAll(".translation").forEach(function(node,index){node.textContent=translated(currentExercise.tasks[index].translation);});
+      $("aiCreate").setAttribute("aria-label",ui().checkAI);
+    }else{
+      $("aiCreate").setAttribute("aria-label",ui().createAI);
+    }
+    if(lastConclusionRaw&&$("aiConclusion").classList.contains("open"))renderConclusion(lastConclusionRaw);
+    renderTopics();updateAiLink();
+  }
+  window.applyCleanLanguage=function(next){applyLanguage(next,true);};
+  window.addEventListener("storage",function(e){if(e.key==="hebrewUnifiedLang"&&allowed.test(e.newValue||""))applyLanguage(e.newValue,false);});
+  window.addEventListener("message",function(e){var value=e.data&&(e.data.lang||e.data.language);if(allowed.test(value||""))applyLanguage(value,true);});
+  $("levels").addEventListener("click",function(e){var button=e.target.closest(".level");if(!button)return;currentLevel=button.dataset.level;document.querySelectorAll(".level").forEach(function(x){x.classList.toggle("active",x===button);});resetExercise();updateAiLink();});
+  $("menuBtn").addEventListener("click",function(){$("overlay").classList.add("open");});
+  $("closeMenu").addEventListener("click",function(){$("overlay").classList.remove("open");});
+  $("overlay").addEventListener("click",function(e){if(e.target===$("overlay"))$("overlay").classList.remove("open");});
+  $("topics").addEventListener("click",function(e){var button=e.target.closest(".topic");if(!button)return;currentCategory=button.dataset.category;resetExercise();renderTopics();updateAiLink();$("overlay").classList.remove("open");});
+  $("tasks").addEventListener("click",function(e){
+    var target=e.target.closest(".choice-speak,.choice-text");if(!target)return;
+    if(target.classList.contains("choice-speak")){e.preventDefault();e.stopPropagation();}
+    speakHebrew(target.getAttribute("data-he")||target.textContent||"");
+  });
+  function speakConclusion(e){
+    var target=e.target.closest('.hebrew-conclusion');
+    if(!target)return;
+    if(e.type==="keydown"&&e.key!=="Enter"&&e.key!==" ")return;
+    e.preventDefault();speakHebrew(target.textContent||"");
+  }
+  $("conclusionInput").addEventListener("click",speakConclusion);
+  $("conclusionInput").addEventListener("keydown",speakConclusion);
+  $("aiCreate").addEventListener("click",function(e){
+    e.preventDefault();
+    if(!currentExercise){if(!currentCategory){$("status").textContent=ui().chooseCategory;return;}window.open("https://chatgpt.com/?q="+encodeURIComponent(promptText()),"_blank","noopener");return;}
+    var task=$("tasks").querySelector(".task"),picked=task.querySelector("input:checked");
+    if(!picked){$("status").textContent=ui().chooseAnswer;return;}
+    var right=Number(task.dataset.correct),selected=Number(picked.value);
+    task.querySelectorAll(".choice").forEach(function(choice,index){choice.classList.toggle("correct",index===right);choice.classList.toggle("wrong",index===selected&&index!==right);});
+    lastCheckedAnswer=selected;
+    awaitingConclusion=true;
+    $("status").textContent=ui().copyConclusion;
+    var item=currentExercise.tasks[0],data={translation:item.translation,options:item.options,correct:item.correct,selected:selected};
+    var request=feedbackPrompt(data);
+    window.open("https://chatgpt.com/?q="+encodeURIComponent(request),"_blank","noopener");
+  });
+  $("addExercise").addEventListener("click",async function(){
+    var raw=await clipboard();if(!raw)raw=window.prompt(awaitingConclusion?ui().pasteConclusion:ui().pasteCode,"")||"";
+    if(!raw.trim())return;
+    if(awaitingConclusion){try{renderConclusion(raw);$("aiConclusion").classList.add("open");$("status").textContent=ui().inserted;awaitingConclusion=false;}catch(_e){$("status").textContent=ui().badConclusion;}return;}
+    try{var data=parseCode(raw);if(!validate(data))throw new Error(ui().badShape);render(data);}catch(e){$("status").textContent=ui().badCode+e.message;}
+  });
+  $("removeExercise").addEventListener("click",function(){resetExercise();$("status").textContent=ui().removed;try{localStorage.removeItem("hebrewMorphQuiz");}catch(_e){}});
+  var helpButton=$("helpBtn");
+  if(helpButton)helpButton.addEventListener("click",function(){
+    var help=lang==="uk"
+      ?"Натисніть ☰ → виберіть розділ морфології та складність.\n\n1. Натисніть AI — відкриється запит на одне завдання.\n2. Скопіюйте код і натисніть +.\n3. З’являться три переклади й чотири речення івритом.\n4. Виберіть одне речення.\n5. Натисніть AI✓ для висновку ШІ.\n6. Скопіюйте блок відповіді й знову натисніть основну кнопку +."
+      :(lang==="en"
+        ?"Press ☰, then choose a morphology topic and difficulty.\n\n1. Press AI to request one task.\n2. Copy the code and press +.\n3. Three translations and four Hebrew sentences will appear.\n4. Choose one sentence.\n5. Press AI✓ for the AI conclusion.\n6. Copy the response block and press the main + button again."
+        :"Нажмите ☰ → выберите морфологию и сложность.\n\n1. Нажмите AI — откроется запрос на одно задание.\n2. Скопируйте код и нажмите +.\n3. Появятся три перевода и четыре предложения на иврите.\n4. Выберите одно предложение.\n5. Нажмите AI✓ для заключения ИИ.\n6. Скопируйте блок ответа и снова нажмите основную кнопку +.");
+    alert(help);
+  });
+  applyLanguage(lang,false);resetExercise();
+})();
+</script>
+</body>
+</html>

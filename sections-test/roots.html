@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Корни иврита</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif}
+.root-app{width:min(100%,430px);margin:0 auto;padding:18px 10px 30px}
+.root-title{text-align:center;font-size:28px;font-weight:900;margin:10px 0 18px}
+.root-search{position:relative;width:min(100%,390px);margin:0 auto 14px}
+#rootInput{width:100%;height:48px;border:2px solid #000;border-radius:10px;background:#fff;padding:0 44px 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:400;text-align:center;direction:ltr;outline:none}
+#clearRoot{position:absolute;right:5px;top:5px;width:38px;height:38px;border:0;background:transparent;font-size:25px;cursor:pointer;display:none}
+.root-note{width:min(100%,390px);margin:0 auto 12px;text-align:center;font-size:16px;font-weight:700;line-height:1.35;color:#444}
+.root-display{display:none;width:min(100%,390px);margin:0 auto 12px;text-align:center}
+.root-display .label{font-size:15px;font-weight:700;color:#555}
+.root-display .he{font-family:David,"Times New Roman",serif;font-size:38px;font-weight:900;direction:rtl}
+.binyans{width:min(100%,390px);margin:0 auto}
+.binyan-card{border:1px solid #d8d8d8;border-radius:10px;background:#fff;overflow:hidden;margin:0 0 10px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.binyan-head{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;justify-content:center;gap:20px;background:#efefef;padding:8px 12px}
+.binyan-name{font-size:20px;font-weight:900;text-align:center;white-space:nowrap}
+.binyan-verb{font-family:David,"Times New Roman",serif;font-size:34px;font-weight:900;direction:rtl;text-align:center;line-height:1.05;white-space:nowrap}
+.binyan-tr{padding:5px 10px 0;text-align:center;font-size:16px;font-weight:700}
+.binyan-action{width:100%;border:0;background:#fff;padding:7px 10px 10px;cursor:pointer;color:#0b69c7;text-decoration:underline;font-size:17px;font-weight:700}
+.empty{width:min(100%,390px);margin:20px auto;text-align:center;font-size:17px;font-weight:700;color:#555}
+.ai-box{display:none;width:min(100%,390px);margin:12px auto 0;text-align:center}
+.ai-box.open{display:block}
+#rootAiLink{display:inline-block;color:#0b69c7;text-decoration:underline;font-size:18px;font-weight:700;margin:4px 0 8px}
+.code-title{font-size:15px;font-weight:700;margin:3px 0 6px;color:#555}
+.code-row{display:grid;grid-template-columns:minmax(0,1fr) 46px 46px;gap:6px;align-items:stretch}
+#rootCode{width:100%;height:54px;border:2px solid #000;border-radius:10px;padding:7px;font-size:12px;resize:none}
+.code-btn{border:2px solid #000;border-radius:10px;background:#fff;font-size:30px;cursor:pointer}
+#rootCodeStatus{min-height:20px;margin-top:5px;font-size:14px;font-weight:700}
+.hidden-lang{display:none!important}
+</style>
+
+<style id="universal-ai-layout-final">
+/* Единственный финальный layout универсального блока. */
+#verbSearchWrap,.verb-search,.root-search{
+  position:relative!important;
+  display:block!important;
+  width:min(100%,390px)!important;
+  max-width:390px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+#verbSearch,#rootInput{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  height:48px!important;
+  min-height:48px!important;
+  box-sizing:border-box!important;
+}
+#clearVerbSearch,#clearRoot{
+  position:absolute!important;
+  right:5px!important;
+  top:3px!important;
+}
+#alwaysAiCodeCell,#rootAiBox{
+  width:min(100%,390px)!important;
+  max-width:390px!important;
+  margin:10px auto 12px!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+#alwaysAiCodeWrap,#rootDirectCodeWrap{
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  margin:0 0 10px!important;
+}
+#alwaysAiCodeInput,#rootCode{
+  display:block!important;
+  width:100%!important;
+  height:72px!important;
+  min-height:72px!important;
+  max-height:72px!important;
+  resize:none!important;
+  box-sizing:border-box!important;
+}
+#alwaysAiCodeActions,#rootCodeActions{
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px!important;
+  width:100%!important;
+  grid-template-columns:none!important;
+  white-space:nowrap!important;
+}
+#alwaysAiCodeAI,#alwaysAiCodeAdd,#alwaysAiCodeRemove,
+#rootCodeAI,#rootCodeAdd,#rootCodeRemove{
+  position:static!important;
+  float:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 58px!important;
+  width:58px!important;
+  min-width:58px!important;
+  max-width:58px!important;
+  height:58px!important;
+  min-height:58px!important;
+  max-height:58px!important;
+  margin:0!important;
+  padding:0!important;
+  border:2px solid #111!important;
+  border-radius:13px!important;
+  background:#fff!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:370px){
+  #alwaysAiCodeAI,#alwaysAiCodeAdd,#alwaysAiCodeRemove,
+  #rootCodeAI,#rootCodeAdd,#rootCodeRemove{
+    flex-basis:56px!important;
+    width:56px!important;
+    min-width:56px!important;
+    max-width:56px!important;
+    height:56px!important;
+    min-height:56px!important;
+    max-height:56px!important;
+  }
+}
+</style>
+
+
+<style id="ai-links-hard-active">
+#rootCodeAdd,#rootCodeRemove{pointer-events:auto!important;opacity:1!important;cursor:pointer!important;text-decoration:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;}
+</style>
+
+<style id="remove-all-inner-headers">
+.mobile-header{display:none!important;}
+</style>
+
+</head>
+<body>
+<div class="root-app" style="width:min(100%,430px)!important;margin:0 auto!important;padding:10px 10px 30px!important;">
+<div class="root-search">
+<input id="rootInput" style="height:48px!important;min-height:48px!important;" type="text" autocomplete="off" placeholder="🔍 Введите корень" aria-label="Введите корень">
+</div>
+<div class="ai-box" id="rootAiBox" style="display:block!important;width:min(100%,390px)!important;margin:8px auto 0!important;text-align:center!important;">
+  <input id="rootCode" type="hidden" value="">
+  <div id="rootCodeActions" style="display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:center!important;gap:10px!important;width:100%!important;white-space:nowrap!important;">
+    <a id="rootCodeAI" href="#" target="_blank" rel="noopener noreferrer">AI</a>
+    <a class="code-btn" id="rootCodeAdd" href="#">+</a>
+    <a class="code-btn" id="rootCodeRemove" href="#">−</a>
+  </div>
+  <div id="rootCodeStatus"></div>
+</div>
+</div>
+<div class="binyans" id="binyans"></div>
+<div class="hidden-lang"><button data-lang="ru">RU</button><button data-lang="uk">UK</button><button data-lang="en">EN</button></div>
+</div>
+<script>
+(function(){
+"use strict";
+var lang="ru";
+var rootsDB={};
+var BIN_NAMES={
+paal:{ru:"Пааль",uk:"Пааль",en:"Paal"},nifal:{ru:"Нифаль",uk:"Ніфаль",en:"Nifal"},
+piel:{ru:"Пиэль",uk:"Піель",en:"Piel"},pual:{ru:"Пуаль",uk:"Пуаль",en:"Pual"},
+hifil:{ru:"Хифиль",uk:"Хіфіль",en:"Hifil"},hufal:{ru:"Хуфаль",uk:"Хуфаль",en:"Hufal"},
+hitpael:{ru:"Хитпаэль",uk:"Хітпаель",en:"Hitpael"}};
+var TXT={
+ru:{title:"Корни иврита",ph:"🔍 Корень, глагол или перевод",root:"Корень",note:"Введите корень, инфинитив, любую форму глагола на иврите или перевод. Если слово есть в базе, корень будет найден автоматически. Если нет — используйте AI.",example:"Например: כתב / לִכְתּוֹב / כתבתי / писать",action:"Открыть спряжение",verbAi:"Получить спряжение в ИИ",ai:"🔗 Получить глаголы этого корня в ИИ",code:"Вставьте JavaScript-код rootsDB из ИИ",saved:"Корень и его биньяны сохранены в базе и будут открываться без ИИ.",bad:"Не удалось распознать код rootsDB.",removed:"Добавленный корень удалён из локальной базы."},
+uk:{title:"Корені івриту",ph:"🔍 Корінь, дієслово або переклад",root:"Корінь",note:"Введіть корінь, інфінітив, будь-яку форму дієслова івритом або переклад. Якщо слово є в базі, корінь буде знайдено автоматично. Якщо ні — використайте AI.",example:"Наприклад: כתב / לִכְתּוֹב / כתבתי / писати",action:"Відкрити дієвідмінювання",verbAi:"Отримати відмінювання в ШІ",ai:"🔗 Отримати дієслова цього кореня в ШІ",code:"Вставте JavaScript-код rootsDB із ШІ",saved:"Корінь і його біньяни збережено в базі та надалі відкриватимуться без ШІ.",bad:"Не вдалося розпізнати код rootsDB.",removed:"Доданий корінь видалено з локальної бази."},
+en:{title:"Hebrew roots",ph:"🔍 Root, verb or translation",root:"Root",note:"Enter a root, infinitive, any Hebrew conjugated form, or a translation. If the verb is already in the database, its root is found automatically. Otherwise use AI.",example:"Example: כתב / לִכְתּוֹב / כתבתי / write",action:"Open conjugation",verbAi:"Get conjugation from AI",ai:"🔗 Get verbs for this root with AI",code:"Paste JavaScript rootsDB code from AI",saved:"The root and its binyanim are saved and will open without AI next time.",bad:"Could not recognize rootsDB code.",removed:"Added root removed from the local database."}};
+function cleanRoot(v){return String(v||"").replace(/[\u0591-\u05C7]/g,"").replace(/[^\u05D0-\u05EA]/g,"");}
+var STORAGE="hebrewRootsDBCustomV2",custom={};
+function loadCustom(){try{custom=JSON.parse(localStorage.getItem(STORAGE)||"{}")||{};}catch(_e){custom={};}}
+function saveCustom(){
+  try{localStorage.setItem(STORAGE,JSON.stringify(custom||{}));}catch(_e){}
+  try{
+    if(parent && parent!==window && typeof parent.renderSavedDropdown==="function"){
+      parent.renderSavedDropdown();
+    }
+  }catch(_e){}
+}
+function getEntry(root){
+  if(rootsDB[root])return rootsDB[root];
+  var saved=custom[root];
+  return saved&&saved.__aiSaved===true?saved:null;
+}
+function stripCodeFences(s){return String(s||"").trim().replace(/^```(?:javascript|js)?\s*/i,"").replace(/\s*```$/,"").trim();}
+function makeAiPrompt(query){
+var q=String(query||"").trim();
+return [
+'Для сайта "Иврит с ИИ" определи ивритский корень для запроса: '+q+'.',
+'Запрос может быть: самим корнем, инфинитивом, любой формой спряжения на иврите или переводом на русском, украинском или английском.',
+'Сначала точно определи глагол и его трёхбуквенный ивритский корень.',
+'Затем создай запись rootsDB именно для найденного корня.',
+'Определи ТОЛЬКО реально употребляемые в современном иврите глаголы этого корня.',
+'НЕ выводи автоматически все 7 биньянов.',
+'Для каждого глагола укажи биньян, инфинитив на иврите с правильными огласовками и переводы ru, uk, en.',
+'Разрешённые id: paal, nifal, piel, pual, hifil, hufal, hitpael.',
+'Верни ТОЛЬКО один Markdown-блок ```javascript без пояснений.',
+'Формат:',
+'rootsDB["КОРЕНЬ"] = { bins: [ { id: "paal", he: "ИВРИТ_С_ОГЛАСОВКАМИ", ru: "перевод", uk: "переклад", en: "translation" } ] };'
+].join("\n");
+}
+var lastAutoAiRoot="";
+function updateAiLink(query){return "https://chatgpt.com/?q="+encodeURIComponent(makeAiPrompt(query));}
+function openAiForMissingRoot(root){
+  if(!root || root===lastAutoAiRoot)return;
+  lastAutoAiRoot=root;
+  var url=updateAiLink(root);
+  try{
+    var w=window.open(url,"_blank","noopener");
+    if(!w){
+      /* Если браузер заблокировал новое окно, ссылка остаётся видимой для одного нажатия. */
+    }
+  }catch(_e){}
+}
+
+function normSearch(v){
+  return String(v||"").replace(/[\u0591-\u05C7]/g,"").toLocaleLowerCase().replace(/\s+/g," ").trim();
+}
+function allRootKeys(){
+  var seen={},out=[];
+  Object.keys(rootsDB||{}).concat(Object.keys(custom||{})).forEach(function(k){
+    var r=cleanRoot(k);
+    if(r.length===3&&!seen[r]){seen[r]=1;out.push(r);}
+  });
+  return out;
+}
+function rootFromInfinitiveOrTranslation(q){
+  var want=normSearch(q);
+  var wantHe=String(q||"").replace(/[\u0591-\u05C7]/g,"").replace(/[^\u05D0-\u05EA]/g,"");
+  var keys=allRootKeys();
+
+  for(var i=0;i<keys.length;i++){
+    var root=keys[i],entry=getEntry(root);
+    if(!entry||!Array.isArray(entry.bins))continue;
+    for(var j=0;j<entry.bins.length;j++){
+      var b=entry.bins[j]||{};
+      var vals=[b.he,b.ru,b.uk,b.en];
+      for(var z=0;z<vals.length;z++){
+        if(normSearch(vals[z])===want)return root;
+      }
+      if(wantHe){
+        var h=String(b.he||"").replace(/[\u0591-\u05C7]/g,"").replace(/[^\u05D0-\u05EA]/g,"");
+        if(h===wantHe)return root;
+      }
+    }
+  }
+  return "";
+}
+function resolveInputToRoot(q){
+  q=String(q||"").trim();
+  if(!q)return "";
+
+  var direct=cleanRoot(q);
+  if(direct.length===3 && getEntry(direct))return direct;
+
+  var byBins=rootFromInfinitiveOrTranslation(q);
+  if(byBins)return byBins;
+
+  try{
+    if(parent&&parent!==window&&typeof parent.resolveRootQueryFromVerbDB==="function"){
+      var inf=parent.resolveRootQueryFromVerbDB(q);
+      if(inf){
+        var viaVerb=rootFromInfinitiveOrTranslation(inf);
+        if(viaVerb)return viaVerb;
+      }
+    }
+  }catch(_e){}
+
+  /* Если введены ровно 3 буквы иврита, считаем это кандидатом на корень,
+     даже если его ещё нет в rootsDB — AI сможет создать запись. */
+  if(direct.length===3)return direct;
+  return "";
+}
+
+function render(){
+var query=String(document.getElementById("rootInput").value||"").trim(),
+    root=resolveInputToRoot(query),
+    box=document.getElementById("binyans"),
+    ai=document.getElementById("rootAiBox"),
+    status=document.getElementById("rootCodeStatus");
+box.innerHTML="";
+if(status)status.textContent="";
+
+if(!root){
+  if(ai)ai.style.setProperty("display","block","important");
+  updateDirectState();
+  return;
+}
+
+var entry=getEntry(root);
+if(!entry||!Array.isArray(entry.bins)||!entry.bins.length){
+  if(ai)ai.style.setProperty("display","block","important");
+  updateDirectState();
+  return;
+}
+
+if(ai)ai.style.setProperty("display","none","important");
+
+var x=TXT[lang]||TXT.ru;
+entry.bins.forEach(function(item){
+  if(!item||!item.id||!item.he)return;
+  var card=document.createElement("div");
+  card.className="binyan-card";
+  var head=document.createElement("div");
+  head.className="binyan-head";
+  var name=document.createElement("div");
+  name.className="binyan-name";
+  name.textContent=(BIN_NAMES[item.id]&&BIN_NAMES[item.id][lang])||item.id;
+  var verb=document.createElement("div");
+  verb.className="binyan-verb";
+  verb.textContent=item.he;
+  head.appendChild(name);
+  head.appendChild(verb);
+  var tr=document.createElement("div");
+  tr.className="binyan-tr";
+  tr.textContent=item[lang]||item.ru||item.uk||item.en||"";
+  var action=document.createElement("button");
+  action.type="button";
+  action.className="binyan-action";
+  function existsNow(){
+    try{
+      return !!(parent&&typeof parent.rootVerbExistsInDB==="function"&&parent.rootVerbExistsInDB(item.he));
+    }catch(_e){return false;}
+  }
+  function refreshAction(){
+    action.textContent=existsNow()?x.action:(x.verbAi||x.action);
+  }
+  refreshAction();
+  [80,200,500,1000,2000,4000].forEach(function(ms){setTimeout(refreshAction,ms);});
+  action.addEventListener("click",function(){
+    var existsInVerbDB=existsNow();
+    try{
+      if(existsInVerbDB&&parent&&typeof parent.openRootVerbFromDB==="function"){
+        parent.openRootVerbFromDB(item.he); return;
+      }
+      if(parent&&typeof parent.openRootVerbInAI==="function"){
+        parent.openRootVerbInAI(item.he); return;
+      }
+    }catch(_e){}
+    if(!existsInVerbDB)window.open("https://chat.openai.com/?q="+encodeURIComponent(item.he),"_blank","noopener");
+  });
+  card.appendChild(head);
+  card.appendChild(tr);
+  card.appendChild(action);
+  box.appendChild(card);
+});
+}
+
+function parseRootCode(text,expectedRoot){
+  var code=stripCodeFences(text),temp={};
+  if(!code)return null;
+  try{
+    new Function("rootsDB",'"use strict";\n'+code)(temp);
+    var keys=Object.keys(temp);
+    if(keys.length!==1)return null;
+    var key=cleanRoot(keys[0]),entry=temp[keys[0]];
+    var allowed={paal:1,nifal:1,piel:1,pual:1,hifil:1,hufal:1,hitpael:1};
+    if((expectedRoot&&key!==expectedRoot)||!entry||!Array.isArray(entry.bins)||!entry.bins.length)return null;
+    if(entry.bins.some(function(b){return !b||!allowed[b.id]||!b.he;}))return null;
+    entry.__aiSaved=true;
+    return {key:key,entry:entry};
+  }catch(_e){return null;}
+}
+function updateDirectState(){
+  var input=document.getElementById("rootInput"),
+      ai=document.getElementById("rootCodeAI"),
+      add=document.getElementById("rootCodeAdd"),
+      rem=document.getElementById("rootCodeRemove"),
+      query=String(input&&input.value||"").trim(),
+      ok=!!query;
+  if(ai){
+    ai.href=ok?updateAiLink(query):"#";
+    ai.setAttribute("aria-disabled",ok?"false":"true");
+    ai.style.opacity=ok?"1":".35";
+    ai.style.pointerEvents=ok?"auto":"none";
+    ai.tabIndex=ok?0:-1;
+  }
+  if(add){
+    add.style.opacity="1";
+    add.style.pointerEvents="auto";
+    add.setAttribute("aria-disabled","false");
+  }
+  if(rem){
+    rem.style.opacity="1";
+    rem.style.pointerEvents="auto";
+    rem.setAttribute("aria-disabled","false");
+  }
+}
+var rootAiBtn=document.getElementById("rootCodeAI");
+if(rootAiBtn){
+  rootAiBtn.addEventListener("click",function(e){
+    e.preventDefault();
+    var query=String(document.getElementById("rootInput").value||"").trim();
+    if(!query)return;
+    var url=updateAiLink(query);
+    rootAiBtn.href=url;
+    try{window.open(url,"_blank","noopener");}catch(_e){}
+  });
+}
+var rootAdd=document.getElementById("rootCodeAdd");
+if(rootAdd){
+  rootAdd.addEventListener("click",function(e){
+    e.preventDefault();
+    var input=document.getElementById("rootInput"),
+        query=String(input&&input.value||"").trim(),
+        root=resolveInputToRoot(query),
+        codeBox=document.getElementById("rootCode"),
+        status=document.getElementById("rootCodeStatus");
+    if(!query)return;
+
+    function applyClipboard(text){
+      text=String(text||"").trim();
+      if(text)codeBox.value=text;
+      if(!String(codeBox.value||"").trim()){
+        if(status)status.textContent=lang==="uk"?"Буфер обміну порожній або недоступний.":lang==="en"?"Clipboard is empty or unavailable.":"Буфер обмена пуст или недоступен.";
+        return;
+      }
+      var parsed=parseRootCode(codeBox.value,root);
+      if(!parsed){
+        if(status)status.textContent=(TXT[lang]||TXT.ru).bad;
+        return;
+      }
+      custom[parsed.key]=parsed.entry;
+      saveCustom();
+      codeBox.value="";
+      if(input)input.value=parsed.key;
+      render();
+      updateDirectState();
+    }
+
+    var readers=[];
+    try{if(navigator.clipboard&&navigator.clipboard.readText)readers.push(navigator.clipboard);}catch(_e){}
+    try{if(parent&&parent!==window&&parent.navigator&&parent.navigator.clipboard&&parent.navigator.clipboard.readText)readers.push(parent.navigator.clipboard);}catch(_e){}
+    var i=0;
+    function next(){
+      if(i>=readers.length){applyClipboard(codeBox.value);return;}
+      try{
+        Promise.resolve(readers[i++].readText()).then(function(t){
+          if(String(t||"").trim())applyClipboard(t);else next();
+        }).catch(next);
+      }catch(_e){next();}
+    }
+    next();
+  });
+}
+var rootRemove=document.getElementById("rootCodeRemove");
+if(rootRemove){
+  rootRemove.addEventListener("click",function(e){
+    e.preventDefault();
+    var query=String(document.getElementById("rootInput").value||"").trim(),
+        root=resolveInputToRoot(query)||cleanRoot(query),
+        status=document.getElementById("rootCodeStatus");
+    if(custom[root]){delete custom[root];saveCustom();}
+    document.getElementById("rootCode").value="";
+    render();
+    if(status)status.textContent=(TXT[lang]||TXT.ru).removed;
+  });
+}
+function applyLanguage(l){if(/^(ru|uk|en)$/.test(l))lang=l;var x=TXT[lang]||TXT.ru;document.documentElement.lang=lang;document.getElementById("rootInput").placeholder=x.ph;render();}
+window.applyCleanLanguage=applyLanguage;
+document.getElementById("rootInput").addEventListener("input",render);
+document.getElementById("rootInput").addEventListener("input",updateDirectState);
+loadCustom();applyLanguage("ru");updateDirectState();
+})();
+</script>
+</body>
+</html>

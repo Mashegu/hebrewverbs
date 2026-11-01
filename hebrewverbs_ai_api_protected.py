@@ -57,8 +57,12 @@ def _db():
     return conn
 
 
+# Increment when generation instructions change, so older cached texts are not reused.
+PROMPT_VERSION = 'hebrew-proofread-v2'
+
+
 def _cache_key(req):
-    value = json.dumps([req.section, req.topic.strip(), req.level], ensure_ascii=False)
+    value = json.dumps([PROMPT_VERSION, req.section, req.topic.strip(), req.level], ensure_ascii=False)
     return hashlib.sha256(value.encode('utf-8')).hexdigest()
 
 
@@ -154,6 +158,21 @@ def _instructions(section, level):
         f'Keys: section (exactly "{section}"), level (string), '
         'topic (object with he, ru, uk, en), '
         f'{kind} (array). {item_spec} '
+        'Before finalizing, silently proofread EVERY Hebrew field and its translations, '
+        'including topic, sentences, word entries, conjugated forms and root derivatives. '
+        'Verify standard Modern Hebrew spelling and correct niqqud for every Hebrew word, '
+        'including verb patterns, prefixes, articles, prepositions and suffixes. '
+        'Verify grammar, tense, person, gender and number agreement, syntax and natural '
+        'Modern Hebrew phrasing appropriate to the requested level. '
+        'Verify each Russian, Ukrainian and English translation against its exact Hebrew '
+        'source: preserve meaning, negation, tense, person, gender, number and nuance; '
+        'use natural, grammatically correct language in each translation. '
+        'For sentences, verify that every words-array entry actually occurs in its '
+        'sentence in the appropriate form, has accurate he/ru/uk/en equivalents, '
+        'and a correct part-of-speech label. '
+        'For forms and entries, check grammatical labels and reject fabricated or '
+        'nonstandard forms. Correct any detected error before returning the result. '
+        'Do not output proofreading notes or claims of verification. '
         'Check all required keys and the item count before responding.'
     )
 

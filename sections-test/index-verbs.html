@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Изучение спряжения глаголов иврита">
+  <title>Спряжение глаголов — Иврит</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:#17243b;background:#f5f7fb}
+    *{box-sizing:border-box}body{margin:0}a{color:inherit}button{font:inherit;cursor:pointer}
+    .wrap{max-width:1050px;margin:auto;padding:0 20px}header{background:#fff;border-bottom:1px solid #dfe5ee}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:80px;flex-wrap:wrap;padding:15px 0}
+    .brand{text-decoration:none;font-weight:750;font-size:1.2rem}.brand span{display:block;font-weight:400;color:#53647a;font-size:.9rem}
+    nav{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.btn{border:1px solid #cbd5e1;border-radius:9px;padding:10px 15px;background:white;text-decoration:none;font-weight:600}
+    .btn.primary{background:#215cc5;color:white;border-color:#215cc5}.btn:hover,.btn:focus-visible{outline:2px solid #8eb5ff;outline-offset:2px}
+    main{padding:46px 0 65px}.hero{background:white;border:1px solid #e1e7ef;border-radius:20px;padding:clamp(24px,5vw,56px);box-shadow:0 8px 30px #17243b0b}
+    h1{font-size:clamp(1.9rem,4vw,3rem);margin:0 0 14px}p{line-height:1.6;color:#46566d}.he{font-size:1.7rem;direction:rtl;unicode-bidi:isolate;margin:0 0 10px}
+    .actions{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap}.ad{margin-top:28px;min-height:160px;border:2px dashed #b8c4d5;border-radius:15px;display:grid;place-items:center;text-align:center;padding:25px;color:#627187;background:#eef2f8}
+    .ad strong{display:block;color:#3b4b61;margin-bottom:6px}footer{border-top:1px solid #dfe5ee;padding:22px 0;color:#66758b;font-size:.9rem}
+    [hidden]{display:none!important}@media(max-width:550px){.top{align-items:flex-start}nav{width:100%}.btn{flex:1;text-align:center}}
+  </style>
+</head>
+<body>
+<header><div class="wrap top">
+  <a class="brand" href="./index.html">Изучаем иврит<span>Раздел «Спряжение глаголов»</span></a>
+  <nav aria-label="Учётная запись">
+    <a class="btn" id="login" href="#">Вход</a>
+    <a class="btn" id="register" href="#">Регистрация</a>
+    <button class="btn" id="logout" type="button" hidden>Выход</button>
+  </nav>
+</div></header>
+<main class="wrap">
+  <section class="hero" aria-labelledby="page-title">
+    <p class="he" lang="he">בִּנְיָנִים וְנְטִיַּת פְּעָלִים</p>
+    <h1 id="page-title">Спряжение глаголов</h1>
+    <p>Откройте учебные материалы по спряжению глаголов иврита. Все страницы раздела будут доступны через ссылку ниже после указания пути к существующей странице раздела.</p>
+    <div class="actions"><a class="btn primary" id="verbs" href="#">Перейти к спряжению глаголов</a></div>
+  </section>
+  <aside class="ad" aria-label="Рекламный блок"><div><strong>Место для рекламы</strong><span>Здесь можно будет разместить рекламный баннер или рекламный код.</span></div></aside>
+</main>
+<footer><div class="wrap">© <span id="year"></span> Изучаем иврит</div></footer>
+<script>
+  // Укажите действительные пути из вашего репозитория перед публикацией.
+  const CONFIG = {
+    verbsUrl: '', // Например: './verbs.html' — замените на реальный путь
+    loginUrl: '', // Адрес страницы входа
+    registerUrl: '' // Адрес страницы регистрации
+  };
+  document.getElementById('year').textContent = new Date().getFullYear();
+  for (const [id, key] of [['verbs','verbsUrl'],['login','loginUrl'],['register','registerUrl']]) {
+    const element = document.getElementById(id);
+    if (CONFIG[key]) element.href = CONFIG[key];
+    else {
+      element.setAttribute('aria-disabled', 'true');
+      element.title = 'Укажите адрес в CONFIG';
+      element.addEventListener('click', event => { event.preventDefault(); alert('Ссылка пока не настроена. Укажите адрес в CONFIG файла index.html.'); });
+    }
+  }
+  // Кнопку «Выход» показывайте только после интеграции с системой авторизации.
+  // Для реального выхода потребуется вызов обработчика завершения сессии.
+</script>
+</body>
+</html>

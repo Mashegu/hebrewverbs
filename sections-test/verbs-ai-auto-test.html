@@ -12,7 +12,7 @@
 (function(){
 'use strict';
 var API='https://hebrewverbs-api.duckdns.org/api/ai/generate';
-var pending=null,busy=false; window.__analogTestVersion='20261125';
+var pending=null,busy=false;
 function el(id){return document.getElementById(id)}
 function mode(){return document.body.classList.contains('hebrew-roots-mode')?'roots':document.body.classList.contains('independent-examples-mode')?'examples':'verbs'}
 function lang(){return document.querySelector('.lang-btn.active')?.dataset.lang||'ru'}
@@ -53,7 +53,7 @@ function validate(d,section){
  return d;
 }
 async function generate(section,q,target){
- var res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({section:section,topic:q,level:'beginner',test_namespace:'analogtest20261125',...(target?{binyan:target.binyan,root:target.root}: {})})});
+ var res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({section:section,topic:q,level:'beginner',test_namespace:section==='verbs'?'analogtest20261125':'test20261124',...(target?{binyan:target.binyan,root:target.root}: {})})});
  if(!res.ok)throw Error('Сервер ответил HTTP '+res.status);
  return validate(await res.json(),section);
 }
@@ -78,7 +78,7 @@ function showExamples(rows,q){
 }
 function saveExamples(d,q){
  var rows=d.sentences.map(function(r){return {he:r.he,ru:r.ru,uk:r.uk,en:r.en}});
- var key='hebrewVerbIndependentExamplesV1AnalogTest20261125',all=JSON.parse(localStorage.getItem(key)||'{}');
+ var key='hebrewVerbIndependentExamplesV1Test20261124',all=JSON.parse(localStorage.getItem(key)||'{}');
  [q,d.topic?.he,d.topic?.ru,d.topic?.uk,d.topic?.en].filter(Boolean).forEach(function(v){all[norm(v)]=rows});
  localStorage.setItem(key,JSON.stringify(all));showExamples(rows,q);
 }
@@ -132,7 +132,7 @@ async function action(kind,target){
     await new Promise(function(resolve){requestAnimationFrame(function(){setTimeout(resolve,180)})});
     d=pending.data;
    }
-  else{note('Тест аналогов: получаем данные с сервера…');d=await generate(section,q,target);pending={section:section,q:q,data:d}}
+  else{note('Получаем данные с сервера…');d=await generate(section,q,target);pending={section:section,q:q,data:d}}
   if(kind==='ai'){
    note(section==='verbs'?'Получены 33 формы. Нажмите + для сохранения.':section==='examples'?'Примеры получены. Нажмите + для сохранения.':'Биньяны получены. Нажмите + для сохранения.');
   }else{
@@ -799,7 +799,7 @@ function all(){
  // "Спряжение глаголов" database menu. No built-in or roots-only verbs.
  var m=new Map();
  try{
-  var records=JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsAnalogTest20261125C')||'{}')||{};
+  var records=JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsTest20261124C')||'{}')||{};
   Object.values(records).forEach(function(rec){
    var inf=rec&&rec.data&&rec.data.infinitive;
    if(!inf||!inf.he)return;
@@ -813,7 +813,7 @@ function all(){
 
 function get(q){var n=norm(q);return all().find(function(r){return [r.he,r.ru,r.uk,r.en].some(function(x){return norm(x)===n})})||null}
 
-function conjugation(he){var n=String(he||'').normalize('NFC').trim();if(!n)return null;try{var records=JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsAnalogTest20261125C')||'{}');var matches=Object.values(records).filter(function(x){return x&&x.data&&x.data.infinitive&&String(x.data.infinitive.he||'').normalize('NFC').trim()===n});matches.sort(function(a,b){return Number(b.createdAt||0)-Number(a.createdAt||0)});return matches[0]||null}catch(e){return null}}
+function conjugation(he){var n=String(he||'').normalize('NFC').trim();if(!n)return null;try{var records=JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsTest20261124C')||'{}');var matches=Object.values(records).filter(function(x){return x&&x.data&&x.data.infinitive&&String(x.data.infinitive.he||'').normalize('NFC').trim()===n});matches.sort(function(a,b){return Number(b.createdAt||0)-Number(a.createdAt||0)});return matches[0]||null}catch(e){return null}}
 // Data format and persistent root records are compatible with the analogue.
 var temporaryRootsDB=Object.create(null);
 function cleanRoot(v){return String(v||'').replace(/[\u0591-\u05C7]/g,'').replace(/[^\u05D0-\u05EA]/g,'')}
@@ -1342,7 +1342,7 @@ h1,h2,h3,h4,h5,h6,
 <script id="verbs-lru-1500">
 /* Shared local table cache. Never evict before a successful write. */
 window.verbsTableCache = (function(){
-  var KEY='hebrewVerbsLocalRecordsAnalogTest20261125C', LIMIT=1500;
+  var KEY='hebrewVerbsLocalRecordsTest20261124C', LIMIT=1500;
   function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){return {};}}
   function persist(all){localStorage.setItem(KEY,JSON.stringify(all));}
   function touch(base){
@@ -1480,7 +1480,7 @@ html[lang="en"] #verbsSavedOverlay #dbTitle::after{content:"In the database:"}
  function norm(v){return String(v==null?'':v).normalize('NFKC').toLocaleLowerCase().replace(/[\u0591-\u05c7]/g,'').replace(/\s+/g,' ').trim();}
  function recordFor(value){
    var q=norm(value);if(!q)return null;
-   var all;try{all=JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsAnalogTest20261125C')||'{}');}catch(e){return null;}
+   var all;try{all=JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsTest20261124C')||'{}');}catch(e){return null;}
    for(var key in all){
      if(!Object.prototype.hasOwnProperty.call(all,key))continue;
      var rec=all[key],d=rec&&rec.data,inf=d&&d.infinitive;
@@ -1540,7 +1540,7 @@ body.independent-examples-mode #alwaysAiCodeRemove{display:inline-flex!important
  function tr(k){return (dict[lang()]||dict.ru)[k];}
  function el(id){return document.getElementById(id);}
  function normalize(v){return String(v||'').normalize('NFKC').toLowerCase().replace(/[\u0591-\u05c7]/g,'').trim();}
- function records(){try{return Object.values(JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsAnalogTest20261125C')||'{}'));}catch(_){return [];}}
+ function records(){try{return Object.values(JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsTest20261124C')||'{}'));}catch(_){return [];}}
  function match(q){var n=normalize(q);if(!n)return null;return records().find(function(rec){var d=rec&&rec.data||{},inf=d.infinitive||{};var vals=[rec.base,inf.he,inf.ru,inf.uk,inf.en];['present','past','future','imperative'].forEach(function(k){(d[k]||[]).forEach(function(r){vals.push(r.he,r.ru,r.uk,r.en);});});return vals.some(function(v){return normalize(v)===n;});})||null;}
  function choose(q){var rec=match(q);var inf=rec&&rec.data&&rec.data.infinitive;current=inf?(inf[lang()]||inf.ru||q):q;var input=el('verbSearch');if(input)input.value=current;var panel=el('verbsPanel');if(panel)panel.classList.remove('table-open','analog-table-open','examples-open','list-open');var overlay=el('verbsSavedOverlay');if(overlay)overlay.classList.remove('open');var conj=el('conjScreen');if(conj)conj.style.display='none';displayed=false;render([]);}
  function render(rows){var root=el('independentExamplesScreen');if(!root)return;root.replaceChildren();var title=document.createElement('h2');title.className='independent-word';title.textContent=current||'';if(current)root.appendChild(title);if(!rows.length)return;rows.forEach(function(r){var card=document.createElement('div');card.className='example-card';var translation=document.createElement('div');translation.className='example-translation';translation.textContent=r[lang()]||r.ru||'';var hebrew=document.createElement('div');hebrew.className='example-hebrew';hebrew.dir='rtl';hebrew.lang='he';hebrew.textContent=r.he;card.append(translation,hebrew);root.appendChild(card);});}
@@ -1584,7 +1584,7 @@ body.independent-examples-mode #alwaysAiCodeRemove{display:inline-flex!important
   choose(q);
   var rec=match(q), data=rec&&rec.data||{}, inf=data.infinitive||{};
   var keys=[rec&&rec.base,inf.he,inf.ru,inf.uk,inf.en,q].filter(Boolean);
-  var storeKey='hebrewVerbIndependentExamplesV1AnalogTest20261125';
+  var storeKey='hebrewVerbIndependentExamplesV1Test20261124';
   function saved(){try{return JSON.parse(localStorage.getItem(storeKey)||'{}')||{};}catch(_){return {};}}
   function existing(){
     var rows=Array.isArray(data.examples)?data.examples:null,db=window.examplesDB||{},stored=saved();
@@ -3298,7 +3298,7 @@ window.firebaseConfig = {
 <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
 <script>
 (function(){
-  var FIREBASE_PATH = "hebrewVerbs/userVerbsAnalogTest20261125C";
+  var FIREBASE_PATH = "hebrewVerbs/userVerbsTest20261124C";
   var lastAddedBase = "";
 
   function getLang(){
@@ -3577,7 +3577,7 @@ window.firebaseConfig = {
 
   function loadLocalRecords(){
     try{
-      var all = JSON.parse(localStorage.getItem("hebrewVerbsLocalRecordsAnalogTest20261125C") || "{}");
+      var all = JSON.parse(localStorage.getItem("hebrewVerbsLocalRecordsTest20261124C") || "{}");
       Object.keys(all).forEach(function(k){ applyVerb(all[k]); });
     }catch(e){ console.error("Local load error:", e); }
   }
@@ -3653,7 +3653,7 @@ window.firebaseConfig = {
     var q=String(search&&search.value||'').trim();
     if(!q){ if(status)status.textContent=T('nothing'); return; }
     var all={};
-    try{ all=JSON.parse(localStorage.getItem("hebrewVerbsLocalRecordsAnalogTest20261125C")||"{}"); }catch(e){ all={}; }
+    try{ all=JSON.parse(localStorage.getItem("hebrewVerbsLocalRecordsTest20261124C")||"{}"); }catch(e){ all={}; }
     function norm(v){return String(v||'').toLowerCase().replace(/[\u0591-\u05C7]/g,'').replace(/^ל/,'').replace(/\s+/g,' ').trim();}
     var nq=norm(q), base='';
     if(q){Object.keys(all).some(function(k){
@@ -3666,7 +3666,7 @@ window.firebaseConfig = {
     if(!base){ if(status)status.textContent=T('nothing'); return; }
     var obj=window.verbsDB&&window.verbsDB[base];
     delete all[base];
-    try{localStorage.setItem("hebrewVerbsLocalRecordsAnalogTest20261125C",JSON.stringify(all));}catch(e){console.error(e);}
+    try{localStorage.setItem("hebrewVerbsLocalRecordsTest20261124C",JSON.stringify(all));}catch(e){console.error(e);}
     if(window.verbsDB&&obj){Object.keys(window.verbsDB).forEach(function(k){if(k===base||window.verbsDB[k]===obj)delete window.verbsDB[k];});}
     var card=document.querySelector('.verb[data-base="'+CSS.escape(base)+'"]'); if(card)card.remove();
     var screen=document.getElementById('conjScreen'); if(screen)screen.innerHTML='';
@@ -3853,7 +3853,7 @@ window.firebaseConfig = {
 </style>
 <script id="constructor-user-only-js">
 (function(){
-  var FIREBASE_PATH = "hebrewVerbs/userVerbsAnalogTest20261125C";
+  var FIREBASE_PATH = "hebrewVerbs/userVerbsTest20261124C";
 
   function byId(id){ return document.getElementById(id); }
 
@@ -3990,7 +3990,7 @@ window.firebaseConfig = {
 
   function loadLocalUserRecords(){
     try{
-      var all=JSON.parse(localStorage.getItem("hebrewVerbsLocalRecordsAnalogTest20261125C")||"{}");
+      var all=JSON.parse(localStorage.getItem("hebrewVerbsLocalRecordsTest20261124C")||"{}");
       Object.keys(all).forEach(function(k){ applyUserRecord(all[k]); });
     }catch(e){ console.error("Local user verbs load error:",e); }
   }
@@ -4089,7 +4089,7 @@ window.firebaseConfig = {
 </style>
 <script id="infinitives-direct-fix-js">
 (function(){
-  var FIREBASE_PATH = "hebrewVerbs/userVerbsAnalogTest20261125C";
+  var FIREBASE_PATH = "hebrewVerbs/userVerbsTest20261124C";
   function safeKey(base){ return encodeURIComponent(String(base || '').trim()); }
   function getDb(){
     try{
@@ -4253,7 +4253,7 @@ body:not(.independent-examples-mode) #verbsPanel.table-open #conjScreen{display:
     var ai=document.getElementById('aiSuggestBox');
     if(ai){ai.style.display='none';ai.classList.remove('ai-visible','ai-one-button','ai-workflow');ai.classList.add('ai-hidden');}
     panel.scrollTop=0;
-    try{localStorage.setItem('lastVerbBase_m39AnalogTest20261125C',card.getAttribute('data-base')||'');}catch(e){}
+    try{localStorage.setItem('lastVerbBase_m39Test20261124C',card.getAttribute('data-base')||'');}catch(e){}
     return true;
   }
 
@@ -5518,7 +5518,7 @@ body:not(.independent-examples-mode) #verbsPanel.table-open #conjScreen{display:
 <script id="latest-user-added-verb-script">
 (function(){
   "use strict";
-  var STORE="hebrewLatestAddedVerbV1AnalogTest20261125C";
+  var STORE="hebrewLatestAddedVerbV1Test20261124C";
   var armed=null;
 
   function keyOf(el){return el&&el.getAttribute("data-base")||"";}
@@ -5602,7 +5602,7 @@ body:not(.independent-examples-mode) #verbsPanel.analog-table-open #conjScreen{d
 <script id="analog-plus-clean-controller">
 (function(){
   "use strict";
-  var STORE="hebrewVerbsLocalRecordsAnalogTest20261125C";
+  var STORE="hebrewVerbsLocalRecordsTest20261124C";
   function byId(id){return document.getElementById(id);}
   function esc(v){return String(v==null?"":v).replace(/[&<>\"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
   function lang(){
@@ -5889,7 +5889,7 @@ body:not(.independent-examples-mode) #verbsPanel.analog-table-open #conjScreen{d
       },120);
     }
   },true);
-  /* Legacy clipboard handler disabled in automatic test. */
+  window.addEventListener('click',handlePlus,true);
 })();
 </script>
 
@@ -5921,7 +5921,7 @@ else document.body.appendChild(panel);
 var body=panel.querySelector('#dbRows'),title=panel.querySelector('#dbTitle'),records=[],cursor=0,watch=null;
 function language(){var active=document.querySelector('.lang-btn.active[data-lang]');return active&&active.dataset.lang||document.documentElement.lang||'ru';}
 function clean(s){return String(s||'').replace(/[\u0591-\u05c7]/g,'').replace(/\s+/g,'').trim();}
-function getAll(){try{return JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsAnalogTest20261125C')||'{}')||{};}catch(e){return {};}}
+function getAll(){try{return JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsTest20261124C')||'{}')||{};}catch(e){return {};}}
 function items(){var lang=language(),map=new Map(),all=getAll();Object.keys(all).forEach(function(k){var rec=all[k],inf=rec&&rec.data&&rec.data.infinitive;if(!inf)return;var he=String(inf.he||k).trim(),tr=String(inf[lang]||'').trim();if(!he)return;if(!tr)tr='—';var id=he.normalize("NFC");var row={key:k,he:he,tr:tr,at:Number(rec.createdAt)||0};if(!map.has(id)||row.at>map.get(id).at)map.set(id,row);});return Array.from(map.values()).sort(function(a,b){return a.tr.localeCompare(b.tr,lang,{sensitivity:'base'})||a.he.localeCompare(b.he,'he');});}
 var previousTableState=null;
 function close(){
@@ -5973,7 +5973,7 @@ function openRecord(item){
    alert(({ru:'Не удалось открыть сохранённую таблицу: ',uk:'Не вдалося відкрити збережену таблицю: ',en:'Could not open saved conjugation: '})[language()]+err.message);
  }
 }
-function erase(item){var all=getAll();var deleted=all[item.key];delete all[item.key];localStorage.setItem('hebrewVerbsLocalRecordsAnalogTest20261125C',JSON.stringify(all));if(window.verbsDB){Object.keys(window.verbsDB).forEach(function(k){if(k===item.key||(deleted&&deleted.data&&window.verbsDB[k]===deleted.data))delete window.verbsDB[k];});}document.querySelectorAll('#verbsPanel .verb[data-base]').forEach(function(card){if(card.getAttribute('data-base')===item.key)card.remove();});try{if(window.firebase&&window.firebase.database){var db=window.firebase.database();var safe=String(item.key).replace(/[.#$\[\]/]/g,'_');db.ref('hebrewVerbs/userVerbsAnalogTest20261125C/'+safe).remove().catch(function(e){console.error('Firebase delete failed',e);});}}catch(e){console.error('Firebase delete unavailable',e);}render();}
+function erase(item){var all=getAll();var deleted=all[item.key];delete all[item.key];localStorage.setItem('hebrewVerbsLocalRecordsTest20261124C',JSON.stringify(all));if(window.verbsDB){Object.keys(window.verbsDB).forEach(function(k){if(k===item.key||(deleted&&deleted.data&&window.verbsDB[k]===deleted.data))delete window.verbsDB[k];});}document.querySelectorAll('#verbsPanel .verb[data-base]').forEach(function(card){if(card.getAttribute('data-base')===item.key)card.remove();});try{if(window.firebase&&window.firebase.database){var db=window.firebase.database();var safe=String(item.key).replace(/[.#$\[\]/]/g,'_');db.ref('hebrewVerbs/userVerbsTest20261124C/'+safe).remove().catch(function(e){console.error('Firebase delete failed',e);});}}catch(e){console.error('Firebase delete unavailable',e);}render();}
 function append(item,featured){var row=document.createElement('div');row.className='db-item'+(featured?' featured':'');var target=document.createElement('div');target.setAttribute('role','button');target.tabIndex=0;target.style.cursor='pointer';var tr=document.createElement('div');tr.className='db-tr';tr.textContent=item.tr;var he=document.createElement('div');he.className='db-he';he.dir='rtl';he.lang='he';he.textContent=item.he;target.append(tr,he);target.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openRecord(item);});target.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();openRecord(item);}});var del=document.createElement('button');del.className='db-delete';del.type='button';del.textContent='−';del.setAttribute('aria-label',({ru:'Удалить глагол',uk:'Видалити дієслово',en:'Delete verb'})[language()]||'Удалить глагол');del.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();erase(item);});row.append(target,del);body.appendChild(row);}
 var marker=document.createElement('div');marker.style.height='1px';
 function next(){var end=Math.min(cursor+25,records.length);while(cursor<end)append(records[cursor++],false);marker.remove();if(cursor<records.length)body.appendChild(marker);else if(watch){watch.disconnect();watch=null;}}
@@ -6013,7 +6013,7 @@ window.addEventListener('scroll',function(){if(panel.classList.contains('open')&
  function norm(v){return String(v||'').normalize('NFKC').toLocaleLowerCase().replace(/[\u0591-\u05c7]/g,'').replace(/\s+/g,' ').trim();}
  function lookup(value){
   var q=norm(value);if(!q)return null;
-  var all=window.verbsTableCache&&window.verbsTableCache.read?window.verbsTableCache.read():JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsAnalogTest20261125C')||'{}');
+  var all=window.verbsTableCache&&window.verbsTableCache.read?window.verbsTableCache.read():JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsTest20261124C')||'{}');
   for(var key of Object.keys(all)){
    var r=all[key],data=r&&r.data,inf=data&&data.infinitive;
    if(!inf)continue;
@@ -6226,7 +6226,7 @@ body:not(.independent-examples-mode):not(.hebrew-roots-mode) #verbsPanel.table-o
  function inConjugation(){return !document.body.classList.contains('independent-examples-mode')&&!document.body.classList.contains('hebrew-roots-mode');}
  function findSaved(query){
   var q=norm(query);if(!q)return null;
-  var data;try{data=JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsAnalogTest20261125C')||'{}')||{};}catch(_){return null;}
+  var data;try{data=JSON.parse(localStorage.getItem('hebrewVerbsLocalRecordsTest20261124C')||'{}')||{};}catch(_){return null;}
   var found=null;
   Object.keys(data).forEach(function(key){
    var rec=data[key],d=rec&&rec.data,inf=d&&d.infinitive;if(!inf)return;
